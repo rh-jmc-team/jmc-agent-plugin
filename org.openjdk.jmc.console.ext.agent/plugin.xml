@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   
+   <extension
+         point="org.openjdk.jmc.console.ui.consolepage">
+         <consolePage
+            helpContextID="org.openjdk.jmc.console.ext.agent.views.AgentTab"
+            hostEditorId="org.openjdk.jmc.console.ui.editor"
+            placement="/#7.0"
+            icon="icons/agent-16.png"
+            id="org.openjdk.jmc.console.ext.agent.views.AgentTab"
+            name="Agent">
+            <class class="org.openjdk.jmc.console.ext.agent.views.AgentTab">
+            </class>
+      </consolePage>
+   </extension>
+
+</plugin>
