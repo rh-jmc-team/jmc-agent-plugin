@@ -14,7 +14,9 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Text;
@@ -42,7 +44,7 @@ public class AgentTab implements IConsolePageStateHandler {
 		container.setLayout(MCLayoutFactory.createFormPageLayout());
 
 		Composite chartLabelContainer = toolkit.createComposite(container);
-		chartLabelContainer.setLayout(new GridLayout(2, false));
+		chartLabelContainer.setLayout(new GridLayout(3, false));
 		Label label = new Label(chartLabelContainer, SWT.NULL);
 		label.setText("Agent jar Path: ");
 		GridData gridData = new GridData(SWT.FILL, SWT.FILL, false, false);
@@ -51,6 +53,18 @@ public class AgentTab implements IConsolePageStateHandler {
 		Text agentJarPath = new Text(chartLabelContainer, SWT.LEFT | SWT.BORDER);
 		agentJarPath.setLayoutData(gridData);
 		agentJarPath.setText("Enter path...");
+		Button browseJarButton = new Button(chartLabelContainer, SWT.PUSH);
+		browseJarButton.setText("Browse");
+		browseJarButton.addListener(SWT.Selection, new Listener() {
+			public void handleEvent(Event e) {
+				FileDialog fd = new FileDialog(Display.getCurrent().getActiveShell());
+				fd.setFilterExtensions(new String[] {"*.jar;*.JAR"});
+				String filename = fd.open();
+				if (filename != null) {
+					agentJarPath.setText(new StringBuilder().append(fd.getFilterPath()).append("/").append(fd.getFileName()).toString());
+				}
+			}
+		});
 
 		Button button = new Button(container, SWT.PUSH);
 		button.setText("Load agent");
