@@ -75,6 +75,18 @@ public class AgentTab implements IConsolePageStateHandler {
 		Text xmlPath = new Text(chartLabelContainer, SWT.LEFT | SWT.BORDER);
 		xmlPath.setLayoutData(gridData);
 		xmlPath.setText(ENTER_PATH_MSG);
+		Button browseXmlButton = new Button(chartLabelContainer, SWT.PUSH);
+		browseXmlButton.setText("Browse");
+		browseXmlButton.addListener(SWT.Selection, new Listener() {
+			public void handleEvent(Event e) {
+				FileDialog fd = new FileDialog(Display.getCurrent().getActiveShell());
+				fd.setFilterExtensions(new String[] {"*.xml;*.XML"});
+				String filename = fd.open();
+				if (filename != null) {
+					xmlPath.setText(new StringBuilder().append(fd.getFilterPath()).append("/").append(fd.getFileName()).toString());
+				}
+			}
+		});
 
 		Button button = new Button(container, SWT.PUSH);
 		button.setText("Load agent");
