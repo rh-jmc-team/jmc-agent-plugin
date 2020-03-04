@@ -33,6 +33,7 @@ import org.openjdk.jmc.ui.misc.MCLayoutFactory;
 public class AgentTab implements IConsolePageStateHandler {
 	private static final String NO_EVENT_PROBES_XML = "no-event-probes.xml";
 	private static final String TEMP_DIR_NAME = "eventProbes";
+	private static final String ENTER_PATH_MSG = "Enter Path...";
 
 	@Inject
 	protected void createPageContent(IConsolePageContainer page, IManagedForm managedForm, IConnectionHandle handle) {
@@ -45,6 +46,7 @@ public class AgentTab implements IConsolePageStateHandler {
 
 		Composite chartLabelContainer = toolkit.createComposite(container);
 		chartLabelContainer.setLayout(new GridLayout(3, false));
+
 		Label label = new Label(chartLabelContainer, SWT.NULL);
 		label.setText("Agent jar Path: ");
 		GridData gridData = new GridData(SWT.FILL, SWT.FILL, false, false);
@@ -52,7 +54,7 @@ public class AgentTab implements IConsolePageStateHandler {
 		label.setLayoutData(gridData);
 		Text agentJarPath = new Text(chartLabelContainer, SWT.LEFT | SWT.BORDER);
 		agentJarPath.setLayoutData(gridData);
-		agentJarPath.setText("Enter path...");
+		agentJarPath.setText(ENTER_PATH_MSG);
 		Button browseJarButton = new Button(chartLabelContainer, SWT.PUSH);
 		browseJarButton.setText("Browse");
 		browseJarButton.addListener(SWT.Selection, new Listener() {
@@ -65,6 +67,26 @@ public class AgentTab implements IConsolePageStateHandler {
 				}
 			}
 		});
+		agentJarPath.setText(ENTER_PATH_MSG);
+
+		label = new Label(chartLabelContainer, SWT.NULL);
+		label.setText("XML Path: ");
+		label.setLayoutData(gridData);
+		Text xmlPath = new Text(chartLabelContainer, SWT.LEFT | SWT.BORDER);
+		xmlPath.setLayoutData(gridData);
+		xmlPath.setText(ENTER_PATH_MSG);
+		Button browseXmlButton = new Button(chartLabelContainer, SWT.PUSH);
+		browseXmlButton.setText("Browse");
+		browseXmlButton.addListener(SWT.Selection, new Listener() {
+			public void handleEvent(Event e) {
+				FileDialog fd = new FileDialog(Display.getCurrent().getActiveShell());
+				fd.setFilterExtensions(new String[] {"*.xml;*.XML"});
+				String filename = fd.open();
+				if (filename != null) {
+					xmlPath.setText(new StringBuilder().append(fd.getFilterPath()).append("/").append(fd.getFileName()).toString());
+				}
+			}
+		});
 
 		Button button = new Button(container, SWT.PUSH);
 		button.setText("Load agent");
@@ -73,18 +95,21 @@ public class AgentTab implements IConsolePageStateHandler {
 			@Override
 			public void handleEvent(Event event) {
 				String pid = handle.getServerDescriptor().getJvmInfo().getPid().toString();
-				if (loadAgent(agentJarPath.getText(), pid)) {
+				if (loadAgent(agentJarPath.getText(), xmlPath.getText(), pid)) {
 					button.setVisible(false);
 				}
 			}
 		});
 	}
 
-	private boolean loadAgent(String agentJar, String pid) {
+	private boolean loadAgent(String agentJar, String xmlPath, String pid) {
 		try {
 			VirtualMachine vm = VirtualMachine.attach(pid);
-			File tempFile = materialize(TEMP_DIR_NAME, NO_EVENT_PROBES_XML, AgentTab.class);
-			vm.loadAgent(agentJar,tempFile.getPath());
+			if (xmlPath == null || xmlPath == ENTER_PATH_MSG) {
+				File tempFile = materialize(TEMP_DIR_NAME, NO_EVENT_PROBES_XML, AgentTab.class);
+				xmlPath = tempFile.getPath();
+			}
+			vm.loadAgent(agentJar, xmlPath);
 			vm.detach();
 		} catch (AgentInitializationException e) {
 			System.err.println("ERROR: Could not access jdk.internal.misc.Unsafe! Rerun your application with '--add-opens java.base/jdk.internal.misc=ALL-UNNAMED'.");
