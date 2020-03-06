@@ -1,13 +1,42 @@
-package org.openjdk.jmc.console.ext.agent.views;
-
-import com.sun.tools.attach.AgentInitializationException;
-import com.sun.tools.attach.VirtualMachine;
+/*
+ * Copyright (c) 2020, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2020, Red Hat Inc. All rights reserved.
+ *
+ * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
+ *
+ * The contents of this file are subject to the terms of either the Universal Permissive License
+ * v 1.0 as shown at http://oss.oracle.com/licenses/upl
+ *
+ * or the following license:
+ *
+ * Redistribution and use in source and binary forms, with or without modification, are permitted
+ * provided that the following conditions are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright notice, this list of conditions
+ * and the following disclaimer.
+ *
+ * 2. Redistributions in binary form must reproduce the above copyright notice, this list of
+ * conditions and the following disclaimer in the documentation and/or other materials provided with
+ * the distribution.
+ *
+ * 3. Neither the name of the copyright holder nor the names of its contributors may be used to
+ * endorse or promote products derived from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+ * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
+ * FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR
+ * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+ * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY
+ * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+package org.openjdk.jmc.console.ext.agent.ui;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import javax.inject.Inject;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
@@ -20,31 +49,22 @@ import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Text;
-import org.eclipse.ui.IMemento;
-import org.eclipse.ui.forms.IManagedForm;
-import org.eclipse.ui.forms.widgets.FormToolkit;
-import org.eclipse.ui.forms.widgets.ScrolledForm;
 import org.openjdk.jmc.common.io.IOToolkit;
-import org.openjdk.jmc.console.ui.editor.IConsolePageContainer;
-import org.openjdk.jmc.console.ui.editor.IConsolePageStateHandler;
-import org.openjdk.jmc.rjmx.IConnectionHandle;
-import org.openjdk.jmc.ui.misc.MCLayoutFactory;
+import org.openjdk.jmc.rjmx.IServerHandle;
 
-public class AgentTab implements IConsolePageStateHandler {
-	private static final String NO_EVENT_PROBES_XML = "no-event-probes.xml";
-	private static final String TEMP_DIR_NAME = "eventProbes";
-	private static final String ENTER_PATH_MSG = "Enter Path...";
+import com.sun.tools.attach.AgentInitializationException;
+import com.sun.tools.attach.VirtualMachine;
 
-	@Inject
-	protected void createPageContent(IConsolePageContainer page, IManagedForm managedForm, IConnectionHandle handle) {
-		// Create SectionPartManager
-		ScrolledForm form = managedForm.getForm();
-		FormToolkit toolkit = managedForm.getToolkit();
+public class AgentUi extends Composite {
 
-		Composite container = form.getBody();
-		container.setLayout(MCLayoutFactory.createFormPageLayout());
+    private static final String NO_EVENT_PROBES_XML = "no-event-probes.xml";
+    private static final String TEMP_DIR_NAME = "eventProbes";
+    private static final String ENTER_PATH_MSG = "Enter Path...";
 
-		Composite chartLabelContainer = toolkit.createComposite(container);
+	public AgentUi(Composite parent, int style, IServerHandle handle) {
+		super(parent, style);
+		this.setLayout(new GridLayout());
+		Composite chartLabelContainer = new Composite(this, SWT.NO_BACKGROUND);
 		chartLabelContainer.setLayout(new GridLayout(3, false));
 
 		Label label = new Label(chartLabelContainer, SWT.NULL);
@@ -88,7 +108,7 @@ public class AgentTab implements IConsolePageStateHandler {
 			}
 		});
 
-		Button button = new Button(container, SWT.PUSH);
+		Button button = new Button(this, SWT.PUSH);
 		button.setText("Load agent");
 		button.addListener(SWT.Selection, new Listener() {
 
@@ -106,7 +126,7 @@ public class AgentTab implements IConsolePageStateHandler {
 		try {
 			VirtualMachine vm = VirtualMachine.attach(pid);
 			if (xmlPath == null || xmlPath == ENTER_PATH_MSG) {
-				File tempFile = materialize(TEMP_DIR_NAME, NO_EVENT_PROBES_XML, AgentTab.class);
+				File tempFile = materialize(TEMP_DIR_NAME, NO_EVENT_PROBES_XML, AgentUi.class);
 				xmlPath = tempFile.getPath();
 			}
 			vm.loadAgent(agentJar, xmlPath);
@@ -166,18 +186,6 @@ public class AgentTab implements IConsolePageStateHandler {
 		} finally {
 			IOToolkit.closeSilently(in);
 		}
-	}
-
-	@Override
-	public boolean saveState(IMemento state) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public void dispose() {
-		// TODO Auto-generated method stub
-
 	}
 
 }
