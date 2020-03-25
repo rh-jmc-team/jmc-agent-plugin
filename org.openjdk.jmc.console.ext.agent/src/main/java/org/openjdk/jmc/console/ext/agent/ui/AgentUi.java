@@ -33,10 +33,10 @@
  */
 package org.openjdk.jmc.console.ext.agent.ui;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import javax.management.MBeanServerConnection;
+import javax.management.remote.JMXConnector;
+import javax.management.remote.JMXConnectorFactory;
+import javax.management.remote.JMXServiceURL;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
@@ -49,7 +49,6 @@ import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Text;
-import org.openjdk.jmc.common.io.IOToolkit;
 import org.openjdk.jmc.rjmx.IServerHandle;
 
 import com.sun.tools.attach.AgentInitializationException;
@@ -57,9 +56,9 @@ import com.sun.tools.attach.VirtualMachine;
 
 public class AgentUi extends Composite {
 
-    private static final String NO_EVENT_PROBES_XML = "no-event-probes.xml";
-    private static final String TEMP_DIR_NAME = "eventProbes";
     private static final String ENTER_PATH_MSG = "Enter Path...";
+    private static final String CONNECTOR_ADDRESS = "com.sun.management.jmxremote.localConnectorAddress";
+    private VirtualMachine vm;
 
 	public AgentUi(Composite parent, int style, IServerHandle handle) {
 		super(parent, style);
@@ -124,13 +123,12 @@ public class AgentUi extends Composite {
 
 	private boolean loadAgent(String agentJar, String xmlPath, String pid) {
 		try {
-			VirtualMachine vm = VirtualMachine.attach(pid);
+			vm = VirtualMachine.attach(pid);
 			if (xmlPath == null || xmlPath.equals(ENTER_PATH_MSG)) {
 				vm.loadAgent(agentJar);
 			} else {
 				vm.loadAgent(agentJar, xmlPath);
 			}
-			vm.detach();
 		} catch (AgentInitializationException e) {
 			System.err.println("ERROR: Could not access jdk.internal.misc.Unsafe! Rerun your application with '--add-opens java.base/jdk.internal.misc=ALL-UNNAMED'.");
 			return false;
@@ -138,6 +136,24 @@ public class AgentUi extends Composite {
 		    throw new RuntimeException(e);
 		}
 		return true;
+	}
+
+	private MBeanServerConnection initMBeanServerConnection() {
+		MBeanServerConnection mbsc = null;
+		try {
+			String connectorAddress = vm.getAgentProperties().getProperty(CONNECTOR_ADDRESS);
+			if (connectorAddress == null) {
+			     vm.startLocalManagementAgent();
+			     connectorAddress = vm.getAgentProperties().getProperty(CONNECTOR_ADDRESS);
+			}
+			JMXServiceURL url = new JMXServiceURL(connectorAddress);
+			JMXConnector jmxConnector = JMXConnectorFactory.connect(url);
+
+			mbsc = jmxConnector.getMBeanServerConnection();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return mbsc;
 	}
 
 }
