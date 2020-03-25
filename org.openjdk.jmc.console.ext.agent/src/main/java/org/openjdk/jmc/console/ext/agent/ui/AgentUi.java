@@ -125,11 +125,10 @@ public class AgentUi extends Composite {
 	private boolean loadAgent(String agentJar, String xmlPath, String pid) {
 		try {
 			VirtualMachine vm = VirtualMachine.attach(pid);
-			if (xmlPath == null || xmlPath == ENTER_PATH_MSG) {
-				File tempFile = materialize(TEMP_DIR_NAME, NO_EVENT_PROBES_XML, AgentUi.class);
-				xmlPath = tempFile.getPath();
-			}
-			vm.loadAgent(agentJar, xmlPath);
+			if (xmlPath == null || xmlPath.equals(ENTER_PATH_MSG)) {
+				vm.loadAgent(agentJar);
+			} else {
+				vm.loadAgent(agentJar, xmlPath);			}
 			vm.detach();
 		} catch (AgentInitializationException e) {
 			System.err.println("ERROR: Could not access jdk.internal.misc.Unsafe! Rerun your application with '--add-opens java.base/jdk.internal.misc=ALL-UNNAMED'.");
@@ -138,54 +137,6 @@ public class AgentUi extends Composite {
 		    throw new RuntimeException(e);
 		}
 		return true;
-	}
-
-	private static File materialize(String dir, String file, Class<?> clazz) {
-		File matDir;
-		try {
-			matDir = materialize(clazz, dir, file);
-			File matFile = new File(matDir, file);
-			return matFile;
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		return null;
-	}
-
-	public static File materialize(Class<?> clazz, String directoryName, String fileName) throws IOException {
-		File directory = File.createTempFile(directoryName, ".dir");
-		materialize(clazz, fileName, directory);
-		return directory;
-	}
-
-	private static void materialize(Class<?> clazz, String fileName, File directory)
-			throws IOException {
-		if (fileName == null) {
-			throw new IOException("Must specify file name to materialize");
-		}
-		if (!directory.delete()) {
-			throw new IOException("Could not delete directory: " + directory.getAbsolutePath());
-		}
-		if (!directory.mkdirs()) {
-			throw new IOException("Could not create directory: " + directory.getAbsolutePath());
-		}
-		InputStream in = null;
-		try {
-			in = clazz.getResourceAsStream(fileName);
-			if (in != null) {
-				FileOutputStream os = null;
-				try {
-					File file = new File(directory, fileName);
-					os = new FileOutputStream(file);
-					IOToolkit.copy(in, os);
-					os.close();
-				} finally {
-					IOToolkit.closeSilently(os);
-				}
-			}
-		} finally {
-			IOToolkit.closeSilently(in);
-		}
 	}
 
 }
