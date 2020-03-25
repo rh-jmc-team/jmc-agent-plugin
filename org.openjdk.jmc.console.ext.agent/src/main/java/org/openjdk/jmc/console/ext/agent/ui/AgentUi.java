@@ -128,7 +128,8 @@ public class AgentUi extends Composite {
 			if (xmlPath == null || xmlPath.equals(ENTER_PATH_MSG)) {
 				vm.loadAgent(agentJar);
 			} else {
-				vm.loadAgent(agentJar, xmlPath);			}
+				vm.loadAgent(agentJar, xmlPath);
+			}
 			vm.detach();
 		} catch (AgentInitializationException e) {
 			System.err.println("ERROR: Could not access jdk.internal.misc.Unsafe! Rerun your application with '--add-opens java.base/jdk.internal.misc=ALL-UNNAMED'.");
