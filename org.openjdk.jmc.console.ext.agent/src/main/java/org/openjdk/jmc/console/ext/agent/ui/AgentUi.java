@@ -51,6 +51,7 @@ import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.openjdk.jmc.rjmx.IServerHandle;
 
 import com.sun.tools.attach.AgentInitializationException;
@@ -63,8 +64,9 @@ public class AgentUi extends Composite {
     private static final String CONNECTOR_ADDRESS = "com.sun.management.jmxremote.localConnectorAddress";
     private VirtualMachine vm;
     private MBeanServerConnection mbsc;
+    private EventTreeSection eventTree;
 
-	public AgentUi(Composite parent, int style, IServerHandle handle) {
+	public AgentUi(Composite parent, int style, IServerHandle handle, FormToolkit toolkit) {
 		super(parent, style);
 		this.setLayout(new GridLayout());
 		Composite chartLabelContainer = new Composite(this, SWT.NO_BACKGROUND);
@@ -121,10 +123,14 @@ public class AgentUi extends Composite {
 				vm = initVM(pid);
 				if (loadAgent(agentJarPath.getText(), xmlPath.getText())) {
 					mbsc = initMBeanServerConnection();
+					eventTree.setMBeanServerConnection(mbsc);
+					eventTree.setVisible(true);
 					button.setVisible(false);
 				}
 			}
 		});
+		eventTree = new EventTreeSection(this, toolkit);
+		eventTree.setVisible(false);
 	}
 
 	private boolean loadAgent(String agentJar, String xmlPath) {
