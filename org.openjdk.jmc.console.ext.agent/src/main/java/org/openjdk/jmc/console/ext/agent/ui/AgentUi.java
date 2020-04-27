@@ -63,7 +63,7 @@ public class AgentUi extends Composite {
     private static final String ENTER_PATH_MSG = "Enter Path...";
     private static final String CONNECTOR_ADDRESS = "com.sun.management.jmxremote.localConnectorAddress";
     private VirtualMachine vm;
-    private MBeanServerConnection mbsc;
+    private AgentJMXHelper agentJMXHelper;
     private EventTreeSection eventTree;
 
 	public AgentUi(Composite parent, int style, IServerHandle handle, FormToolkit toolkit) {
@@ -122,8 +122,9 @@ public class AgentUi extends Composite {
 				String pid = handle.getServerDescriptor().getJvmInfo().getPid().toString();
 				vm = initVM(pid);
 				if (loadAgent(agentJarPath.getText(), xmlPath.getText())) {
-					mbsc = initMBeanServerConnection();
-					eventTree.setMBeanServerConnection(mbsc);
+					MBeanServerConnection mbsc = initMBeanServerConnection();
+					agentJMXHelper = new AgentJMXHelper(mbsc);
+					eventTree.setAgentJMXHelper(agentJMXHelper);
 					eventTree.setVisible(true);
 					button.setVisible(false);
 				}
