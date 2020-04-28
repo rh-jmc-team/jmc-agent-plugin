@@ -34,6 +34,8 @@
 package org.openjdk.jmc.console.ext.agent.ui;
 
 import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.management.MBeanServerConnection;
 import javax.management.remote.JMXConnector;
@@ -63,7 +65,7 @@ public class AgentUi extends Composite {
     private static final String ENTER_PATH_MSG = "Enter Path...";
     private static final String CONNECTOR_ADDRESS = "com.sun.management.jmxremote.localConnectorAddress";
     private VirtualMachine vm;
-    private MBeanServerConnection mbsc;
+    private AgentJMXHelper agentJMXHelper;
     private EventTreeSection eventTree;
 
 	public AgentUi(Composite parent, int style, IServerHandle handle, FormToolkit toolkit) {
@@ -122,8 +124,9 @@ public class AgentUi extends Composite {
 				String pid = handle.getServerDescriptor().getJvmInfo().getPid().toString();
 				vm = initVM(pid);
 				if (loadAgent(agentJarPath.getText(), xmlPath.getText())) {
-					mbsc = initMBeanServerConnection();
-					eventTree.setMBeanServerConnection(mbsc);
+					MBeanServerConnection mbsc = initMBeanServerConnection();
+					agentJMXHelper = new AgentJMXHelper(mbsc);
+					eventTree.setAgentJMXHelper(agentJMXHelper);
 					eventTree.setVisible(true);
 					button.setVisible(false);
 				}
@@ -131,6 +134,10 @@ public class AgentUi extends Composite {
 		});
 		eventTree = new EventTreeSection(this, toolkit);
 		eventTree.setVisible(false);
+	}
+
+	public static Logger getLogger() {
+		return Logger.getLogger(AgentUi.class.getName());
 	}
 
 	private boolean loadAgent(String agentJar, String xmlPath) {
@@ -141,7 +148,8 @@ public class AgentUi extends Composite {
 				vm.loadAgent(agentJar, xmlPath);
 			}
 		} catch (AgentInitializationException e) {
-			System.err.println("ERROR: Could not access jdk.internal.misc.Unsafe! Rerun your application with '--add-opens java.base/jdk.internal.misc=ALL-UNNAMED'.");
+			getLogger().log(Level.SEVERE,
+					"Could not access jdk.internal.misc.Unsafe! Rerun your application with '--add-opens java.base/jdk.internal.misc=ALL-UNNAMED'.", e);
 			return false;
 		} catch (Exception e) {
 		    throw new RuntimeException(e);
@@ -154,8 +162,7 @@ public class AgentUi extends Composite {
 		try {
 			vm = VirtualMachine.attach(pid);
 		} catch (AttachNotSupportedException | IOException e) {
-			System.err.println("ERROR: Could not attatch process with pid " + pid + " and create a VirtualMachine");
-			e.printStackTrace();
+			getLogger().log(Level.SEVERE, "Could not attatch process with pid " + pid + " and create a VirtualMachine", e);
 		}
 		return vm;
 	}
@@ -173,7 +180,7 @@ public class AgentUi extends Composite {
 
 			mbsc = jmxConnector.getMBeanServerConnection();
 		} catch (Exception e) {
-			e.printStackTrace();
+			getLogger().log(Level.SEVERE, "Could not create a MBeanServerConnection", e);
 		}
 		return mbsc;
 	}

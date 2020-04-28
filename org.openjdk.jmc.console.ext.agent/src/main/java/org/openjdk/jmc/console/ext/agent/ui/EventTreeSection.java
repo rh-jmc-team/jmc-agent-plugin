@@ -67,13 +67,12 @@ import org.openjdk.jmc.ui.misc.TreeStructureContentProvider;
 public class EventTreeSection extends Composite {
 	private static final String EVENTS_TREE_NAME = "AgentUi.EventsTree";
 	private static final String NO_TRANSFORMED_EVENTS_MSG = "No events are currently transformed";
-	private static final String AGENT_OBJECT_NAME = "org.openjdk.jmc.jfr.agent:type=AgentController";
 	private static final String SECTION_LABEL = "Current Transfromed Events";
 	private static final String GET_EVENTS = "Get Events";
 	private static final List<String> COMPOSITE_DATA_TYPES = new ArrayList<>(Arrays.asList("returnValue", "method"));
 	private static final List<String> COMPOSITE_DATA_ARRAY_TYPES = new ArrayList<>(Arrays.asList("fields", "parameters"));
 	private final TreeViewer viewer;
-	private MBeanServerConnection mbsc;
+	private AgentJMXHelper agentJMXHelper;
 
 	public EventTreeSection(Composite parent, FormToolkit toolkit) {
 		super(parent, SWT.NONE);
@@ -92,7 +91,8 @@ public class EventTreeSection extends Composite {
 		eventsButton.addListener(SWT.Selection, new Listener() {
 			@Override
 			public void handleEvent(Event event) {
-				final ITreeNode[] nodes = buildTreeModel(doRetrieveCurrentTransforms());
+				CompositeData[] cds = agentJMXHelper.retrieveCurrentTransforms();
+				final ITreeNode[] nodes = buildTreeModel(cds);
 				viewer.getControl().setRedraw(false);
 				viewer.setInput(nodes);
 				viewer.getControl().setRedraw(true);
@@ -105,24 +105,8 @@ public class EventTreeSection extends Composite {
 				.setLayoutData(MCLayoutFactory.createFormPageLayoutData(SWT.DEFAULT, SWT.DEFAULT, true, true));
 	}
 
-	public void setMBeanServerConnection(MBeanServerConnection mbsc) {
-		this.mbsc = mbsc;
-	}
-
-	private CompositeData[] doRetrieveCurrentTransforms() {
-		if (mbsc == null) {
-			System.err.println("ERROR: no MBeanServerConnection exists, cannot invoke retrieveCurrentTransforms");
-			return null;
-		}
-		try {
-			Object result = mbsc.invoke(new ObjectName(AGENT_OBJECT_NAME), "retrieveCurrentTransforms", new Object[0], new String[0]);
-			return (CompositeData[]) result;
-		} catch (InstanceNotFoundException | MalformedObjectNameException | MBeanException | ReflectionException
-				| IOException e) {
-			System.err.println("ERROR: Could not retrieve current transforms");
-			e.printStackTrace();
-		}
-		return null;
+	public void setAgentJMXHelper(AgentJMXHelper agentJMXHelper) {
+		this.agentJMXHelper = agentJMXHelper;
 	}
 
 	private TreeViewer createViewer(Composite parent, FormToolkit formToolkit) {
