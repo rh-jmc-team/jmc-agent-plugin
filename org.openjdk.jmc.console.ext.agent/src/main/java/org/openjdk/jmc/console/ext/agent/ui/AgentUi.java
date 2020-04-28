@@ -34,6 +34,8 @@
 package org.openjdk.jmc.console.ext.agent.ui;
 
 import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.management.MBeanServerConnection;
 import javax.management.remote.JMXConnector;
@@ -134,6 +136,10 @@ public class AgentUi extends Composite {
 		eventTree.setVisible(false);
 	}
 
+	public static Logger getLogger() {
+		return Logger.getLogger(AgentUi.class.getName());
+	}
+
 	private boolean loadAgent(String agentJar, String xmlPath) {
 		try {
 			if (xmlPath == null || xmlPath.equals(ENTER_PATH_MSG)) {
@@ -142,7 +148,8 @@ public class AgentUi extends Composite {
 				vm.loadAgent(agentJar, xmlPath);
 			}
 		} catch (AgentInitializationException e) {
-			System.err.println("ERROR: Could not access jdk.internal.misc.Unsafe! Rerun your application with '--add-opens java.base/jdk.internal.misc=ALL-UNNAMED'.");
+			getLogger().log(Level.SEVERE,
+					"Could not access jdk.internal.misc.Unsafe! Rerun your application with '--add-opens java.base/jdk.internal.misc=ALL-UNNAMED'.", e);
 			return false;
 		} catch (Exception e) {
 		    throw new RuntimeException(e);
@@ -155,8 +162,7 @@ public class AgentUi extends Composite {
 		try {
 			vm = VirtualMachine.attach(pid);
 		} catch (AttachNotSupportedException | IOException e) {
-			System.err.println("ERROR: Could not attatch process with pid " + pid + " and create a VirtualMachine");
-			e.printStackTrace();
+			getLogger().log(Level.SEVERE, "Could not attatch process with pid " + pid + " and create a VirtualMachine", e);
 		}
 		return vm;
 	}
@@ -174,7 +180,7 @@ public class AgentUi extends Composite {
 
 			mbsc = jmxConnector.getMBeanServerConnection();
 		} catch (Exception e) {
-			e.printStackTrace();
+			getLogger().log(Level.SEVERE, "Could not create a MBeanServerConnection", e);
 		}
 		return mbsc;
 	}

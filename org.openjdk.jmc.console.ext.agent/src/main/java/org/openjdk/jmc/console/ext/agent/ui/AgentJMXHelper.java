@@ -34,6 +34,7 @@
 package org.openjdk.jmc.console.ext.agent.ui;
 
 import java.io.IOException;
+import java.util.logging.Level;
 
 import javax.management.InstanceNotFoundException;
 import javax.management.MBeanException;
@@ -51,38 +52,32 @@ public class AgentJMXHelper {
 	private MBeanServerConnection mbsc;
 
 	AgentJMXHelper(MBeanServerConnection mbsc) {
+		if (mbsc == null) {
+			AgentUi.getLogger().log(Level.SEVERE, "The MBeanServerConnection cannot be null");
+			return;
+		}
 		this.mbsc = mbsc;
 	}
 
 	public CompositeData[] retrieveCurrentTransforms() {
-		if (mbsc == null) {
-			System.err.println("ERROR: no MBeanServerConnection exists, cannot invoke retrieveCurrentTransforms");
-			return null;
-		}
 		try {
 			Object result = mbsc.invoke(new ObjectName(AGENT_OBJECT_NAME), RETRIEVE_CURRENT_TRANSFORMS, new Object[0], new String[0]);
 			return (CompositeData[]) result;
 		} catch (InstanceNotFoundException | MalformedObjectNameException | MBeanException | ReflectionException
 				| IOException e) {
-			System.err.println("ERROR: Could not retrieve current transforms");
-			e.printStackTrace();
+			AgentUi.getLogger().log(Level.WARNING, "Could not retrieve current transforms", e);
 		}
 		return null;
 	}
 
 	public void defineEventProbes(String xmlDescription) {
-		if (mbsc == null) {
-			System.err.println("ERROR: no MBeanServerConnection exists, cannot invoke defineEventProbes");
-			return;
-		}
 		try {
 			Object[] params = {xmlDescription};
 			String[] signature = {String.class.getName()};
 			mbsc.invoke(new ObjectName(AGENT_OBJECT_NAME), DEFINE_EVENT_PROBES, params, signature);
 		} catch (InstanceNotFoundException | MalformedObjectNameException | MBeanException | ReflectionException
 				| IOException e) {
-			System.err.println("ERROR: Could not define event probes: " + xmlDescription);
-			e.printStackTrace();
+			AgentUi.getLogger().log(Level.WARNING, "Could not define event probes: " + xmlDescription, e);
 		}
 	}
 }
