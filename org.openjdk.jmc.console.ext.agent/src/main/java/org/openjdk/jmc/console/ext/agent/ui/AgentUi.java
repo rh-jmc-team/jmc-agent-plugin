@@ -45,116 +45,41 @@ import javax.management.remote.JMXServiceURL;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Event;
-import org.eclipse.swt.widgets.FileDialog;
-import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Listener;
-import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.openjdk.jmc.rjmx.IServerHandle;
 
-import com.sun.tools.attach.AgentInitializationException;
 import com.sun.tools.attach.AttachNotSupportedException;
 import com.sun.tools.attach.VirtualMachine;
 
 public class AgentUi extends Composite {
 
-    private static final String ENTER_PATH_MSG = "Enter Path...";
     private static final String CONNECTOR_ADDRESS = "com.sun.management.jmxremote.localConnectorAddress";
+    private static final String CONNECTOR_ARGS = "sun.jvm.args";
     private VirtualMachine vm;
+    private FormToolkit toolkit;
     private AgentJMXHelper agentJMXHelper;
     private EventTreeSection eventTree;
+    private LoadAgentSection loadAgentSection;
 
 	public AgentUi(Composite parent, int style, IServerHandle handle, FormToolkit toolkit) {
 		super(parent, style);
 		this.setLayout(new GridLayout());
-		Composite chartLabelContainer = new Composite(this, SWT.NO_BACKGROUND);
-		chartLabelContainer.setLayout(new GridLayout(3, false));
+		this.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+		this.toolkit = toolkit;
 
-		Label label = new Label(chartLabelContainer, SWT.NULL);
-		label.setText("Agent jar Path: ");
-		GridData gridData = new GridData(SWT.FILL, SWT.FILL, false, false);
-		gridData.widthHint = 100;
-		label.setLayoutData(gridData);
-		Text agentJarPath = new Text(chartLabelContainer, SWT.LEFT | SWT.BORDER);
-		agentJarPath.setLayoutData(gridData);
-		agentJarPath.setText(ENTER_PATH_MSG);
-		Button browseJarButton = new Button(chartLabelContainer, SWT.PUSH);
-		browseJarButton.setText("Browse");
-		browseJarButton.addListener(SWT.Selection, new Listener() {
-			public void handleEvent(Event e) {
-				FileDialog fd = new FileDialog(Display.getCurrent().getActiveShell());
-				fd.setFilterExtensions(new String[] {"*.jar;*.JAR"});
-				String filename = fd.open();
-				if (filename != null) {
-					agentJarPath.setText(new StringBuilder().append(fd.getFilterPath()).append("/").append(fd.getFileName()).toString());
-				}
-			}
-		});
-		agentJarPath.setText(ENTER_PATH_MSG);
-
-		label = new Label(chartLabelContainer, SWT.NULL);
-		label.setText("XML Path: ");
-		label.setLayoutData(gridData);
-		Text xmlPath = new Text(chartLabelContainer, SWT.LEFT | SWT.BORDER);
-		xmlPath.setLayoutData(gridData);
-		xmlPath.setText(ENTER_PATH_MSG);
-		Button browseXmlButton = new Button(chartLabelContainer, SWT.PUSH);
-		browseXmlButton.setText("Browse");
-		browseXmlButton.addListener(SWT.Selection, new Listener() {
-			public void handleEvent(Event e) {
-				FileDialog fd = new FileDialog(Display.getCurrent().getActiveShell());
-				fd.setFilterExtensions(new String[] {"*.xml;*.XML"});
-				String filename = fd.open();
-				if (filename != null) {
-					xmlPath.setText(new StringBuilder().append(fd.getFilterPath()).append("/").append(fd.getFileName()).toString());
-				}
-			}
-		});
-
-		Button button = new Button(this, SWT.PUSH);
-		button.setText("Load agent");
-		button.addListener(SWT.Selection, new Listener() {
-
-			@Override
-			public void handleEvent(Event event) {
-				String pid = handle.getServerDescriptor().getJvmInfo().getPid().toString();
-				vm = initVM(pid);
-				if (loadAgent(agentJarPath.getText(), xmlPath.getText())) {
-					MBeanServerConnection mbsc = initMBeanServerConnection();
-					agentJMXHelper = new AgentJMXHelper(mbsc);
-					eventTree.setAgentJMXHelper(agentJMXHelper);
-					eventTree.setVisible(true);
-					button.setVisible(false);
-				}
-			}
-		});
-		eventTree = new EventTreeSection(this, toolkit);
-		eventTree.setVisible(false);
+		String pid = handle.getServerDescriptor().getJvmInfo().getPid().toString();
+		vm = initVM(pid);
+		if (isAgentLoaded()) {
+			setUpJMXRelatedComponents();
+		} else {
+			loadAgentSection = new LoadAgentSection(this, vm);
+			loadAgentSection.setLoadAgentListener(() -> loadAgentListener());
+		}
 	}
 
 	public static Logger getLogger() {
 		return Logger.getLogger(AgentUi.class.getName());
-	}
-
-	private boolean loadAgent(String agentJar, String xmlPath) {
-		try {
-			if (xmlPath == null || xmlPath.equals(ENTER_PATH_MSG)) {
-				vm.loadAgent(agentJar);
-			} else {
-				vm.loadAgent(agentJar, xmlPath);
-			}
-		} catch (AgentInitializationException e) {
-			getLogger().log(Level.SEVERE,
-					"Could not access jdk.internal.misc.Unsafe! Rerun your application with '--add-opens java.base/jdk.internal.misc=ALL-UNNAMED'.", e);
-			return false;
-		} catch (Exception e) {
-		    throw new RuntimeException(e);
-		}
-		return true;
 	}
 
 	private VirtualMachine initVM(String pid) {
@@ -165,6 +90,34 @@ public class AgentUi extends Composite {
 			getLogger().log(Level.SEVERE, "Could not attatch process with pid " + pid + " and create a VirtualMachine", e);
 		}
 		return vm;
+	}
+
+	private boolean isAgentLoaded() {
+		String connectorAddress = null;
+		try {
+			connectorAddress = vm.getAgentProperties().getProperty(CONNECTOR_ADDRESS);
+		} catch (IOException e) {
+			getLogger().log(Level.SEVERE, "Could not check if agent has been loaded dynamically", e);
+			return false;
+		}
+		if (connectorAddress == null) {
+			String vmArgs = null;
+			try {
+				vmArgs = vm.getAgentProperties().getProperty(CONNECTOR_ARGS);
+			} catch (IOException e) {
+				getLogger().log(Level.SEVERE, "Could not check if agent has been loaded statically", e);
+				return false;
+			}
+			return vmArgs.contains("-javaagent:");
+		}
+		return true;
+	}
+
+	private void setUpJMXRelatedComponents() {
+		MBeanServerConnection mbsc = initMBeanServerConnection();
+		agentJMXHelper = new AgentJMXHelper(mbsc);
+		eventTree = new EventTreeSection(this, toolkit);
+		eventTree.setAgentJMXHelper(agentJMXHelper);
 	}
 
 	private MBeanServerConnection initMBeanServerConnection() {
@@ -183,6 +136,12 @@ public class AgentUi extends Composite {
 			getLogger().log(Level.SEVERE, "Could not create a MBeanServerConnection", e);
 		}
 		return mbsc;
+	}
+
+	private void loadAgentListener() {
+		loadAgentSection.dispose();
+		setUpJMXRelatedComponents();
+		this.layout();
 	}
 
 }
