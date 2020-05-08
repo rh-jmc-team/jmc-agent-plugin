@@ -59,6 +59,16 @@ public class AgentJMXHelper {
 		this.mbsc = mbsc;
 	}
 
+	public boolean isMXBeanRegistered() {
+		try {
+			return mbsc.isRegistered(new ObjectName(AGENT_OBJECT_NAME));
+		} catch (MalformedObjectNameException | IOException e) {
+			AgentUi.getLogger().log(Level.SEVERE, "Could not check if agent MXBean is registered", e);
+
+		}
+		return false;
+	}
+
 	public CompositeData[] retrieveCurrentTransforms() {
 		try {
 			Object result = mbsc.invoke(new ObjectName(AGENT_OBJECT_NAME), RETRIEVE_CURRENT_TRANSFORMS, new Object[0], new String[0]);
