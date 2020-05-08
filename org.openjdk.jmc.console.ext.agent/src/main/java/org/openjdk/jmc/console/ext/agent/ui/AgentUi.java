@@ -70,7 +70,9 @@ public class AgentUi extends Composite {
 
 		String pid = handle.getServerDescriptor().getJvmInfo().getPid().toString();
 		vm = initVM(pid);
-		if (isAgentLoaded()) {
+		MBeanServerConnection mbsc = initMBeanServerConnection();
+		agentJMXHelper = new AgentJMXHelper(mbsc);
+		if (agentJMXHelper.isMXBeanRegistered()) {
 			setUpJMXRelatedComponents();
 		} else {
 			loadAgentSection = new LoadAgentSection(this, vm);
@@ -92,30 +94,7 @@ public class AgentUi extends Composite {
 		return vm;
 	}
 
-	private boolean isAgentLoaded() {
-		String connectorAddress = null;
-		try {
-			connectorAddress = vm.getAgentProperties().getProperty(CONNECTOR_ADDRESS);
-		} catch (IOException e) {
-			getLogger().log(Level.SEVERE, "Could not check if agent has been loaded dynamically", e);
-			return false;
-		}
-		if (connectorAddress == null) {
-			String vmArgs = null;
-			try {
-				vmArgs = vm.getAgentProperties().getProperty(CONNECTOR_ARGS);
-			} catch (IOException e) {
-				getLogger().log(Level.SEVERE, "Could not check if agent has been loaded statically", e);
-				return false;
-			}
-			return vmArgs.contains("-javaagent:");
-		}
-		return true;
-	}
-
 	private void setUpJMXRelatedComponents() {
-		MBeanServerConnection mbsc = initMBeanServerConnection();
-		agentJMXHelper = new AgentJMXHelper(mbsc);
 		eventTree = new EventTreeSection(this, toolkit);
 		eventTree.setAgentJMXHelper(agentJMXHelper);
 	}
