@@ -64,7 +64,6 @@ public class AgentJMXHelper {
 			return mbsc.isRegistered(new ObjectName(AGENT_OBJECT_NAME));
 		} catch (MalformedObjectNameException | IOException e) {
 			AgentUi.getLogger().log(Level.SEVERE, "Could not check if agent MXBean is registered", e);
-
 		}
 		return false;
 	}
