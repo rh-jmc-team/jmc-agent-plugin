@@ -33,159 +33,94 @@
  */
 package org.openjdk.jmc.console.ext.agent.ui;
 
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import javax.management.MBeanServerConnection;
+import javax.management.remote.JMXConnector;
+import javax.management.remote.JMXConnectorFactory;
+import javax.management.remote.JMXServiceURL;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Event;
-import org.eclipse.swt.widgets.FileDialog;
-import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Listener;
-import org.eclipse.swt.widgets.Text;
-import org.openjdk.jmc.common.io.IOToolkit;
+import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.openjdk.jmc.rjmx.IServerHandle;
 
-import com.sun.tools.attach.AgentInitializationException;
+import com.sun.tools.attach.AttachNotSupportedException;
 import com.sun.tools.attach.VirtualMachine;
 
 public class AgentUi extends Composite {
 
-    private static final String NO_EVENT_PROBES_XML = "no-event-probes.xml";
-    private static final String TEMP_DIR_NAME = "eventProbes";
-    private static final String ENTER_PATH_MSG = "Enter Path...";
+    private static final String CONNECTOR_ADDRESS = "com.sun.management.jmxremote.localConnectorAddress";
+    private static final String CONNECTOR_ARGS = "sun.jvm.args";
+    private VirtualMachine vm;
+    private FormToolkit toolkit;
+    private AgentJMXHelper agentJMXHelper;
+    private EventTreeSection eventTree;
+    private LoadAgentSection loadAgentSection;
 
-	public AgentUi(Composite parent, int style, IServerHandle handle) {
+	public AgentUi(Composite parent, int style, IServerHandle handle, FormToolkit toolkit) {
 		super(parent, style);
 		this.setLayout(new GridLayout());
-		Composite chartLabelContainer = new Composite(this, SWT.NO_BACKGROUND);
-		chartLabelContainer.setLayout(new GridLayout(3, false));
+		this.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+		this.toolkit = toolkit;
 
-		Label label = new Label(chartLabelContainer, SWT.NULL);
-		label.setText("Agent jar Path: ");
-		GridData gridData = new GridData(SWT.FILL, SWT.FILL, false, false);
-		gridData.widthHint = 100;
-		label.setLayoutData(gridData);
-		Text agentJarPath = new Text(chartLabelContainer, SWT.LEFT | SWT.BORDER);
-		agentJarPath.setLayoutData(gridData);
-		agentJarPath.setText(ENTER_PATH_MSG);
-		Button browseJarButton = new Button(chartLabelContainer, SWT.PUSH);
-		browseJarButton.setText("Browse");
-		browseJarButton.addListener(SWT.Selection, new Listener() {
-			public void handleEvent(Event e) {
-				FileDialog fd = new FileDialog(Display.getCurrent().getActiveShell());
-				fd.setFilterExtensions(new String[] {"*.jar;*.JAR"});
-				String filename = fd.open();
-				if (filename != null) {
-					agentJarPath.setText(new StringBuilder().append(fd.getFilterPath()).append("/").append(fd.getFileName()).toString());
-				}
-			}
-		});
-		agentJarPath.setText(ENTER_PATH_MSG);
-
-		label = new Label(chartLabelContainer, SWT.NULL);
-		label.setText("XML Path: ");
-		label.setLayoutData(gridData);
-		Text xmlPath = new Text(chartLabelContainer, SWT.LEFT | SWT.BORDER);
-		xmlPath.setLayoutData(gridData);
-		xmlPath.setText(ENTER_PATH_MSG);
-		Button browseXmlButton = new Button(chartLabelContainer, SWT.PUSH);
-		browseXmlButton.setText("Browse");
-		browseXmlButton.addListener(SWT.Selection, new Listener() {
-			public void handleEvent(Event e) {
-				FileDialog fd = new FileDialog(Display.getCurrent().getActiveShell());
-				fd.setFilterExtensions(new String[] {"*.xml;*.XML"});
-				String filename = fd.open();
-				if (filename != null) {
-					xmlPath.setText(new StringBuilder().append(fd.getFilterPath()).append("/").append(fd.getFileName()).toString());
-				}
-			}
-		});
-
-		Button button = new Button(this, SWT.PUSH);
-		button.setText("Load agent");
-		button.addListener(SWT.Selection, new Listener() {
-
-			@Override
-			public void handleEvent(Event event) {
-				String pid = handle.getServerDescriptor().getJvmInfo().getPid().toString();
-				if (loadAgent(agentJarPath.getText(), xmlPath.getText(), pid)) {
-					button.setVisible(false);
-				}
-			}
-		});
+		String pid = handle.getServerDescriptor().getJvmInfo().getPid().toString();
+		vm = initVM(pid);
+		MBeanServerConnection mbsc = initMBeanServerConnection();
+		agentJMXHelper = new AgentJMXHelper(mbsc);
+		if (agentJMXHelper.isMXBeanRegistered()) {
+			setUpJMXRelatedComponents();
+		} else {
+			loadAgentSection = new LoadAgentSection(this, vm);
+			loadAgentSection.setLoadAgentListener(() -> loadAgentListener());
+		}
 	}
 
-	private boolean loadAgent(String agentJar, String xmlPath, String pid) {
+	public static Logger getLogger() {
+		return Logger.getLogger(AgentUi.class.getName());
+	}
+
+	private VirtualMachine initVM(String pid) {
+		VirtualMachine vm = null;
 		try {
-			VirtualMachine vm = VirtualMachine.attach(pid);
-			if (xmlPath == null || xmlPath == ENTER_PATH_MSG) {
-				File tempFile = materialize(TEMP_DIR_NAME, NO_EVENT_PROBES_XML, AgentUi.class);
-				xmlPath = tempFile.getPath();
+			vm = VirtualMachine.attach(pid);
+		} catch (AttachNotSupportedException | IOException e) {
+			getLogger().log(Level.SEVERE, "Could not attatch process with pid " + pid + " and create a VirtualMachine", e);
+		}
+		return vm;
+	}
+
+	private void setUpJMXRelatedComponents() {
+		eventTree = new EventTreeSection(this, toolkit);
+		eventTree.setAgentJMXHelper(agentJMXHelper);
+	}
+
+	private MBeanServerConnection initMBeanServerConnection() {
+		MBeanServerConnection mbsc = null;
+		try {
+			String connectorAddress = vm.getAgentProperties().getProperty(CONNECTOR_ADDRESS);
+			if (connectorAddress == null) {
+			     vm.startLocalManagementAgent();
+			     connectorAddress = vm.getAgentProperties().getProperty(CONNECTOR_ADDRESS);
 			}
-			vm.loadAgent(agentJar, xmlPath);
-			vm.detach();
-		} catch (AgentInitializationException e) {
-			System.err.println("ERROR: Could not access jdk.internal.misc.Unsafe! Rerun your application with '--add-opens java.base/jdk.internal.misc=ALL-UNNAMED'.");
-			return false;
+			JMXServiceURL url = new JMXServiceURL(connectorAddress);
+			JMXConnector jmxConnector = JMXConnectorFactory.connect(url);
+
+			mbsc = jmxConnector.getMBeanServerConnection();
 		} catch (Exception e) {
-		    throw new RuntimeException(e);
+			getLogger().log(Level.SEVERE, "Could not create a MBeanServerConnection", e);
 		}
-		return true;
+		return mbsc;
 	}
 
-	private static File materialize(String dir, String file, Class<?> clazz) {
-		File matDir;
-		try {
-			matDir = materialize(clazz, dir, file);
-			File matFile = new File(matDir, file);
-			return matFile;
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		return null;
-	}
-
-	public static File materialize(Class<?> clazz, String directoryName, String fileName) throws IOException {
-		File directory = File.createTempFile(directoryName, ".dir");
-		materialize(clazz, fileName, directory);
-		return directory;
-	}
-
-	private static void materialize(Class<?> clazz, String fileName, File directory)
-			throws IOException {
-		if (fileName == null) {
-			throw new IOException("Must specify file name to materialize");
-		}
-		if (!directory.delete()) {
-			throw new IOException("Could not delete directory: " + directory.getAbsolutePath());
-		}
-		if (!directory.mkdirs()) {
-			throw new IOException("Could not create directory: " + directory.getAbsolutePath());
-		}
-		InputStream in = null;
-		try {
-			in = clazz.getResourceAsStream(fileName);
-			if (in != null) {
-				FileOutputStream os = null;
-				try {
-					File file = new File(directory, fileName);
-					os = new FileOutputStream(file);
-					IOToolkit.copy(in, os);
-					os.close();
-				} finally {
-					IOToolkit.closeSilently(os);
-				}
-			}
-		} finally {
-			IOToolkit.closeSilently(in);
-		}
+	private void loadAgentListener() {
+		loadAgentSection.dispose();
+		setUpJMXRelatedComponents();
+		this.layout();
 	}
 
 }
