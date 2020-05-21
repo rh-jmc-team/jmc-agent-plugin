@@ -5,7 +5,13 @@ Bundle-SymbolicName: org.openjdk.jmc.console.ext.agent;singleton:=true
 Bundle-Version: 8.0.0.qualifier
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.ui,
- org.openjdk.jmc.console.ui
+ org.openjdk.jmc.console.ui,
+ org.eclipse.jface.text,
+ org.eclipse.ui.editors,
+ org.eclipse.core.filesystem,
+ org.eclipse.ui.ide,
+ org.eclipse.core.resources
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
-Import-Package: javax.inject
+Import-Package: javax.inject,
+ org.eclipse.debug.core.sourcelookup.containers
 Automatic-Module-Name: org.openjdk.jmc.console.ext.agent
