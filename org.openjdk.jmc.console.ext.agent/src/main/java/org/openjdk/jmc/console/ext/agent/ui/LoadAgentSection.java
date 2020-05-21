@@ -33,9 +33,12 @@
  */
 package org.openjdk.jmc.console.ext.agent.ui;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.logging.Level;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -53,8 +56,10 @@ import com.sun.tools.attach.VirtualMachine;
 public class LoadAgentSection extends Composite {
 
     private static final String ENTER_PATH_MSG = "Enter Path...";
+    private static final String GIVE_ACCESS_ERROR_MSG = "Could not access jdk.internal.misc.Unsafe! Rerun your application with '--add-opens java.base/jdk.internal.misc=ALL-UNNAMED'.";
     private VirtualMachine vm;
 	private Runnable loadAgentListener;
+	private GenericErrorMessage error;
 
 	public LoadAgentSection(Composite parent, VirtualMachine vm) {
 		super(parent, SWT.NONE);
@@ -118,6 +123,9 @@ public class LoadAgentSection extends Composite {
 				}
 			}
 		});
+
+		error = new GenericErrorMessage(this);
+		error.setVisible(false);
 	}
 
 	public void setLoadAgentListener(Runnable listener) {
@@ -125,15 +133,22 @@ public class LoadAgentSection extends Composite {
 	}
 
 	private boolean loadAgent(String agentJar, String xmlPath) {
+		if (Files.notExists(Path.of(agentJar, ""))) {
+			error.displayError("Agent jar path '" + agentJar + "' does not exist");
+			return false;
+		}
 		try {
 			if (xmlPath == null || xmlPath.equals(ENTER_PATH_MSG)) {
 				vm.loadAgent(agentJar);
+			} else if (Files.notExists(Path.of(xmlPath, ""))) {
+				error.displayError("XML file path '" + xmlPath + "' does not exist");
+				return false;
 			} else {
 				vm.loadAgent(agentJar, xmlPath);
 			}
 		} catch (AgentInitializationException e) {
-			AgentUi.getLogger().log(Level.SEVERE,
-					"Could not access jdk.internal.misc.Unsafe! Rerun your application with '--add-opens java.base/jdk.internal.misc=ALL-UNNAMED'.", e);
+			AgentUi.getLogger().log(Level.SEVERE, GIVE_ACCESS_ERROR_MSG, e);
+			error.displayError(GIVE_ACCESS_ERROR_MSG);
 			return false;
 		} catch (Exception e) {
 		    throw new RuntimeException(e);
