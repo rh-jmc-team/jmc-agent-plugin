@@ -52,44 +52,4 @@ public class XmlDocumentProvider extends StorageDocumentProvider {
 			throw new CoreException(s);
 		}
 	}
-
-//	@Override
-//	protected IAnnotationModel createAnnotationModel(Object element) throws CoreException {
-//		// TODO Auto-generated method stub
-//		return super.createAnnotationModel(element);
-//	}
-//
-//	@Override
-//	protected void doSaveDocument(IProgressMonitor monitor, Object element, IDocument document, boolean overwrite)
-//			throws CoreException {
-//		// TODO Auto-generated method stub
-////		if (!(element instanceof IFileEditorInput)) {
-////			
-////		}
-//	}
-//
-//	@Override
-//	protected IRunnableContext getOperationRunner(IProgressMonitor monitor) {
-//		// TODO Auto-generated method stub
-//		super.getOperationRunner(monitor);
-//		return null;
-//	}
-//	
-//	@Override
-//	protected boolean setDocumentContent(IDocument document, IEditorInput editorInput, String encoding) throws CoreException {
-//		try {
-//			InputStream ins = new FileInputStream(((FileStoreEditorInput) editorInput).getURI().toString());
-//			setDocumentContent(document, ins, encoding);
-//		}catch(IOException x) {
-//			
-//		}
-//		
-//		return true;
-//	}
-//	
-//	@Override
-//	public boolean isReadOnly(Object element) {
-//		// TODO Auto-generated method stub
-//		return super.isReadOnly(element);
-//	}
 }
