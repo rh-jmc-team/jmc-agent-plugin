@@ -5,6 +5,7 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.debug.core.sourcelookup.containers.LocalFileStorage;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -27,14 +28,28 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.editors.text.ILocationProvider;
 import org.eclipse.ui.ide.IDE;
+import org.openjdk.jmc.agent.impl.DefaultTransformRegistry;
 import org.openjdk.jmc.console.ext.agent.editor.XmlEditor;
+import org.openjdk.jmc.console.ext.agent.probe.ProbeValidator;
+import org.openjdk.jmc.console.ext.agent.probe.ValidationResult;
 import org.openjdk.jmc.ui.MCPathEditorInput;
+import org.xml.sax.ErrorHandler;
+import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
 
+import javax.xml.XMLConstants;
+import javax.xml.transform.Source;
+import javax.xml.transform.stream.StreamSource;
+import javax.xml.validation.Schema;
+import javax.xml.validation.SchemaFactory;
+import javax.xml.validation.Validator;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Objects;
 import java.util.logging.Level;
 
 public class EditAgentSection extends Composite {
@@ -44,8 +59,11 @@ public class EditAgentSection extends Composite {
 	private static final String MESSAGE_EDIT = "Edit";
 	private static final String MESSAGE_VALIDATE = "Validate";
 	private static final String MESSAGE_APPLY = "Apply";
+	private static final String MESSAGE_NO_WARNINGS_OR_ERRORS_FOUND = "No errors/warnings found!";
 
 	private AgentJMXHelper agentJMXHelper = null;
+	
+	private Label messageOutput;
 
 	public EditAgentSection(Composite parent) {
 		super(parent, SWT.NONE);
@@ -99,7 +117,12 @@ public class EditAgentSection extends Composite {
 			validate.setText(MESSAGE_VALIDATE);
 			validate.setLayoutData(gridData);
 			validate.addListener(SWT.Selection, event -> {
-				// TODO Auto-generated method stub
+				try {
+					byte[] bytes = Files.readAllBytes(Paths.get(text.getText()));
+					validateProbeDefinition(new String(bytes));
+				} catch (IOException e) {
+					AgentUi.getLogger().log(Level.WARNING, "Could not validate XML config", e);
+				}
 			});
 			
 			Button apply = new Button(row, SWT.PUSH);
@@ -113,10 +136,53 @@ public class EditAgentSection extends Composite {
 					AgentUi.getLogger().log(Level.WARNING, "Could not apply XML config", e);
 				}
 			});
+
+			row = new Composite(this, SWT.NO_BACKGROUND);
+			row.setLayout(new FillLayout());
+
+			messageOutput = new Label(row, SWT.WRAP);
 		}
+		
+		parent.layout(true, true);
 	}
 
 	/*package-private*/ void setAgentJMXHelper(AgentJMXHelper agentJMXHelper) {
 		this.agentJMXHelper = agentJMXHelper;
+	}
+
+	
+
+	private void validateProbeDefinition(String configuration) {
+		ProbeValidator validator = new ProbeValidator();
+		try {
+			validator.validate(new StreamSource(new ByteArrayInputStream(configuration.getBytes())));
+		} catch (IOException e) {
+			messageOutput.setText("[ERROR]\t" + e.getMessage());
+			return;
+		} catch (SAXException e) {
+			// noop
+		}
+
+		ValidationResult result = validator.getValidationResult();
+		StringBuilder sb = new StringBuilder();
+		if (result.getfatalError() != null) {
+			sb.append("[FATAL]\t").append(result.getfatalError().getMessage()).append('\n');
+		}
+
+		for (SAXException error : result.getErrors()) {
+			sb.append("[ERROR]\t").append(error.getMessage()).append('\n');
+		}
+
+		for (SAXException warning : result.getErrors()) {
+			sb.append("[WARN]\t").append(warning.getMessage()).append('\n');
+		}
+
+		String message = sb.toString();
+		if (message.isEmpty()) {
+			message = MESSAGE_NO_WARNINGS_OR_ERRORS_FOUND;
+		}
+		
+		messageOutput.setText(message);
+		this.layout();
 	}
 }
