@@ -63,4 +63,15 @@
             icon="icons/agent-16.png"
             name="Agent Plugin"/>
     </extension>
+    
+    <extension point="org.eclipse.ui.editors">
+      	<editor
+            id="org.openjdk.jmc.console.ext.agent.editor.XmlEditor"
+            name="Agent XML Editor"
+            icon="icons/agent-16.png"
+            extensions="xml"
+            class="org.openjdk.jmc.console.ext.agent.editor.XmlEditor"
+            contributorClass="org.eclipse.ui.texteditor.BasicTextEditorActionContributor">
+      	</editor>
+   </extension>
 </plugin>

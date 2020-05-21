@@ -61,6 +61,7 @@ public class AgentUi extends Composite {
     private AgentJMXHelper agentJMXHelper;
     private EventTreeSection eventTree;
     private LoadAgentSection loadAgentSection;
+    private EditAgentSection editAgentSection;
 
 	public AgentUi(Composite parent, int style, IServerHandle handle, FormToolkit toolkit) {
 		super(parent, style);
@@ -97,6 +98,9 @@ public class AgentUi extends Composite {
 	private void setUpJMXRelatedComponents() {
 		eventTree = new EventTreeSection(this, toolkit);
 		eventTree.setAgentJMXHelper(agentJMXHelper);
+
+		editAgentSection = new EditAgentSection(this);
+		editAgentSection.setAgentJMXHelper(agentJMXHelper);
 	}
 
 	private MBeanServerConnection initMBeanServerConnection() {
