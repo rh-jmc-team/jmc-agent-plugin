@@ -51,9 +51,9 @@ public class AgentJMXHelper {
 
 	private MBeanServerConnection mbsc;
 
-	AgentJMXHelper(MBeanServerConnection mbsc) {
+	public AgentJMXHelper(MBeanServerConnection mbsc) {
 		if (mbsc == null) {
-			AgentUi.getLogger().log(Level.SEVERE, "The MBeanServerConnection cannot be null");
+			AgentPlugin.getDefault().getLogger().log(Level.SEVERE, "The MBeanServerConnection cannot be null");
 			return;
 		}
 		this.mbsc = mbsc;
@@ -63,7 +63,7 @@ public class AgentJMXHelper {
 		try {
 			return mbsc.isRegistered(new ObjectName(AGENT_OBJECT_NAME));
 		} catch (MalformedObjectNameException | IOException e) {
-			AgentUi.getLogger().log(Level.SEVERE, "Could not check if agent MXBean is registered", e);
+			AgentPlugin.getDefault().getLogger().log(Level.SEVERE, "Could not check if agent MXBean is registered", e);
 		}
 		return false;
 	}
@@ -74,7 +74,7 @@ public class AgentJMXHelper {
 			return (CompositeData[]) result;
 		} catch (InstanceNotFoundException | MalformedObjectNameException | MBeanException | ReflectionException
 				| IOException e) {
-			AgentUi.getLogger().log(Level.WARNING, "Could not retrieve current transforms", e);
+			AgentPlugin.getDefault().getLogger().log(Level.WARNING, "Could not retrieve current transforms", e);
 		}
 		return null;
 	}
@@ -86,7 +86,7 @@ public class AgentJMXHelper {
 			mbsc.invoke(new ObjectName(AGENT_OBJECT_NAME), DEFINE_EVENT_PROBES, params, signature);
 		} catch (InstanceNotFoundException | MalformedObjectNameException | MBeanException | ReflectionException
 				| IOException e) {
-			AgentUi.getLogger().log(Level.WARNING, "Could not define event probes: " + xmlDescription, e);
+			AgentPlugin.getDefault().getLogger().log(Level.WARNING, "Could not define event probes: " + xmlDescription, e);
 		}
 	}
 }

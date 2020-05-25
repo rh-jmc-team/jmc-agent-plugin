@@ -8,7 +8,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 
-class GenericErrorMessage extends Composite {
+public class GenericErrorMessage extends Composite {
 	private Label errorLabel;
 
 	public GenericErrorMessage(Composite parent) {
