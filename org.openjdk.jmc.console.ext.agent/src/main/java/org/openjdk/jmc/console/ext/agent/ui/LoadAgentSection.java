@@ -35,6 +35,7 @@ package org.openjdk.jmc.console.ext.agent.ui;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.logging.Level;
 
 import org.eclipse.swt.SWT;
@@ -133,14 +134,14 @@ public class LoadAgentSection extends Composite {
 	}
 
 	private boolean loadAgent(String agentJar, String xmlPath) {
-		if (Files.notExists(Path.of(agentJar, ""))) {
+		if (Files.notExists(Paths.get(agentJar, ""))) {
 			error.displayError("Agent jar path '" + agentJar + "' does not exist");
 			return false;
 		}
 		try {
 			if (xmlPath == null || xmlPath.equals(ENTER_PATH_MSG)) {
 				vm.loadAgent(agentJar);
-			} else if (Files.notExists(Path.of(xmlPath, ""))) {
+			} else if (Files.notExists(Paths.get(xmlPath, ""))) {
 				error.displayError("XML file path '" + xmlPath + "' does not exist");
 				return false;
 			} else {
