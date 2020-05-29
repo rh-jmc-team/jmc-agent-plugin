@@ -16,7 +16,8 @@ import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
 public class ProbeValidator extends Validator {
-	private Validator validator;
+	final private Validator validator;
+
 	private ValidationResult validationResult = new ValidationResult();
 
 	private static final String PROBE_SCHEMA_XSD = "jfrprobes_schema.xsd"; //$NON-NLS-1$

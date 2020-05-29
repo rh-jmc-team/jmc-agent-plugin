@@ -9,7 +9,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 
 public class GenericErrorMessage extends Composite {
-	private Label errorLabel;
+	final private Label errorLabel;
 
 	public GenericErrorMessage(Composite parent) {
 		super(parent, SWT.NONE);

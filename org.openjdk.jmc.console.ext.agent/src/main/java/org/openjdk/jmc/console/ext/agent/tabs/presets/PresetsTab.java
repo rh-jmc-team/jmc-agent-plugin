@@ -15,6 +15,7 @@ import org.openjdk.jmc.ui.misc.MCLayoutFactory;
 public class PresetsTab extends AgentFormPage {
 	private static final String ID = "org.openjdk.jmc.console.ext.agent.tabs.presets.PresetsTab";
 	private static final String TITLE = "Presets";
+
 	private EditAgentSection editAgentSection;
 
 	public PresetsTab(AgentEditor editor) {

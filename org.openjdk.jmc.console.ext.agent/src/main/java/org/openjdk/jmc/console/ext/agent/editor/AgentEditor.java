@@ -137,8 +137,7 @@ public class AgentEditor extends FormEditor {
 				public void run() {
 					if (pages != null) {
 						int count = pages.size();
-						for (int i = 0; i < count; i++) {
-							Object page = pages.get(i);
+						for (Object page : pages) {
 							if (page instanceof IFormPage) {
 								IMessageManager mm = ((IFormPage) page).getManagedForm().getMessageManager();
 								mm.addMessage(this, CONNECTION_LOST, null, IMessageProvider.ERROR);

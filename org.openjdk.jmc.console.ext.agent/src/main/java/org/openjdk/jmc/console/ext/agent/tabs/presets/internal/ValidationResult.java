@@ -7,7 +7,6 @@ import java.util.Objects;
 import org.xml.sax.SAXParseException;
 
 public class ValidationResult {
-
 	private List<SAXParseException> warnings = new ArrayList<>();
 	private List<SAXParseException> errors = new ArrayList<>();
 	private SAXParseException fatalError;

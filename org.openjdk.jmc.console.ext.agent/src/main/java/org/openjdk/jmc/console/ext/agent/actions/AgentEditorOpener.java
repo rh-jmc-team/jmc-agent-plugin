@@ -36,6 +36,7 @@ package org.openjdk.jmc.console.ext.agent.actions;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.openjdk.jmc.console.ext.agent.editor.AgentEditor;
 import org.openjdk.jmc.console.ext.agent.editor.AgentEditorInput;
@@ -60,7 +61,7 @@ public class AgentEditorOpener implements IActionFactory {
 					try {
 						IEditorInput ei = new AgentEditorInput(serverHandle);
 						window.getActivePage().openEditor(ei, AgentEditor.EDITOR_ID, true);
-					} catch (Exception e) {
+					} catch (PartInitException e) {
 						DialogToolkit.showException(window.getShell(), "Failed to open the JMC Agent Plugin.", e);
 					}
 				});

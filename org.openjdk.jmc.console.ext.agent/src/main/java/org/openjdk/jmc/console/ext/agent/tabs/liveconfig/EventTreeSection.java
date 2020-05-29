@@ -65,6 +65,7 @@ public class EventTreeSection extends Composite {
 	private static final List<String> COMPOSITE_DATA_TYPES = new ArrayList<>(Arrays.asList("returnValue", "method"));
 	private static final List<String> COMPOSITE_DATA_ARRAY_TYPES = new ArrayList<>(
 			Arrays.asList("fields", "parameters"));
+
 	private final TreeViewer viewer;
 	private AgentJMXHelper agentJMXHelper;
 

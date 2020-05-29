@@ -50,7 +50,7 @@ public class OverviewTab extends AgentFormPage {
 			l.setText("Agent is loaded");
 		} else {
 			loadAgentSection = new LoadAgentSection(container, vm);
-			loadAgentSection.setLoadAgentListener(() -> loadAgentListener());
+			loadAgentSection.setLoadAgentListener(this::loadAgentListener);
 		}
 	}
 

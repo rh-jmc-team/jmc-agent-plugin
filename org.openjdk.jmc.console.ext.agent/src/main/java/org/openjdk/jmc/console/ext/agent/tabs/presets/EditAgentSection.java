@@ -41,7 +41,7 @@ public class EditAgentSection extends Composite {
 
 	private AgentJMXHelper agentJMXHelper = null;
 
-	private Label messageOutput;
+	final private Label messageOutput;
 
 	public EditAgentSection(Composite parent) {
 		super(parent, SWT.NONE);

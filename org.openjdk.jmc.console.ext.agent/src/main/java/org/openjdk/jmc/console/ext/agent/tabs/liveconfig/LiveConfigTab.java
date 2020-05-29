@@ -16,6 +16,7 @@ import org.openjdk.jmc.ui.misc.MCLayoutFactory;
 public class LiveConfigTab extends AgentFormPage {
 	private static final String ID = "org.openjdk.jmc.console.ext.agent.tabs.liveconfig.LiveConfigTab";
 	private static final String TITLE = "Live Config";
+
 	private EventTreeSection eventTree;
 
 	public LiveConfigTab(AgentEditor editor) {
