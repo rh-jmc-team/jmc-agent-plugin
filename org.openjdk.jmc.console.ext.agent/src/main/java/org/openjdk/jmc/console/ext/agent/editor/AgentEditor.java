@@ -109,7 +109,7 @@ public class AgentEditor extends FormEditor {
 					@Override
 					public void run() {
 						if (!mainUi.isDisposed()) {
-							setUpInjectionables();
+							setUpInjectables();
 							doAddPages();
 							stackLayout.topControl.dispose();
 							stackLayout.topControl = mainUi;
@@ -278,7 +278,7 @@ public class AgentEditor extends FormEditor {
 		return super.getAdapter(adapter);
 	}
 
-	private void setUpInjectionables() {
+	private void setUpInjectables() {
 		IEclipseContext context = this.getSite().getService(IEclipseContext.class);
 
 		// TODO: Consider carefully which services we want to support.

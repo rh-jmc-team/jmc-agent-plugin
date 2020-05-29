@@ -142,8 +142,8 @@ public class EditAgentSection extends Composite {
 
 		ValidationResult result = validator.getValidationResult();
 		StringBuilder sb = new StringBuilder();
-		if (result.getfatalError() != null) {
-			sb.append("[FATAL]\t").append(result.getfatalError().getMessage()).append('\n');
+		if (result.getFatalError() != null) {
+			sb.append("[FATAL]\t").append(result.getFatalError().getMessage()).append('\n');
 		}
 
 		for (SAXException error : result.getErrors()) {

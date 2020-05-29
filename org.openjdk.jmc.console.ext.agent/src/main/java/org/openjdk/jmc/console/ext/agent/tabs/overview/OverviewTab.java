@@ -60,7 +60,7 @@ public class OverviewTab extends AgentFormPage {
 			vm = VirtualMachine.attach(pid);
 		} catch (AttachNotSupportedException | IOException e) {
 			AgentPlugin.getDefault().getLogger().log(Level.SEVERE,
-					"Could not attatch process with pid " + pid + " and create a VirtualMachine", e);
+					"Could not attach process with pid " + pid + " and create a VirtualMachine", e);
 		}
 		return vm;
 	}

@@ -46,7 +46,7 @@ public class ValidationResult {
 		return errors;
 	}
 
-	public SAXParseException getfatalError() {
+	public SAXParseException getFatalError() {
 		return fatalError;
 	}
 }

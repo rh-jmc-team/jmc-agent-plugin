@@ -60,7 +60,7 @@ import org.openjdk.jmc.ui.misc.TreeStructureContentProvider;
 public class EventTreeSection extends Composite {
 	private static final String EVENTS_TREE_NAME = "AgentUi.EventsTree";
 	private static final String NO_TRANSFORMED_EVENTS_MSG = "No events are currently transformed";
-	private static final String SECTION_LABEL = "Current Transfromed Events";
+	private static final String SECTION_LABEL = "Current Transformed Events";
 	private static final String GET_EVENTS = "Get Events";
 	private static final List<String> COMPOSITE_DATA_TYPES = new ArrayList<>(Arrays.asList("returnValue", "method"));
 	private static final List<String> COMPOSITE_DATA_ARRAY_TYPES = new ArrayList<>(
