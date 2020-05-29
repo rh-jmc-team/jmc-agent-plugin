@@ -31,84 +31,50 @@
  * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.openjdk.jmc.console.ext.agent.ui;
+package org.openjdk.jmc.console.ext.agent.ui.tabs.liveconfig;
 
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.layout.FillLayout;
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.ui.IEditorInput;
-import org.eclipse.ui.IEditorSite;
-import org.eclipse.ui.PartInitException;
-import org.eclipse.ui.forms.widgets.Form;
-import org.eclipse.ui.forms.widgets.FormToolkit;
-import org.openjdk.jmc.console.ui.editor.internal.ConsoleEditor;
-import org.openjdk.jmc.ui.UIPlugin;
+import org.eclipse.jface.viewers.ColumnLabelProvider;
+import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Font;
+import org.eclipse.swt.graphics.Image;
 
-@SuppressWarnings("restriction")
-public class AgentEditor extends ConsoleEditor {
+import org.openjdk.jmc.ui.common.tree.ITreeNode;
 
-	private FormToolkit formToolkit;
-	private Composite parent;
-	private AgentUi agentUi;
+public class EventTreeLabelProvider extends ColumnLabelProvider {
 
 	@Override
-	public void init(IEditorSite site, IEditorInput input) throws PartInitException {
-		super.init(site, input);
-		setPartName("JMC Agent Plugin: " + getEditorInput().getName());
+	public Image getImage(Object element) {
+		return null;
 	}
 
 	@Override
-	public void createPartControl(Composite parent) {
-		this.parent = parent;
-		formToolkit = new FormToolkit(UIPlugin.getDefault().getFormColors(Display.getCurrent()));
-		formToolkit.setBorderStyle(SWT.NULL);
-		createAgentUi(parent);
-	}
-
-	public void createAgentUi(Composite parent) {
-		Form form = formToolkit.createForm(parent);
-		form.setText("Agent");
-		form.setImage(getTitleImage());
-		formToolkit.decorateFormHeading(form);
-		Composite body = form.getBody();
-		body.setLayout(new FillLayout());
-		agentUi = new AgentUi(body, SWT.NONE, getEditorInput().getServerHandle(), formToolkit);
-	}
-	
-	@Override
-	public void doSave(IProgressMonitor monitor) {
-		// TODO Auto-generated method stub
-	}
-
-	@Override
-	public void doSaveAs() {
-		// TODO Auto-generated method stub
-	}
-
-	@Override
-	public boolean isDirty() {
-		return false;
-	}
-
-	@Override
-	public boolean isSaveAsAllowed() {
-		return false;
-	}
-
-	@Override
-	public void setFocus() {
-		if (agentUi != null) {
-			agentUi.setFocus();
-			return;
+	public String getText(Object element) {
+		Object data = ((ITreeNode) element).getUserData();
+		if (data instanceof String) {
+			return (String) data;
+		} else {
+			throw new IllegalArgumentException(
+					"This label provider only supports String types: " + data); //$NON-NLS-1$
 		}
-		parent.setFocus();
 	}
 
 	@Override
-	protected void addPages() {
-		// TODO Auto-generated method stub
+	public Font getFont(Object element) {
+		return super.getFont(element);
+	}
+
+	@Override
+	public Color getForeground(Object element) {
+		return super.getForeground(element);
+	}
+
+	@Override
+	public String getToolTipText(Object element) {
+		Object data = ((ITreeNode) element).getUserData();
+		if (data instanceof String) {
+			return (String) data;
+		}
+		return null;
 	}
 
 }

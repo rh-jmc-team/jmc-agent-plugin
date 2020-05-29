@@ -33,11 +33,14 @@
  */
 package org.openjdk.jmc.console.ext.agent.ui;
 
+import java.util.logging.Logger;
+
+import org.openjdk.jmc.console.ext.agent.ui.editor.AgentFormPage;
 import org.openjdk.jmc.ui.MCAbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
 public class AgentPlugin extends MCAbstractUIPlugin {
-	protected static final String PLUGIN_ID = "org.openjdk.jmc.console.ext.agent.ui"; //$NON-NLS-1$
+	public static final String PLUGIN_ID = "org.openjdk.jmc.console.ext.agent.ui"; //$NON-NLS-1$
 
 	private static AgentPlugin m_plugin;
 

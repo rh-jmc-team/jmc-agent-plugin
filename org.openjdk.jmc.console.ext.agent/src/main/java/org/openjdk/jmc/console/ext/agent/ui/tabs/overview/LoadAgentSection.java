@@ -31,15 +31,13 @@
  * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.openjdk.jmc.console.ext.agent.ui;
+package org.openjdk.jmc.console.ext.agent.ui.tabs.overview;
 
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.logging.Level;
 
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -50,6 +48,8 @@ import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Text;
+import org.openjdk.jmc.console.ext.agent.ui.AgentPlugin;
+import org.openjdk.jmc.console.ext.agent.ui.GenericErrorMessage;
 
 import com.sun.tools.attach.AgentInitializationException;
 import com.sun.tools.attach.VirtualMachine;
@@ -148,7 +148,7 @@ public class LoadAgentSection extends Composite {
 				vm.loadAgent(agentJar, xmlPath);
 			}
 		} catch (AgentInitializationException e) {
-			AgentUi.getLogger().log(Level.SEVERE, GIVE_ACCESS_ERROR_MSG, e);
+			AgentPlugin.getDefault().getLogger().log(Level.SEVERE, GIVE_ACCESS_ERROR_MSG, e);
 			error.displayError(GIVE_ACCESS_ERROR_MSG);
 			return false;
 		} catch (Exception e) {

@@ -1,9 +1,5 @@
-package org.openjdk.jmc.console.ext.agent.ui;
+package org.openjdk.jmc.console.ext.agent.ui.tabs.presets;
 
-import org.eclipse.core.resources.IStorage;
-import org.eclipse.core.runtime.IPath;
-import org.eclipse.debug.core.sourcelookup.containers.LocalFileStorage;
-import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
@@ -11,45 +7,27 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 
-import com.sun.tools.attach.VirtualMachine;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IEditorInput;
-import org.eclipse.ui.IEditorRegistry;
-import org.eclipse.ui.IFileEditorInput;
-import org.eclipse.ui.IPathEditorInput;
-import org.eclipse.ui.IPersistableElement;
-import org.eclipse.ui.IStorageEditorInput;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.editors.text.ILocationProvider;
-import org.eclipse.ui.ide.IDE;
-import org.openjdk.jmc.agent.impl.DefaultTransformRegistry;
 import org.openjdk.jmc.console.ext.agent.editor.XmlEditor;
 import org.openjdk.jmc.console.ext.agent.probe.ProbeValidator;
 import org.openjdk.jmc.console.ext.agent.probe.ValidationResult;
+import org.openjdk.jmc.console.ext.agent.ui.AgentJMXHelper;
+import org.openjdk.jmc.console.ext.agent.ui.AgentPlugin;
 import org.openjdk.jmc.ui.MCPathEditorInput;
-import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;
-import org.xml.sax.SAXParseException;
 
-import javax.xml.XMLConstants;
-import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
-import javax.xml.validation.Schema;
-import javax.xml.validation.SchemaFactory;
-import javax.xml.validation.Validator;
 import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.Objects;
 import java.util.logging.Level;
 
 public class EditAgentSection extends Composite {
@@ -109,7 +87,7 @@ public class EditAgentSection extends Composite {
 				try {
 					PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().openEditor(input, XmlEditor.EDITOR_ID);
 				} catch (PartInitException e) {
-					AgentUi.getLogger().log(Level.WARNING, "Could not open XML editor", e);
+					AgentPlugin.getDefault().getLogger().log(Level.WARNING, "Could not open XML editor", e);
 				}
 			});
 			
@@ -121,7 +99,7 @@ public class EditAgentSection extends Composite {
 					byte[] bytes = Files.readAllBytes(Paths.get(text.getText()));
 					validateProbeDefinition(new String(bytes));
 				} catch (IOException e) {
-					AgentUi.getLogger().log(Level.WARNING, "Could not validate XML config", e);
+					AgentPlugin.getDefault().getLogger().log(Level.WARNING, "Could not validate XML config", e);
 				}
 			});
 			
@@ -133,7 +111,7 @@ public class EditAgentSection extends Composite {
 					byte[] bytes = Files.readAllBytes(Paths.get(text.getText()));
 					agentJMXHelper.defineEventProbes(new String(bytes));
 				} catch (IOException e) {
-					AgentUi.getLogger().log(Level.WARNING, "Could not apply XML config", e);
+					AgentPlugin.getDefault().getLogger().log(Level.WARNING, "Could not apply XML config", e);
 				}
 			});
 
@@ -146,11 +124,9 @@ public class EditAgentSection extends Composite {
 		parent.layout(true, true);
 	}
 
-	/*package-private*/ void setAgentJMXHelper(AgentJMXHelper agentJMXHelper) {
+	public void setAgentJMXHelper(AgentJMXHelper agentJMXHelper) {
 		this.agentJMXHelper = agentJMXHelper;
 	}
-
-	
 
 	private void validateProbeDefinition(String configuration) {
 		ProbeValidator validator = new ProbeValidator();

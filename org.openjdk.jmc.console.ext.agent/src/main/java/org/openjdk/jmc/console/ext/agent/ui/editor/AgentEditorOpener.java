@@ -31,50 +31,43 @@
  * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.openjdk.jmc.console.ext.agent.ui;
+package org.openjdk.jmc.console.ext.agent.ui.editor;
 
-import org.eclipse.jface.viewers.ColumnLabelProvider;
-import org.eclipse.swt.graphics.Color;
-import org.eclipse.swt.graphics.Font;
-import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.ui.IEditorInput;
+import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.PlatformUI;
+import org.openjdk.jmc.console.ext.agent.ui.AgentPlugin;
+import org.openjdk.jmc.rjmx.IServerHandle;
+import org.openjdk.jmc.rjmx.actionprovider.IActionFactory;
+import org.openjdk.jmc.ui.common.action.Executable;
+import org.openjdk.jmc.ui.misc.DialogToolkit;
+import org.openjdk.jmc.ui.misc.DisplayToolkit;
 
-import org.openjdk.jmc.ui.common.tree.ITreeNode;
-
-public class EventTreeLabelProvider extends ColumnLabelProvider {
-
-	@Override
-	public Image getImage(Object element) {
-		return null;
-	}
-
-	@Override
-	public String getText(Object element) {
-		Object data = ((ITreeNode) element).getUserData();
-		if (data instanceof String) {
-			return (String) data;
-		} else {
-			throw new IllegalArgumentException(
-					"This label provider only supports String types: " + data); //$NON-NLS-1$
-		}
-	}
+@SuppressWarnings("restriction")
+public class AgentEditorOpener implements IActionFactory {
 
 	@Override
-	public Font getFont(Object element) {
-		return super.getFont(element);
-	}
+	public Executable createAction(IServerHandle serverHandle) {
+		return new Executable() {
 
-	@Override
-	public Color getForeground(Object element) {
-		return super.getForeground(element);
-	}
-
-	@Override
-	public String getToolTipText(Object element) {
-		Object data = ((ITreeNode) element).getUserData();
-		if (data instanceof String) {
-			return (String) data;
-		}
-		return null;
+			@Override
+			public void execute() throws Exception {
+				DisplayToolkit.safeAsyncExec(Display.getDefault(), new Runnable () {
+					@Override
+					public void run() {
+						IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+						try {
+							IEditorInput ei = new AgentEditorInput(serverHandle);
+							window.getActivePage().openEditor(ei, AgentPlugin.PLUGIN_ID, true);
+						} catch (Exception e) {
+							DialogToolkit.showException(window.getShell(),
+									"Failed to open the JMC Agent Plugin.", e);
+						}
+					}
+				});
+			}
+		};
 	}
 
 }

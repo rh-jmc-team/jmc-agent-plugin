@@ -31,7 +31,7 @@
  * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.openjdk.jmc.console.ext.agent.ui;
+package org.openjdk.jmc.console.ext.agent.ui.tabs.liveconfig;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -51,6 +51,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.ui.forms.widgets.FormToolkit;
+import org.openjdk.jmc.console.ext.agent.ui.AgentJMXHelper;
 import org.openjdk.jmc.rjmx.ui.internal.TreeNodeBuilder;
 import org.openjdk.jmc.ui.common.tree.ITreeNode;
 import org.openjdk.jmc.ui.misc.MCLayoutFactory;
