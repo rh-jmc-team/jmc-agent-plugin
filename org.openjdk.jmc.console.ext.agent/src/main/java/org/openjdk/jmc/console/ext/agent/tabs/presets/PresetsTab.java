@@ -6,7 +6,7 @@ import javax.management.MBeanServerConnection;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.forms.IManagedForm;
 import org.eclipse.ui.forms.widgets.ScrolledForm;
-import org.openjdk.jmc.console.ext.agent.AgentJMXHelper;
+import org.openjdk.jmc.console.ext.agent.AgentJmxHelper;
 import org.openjdk.jmc.console.ext.agent.editor.AgentEditor;
 import org.openjdk.jmc.console.ext.agent.editor.AgentFormPage;
 import org.openjdk.jmc.rjmx.IConnectionHandle;
@@ -24,16 +24,13 @@ public class PresetsTab extends AgentFormPage {
 	}
 
 	@Inject
-	protected void createPageContent(IManagedForm managedForm, IConnectionHandle handle) {
+	protected void createPageContent(IManagedForm managedForm, AgentJmxHelper helper, IConnectionHandle handle) {
 		ScrolledForm form = managedForm.getForm();
 		Composite container = form.getBody();
 		container.setLayout(MCLayoutFactory.createFormPageLayout());
 
-		MBeanServerConnection mbeanServer = handle.getServiceOrDummy(MBeanServerConnection.class);
-		AgentJMXHelper agentJMXHelper = new AgentJMXHelper(mbeanServer);
-
 		editAgentSection = new EditAgentSection(container);
-		editAgentSection.setAgentJMXHelper(agentJMXHelper);
+		editAgentSection.setAgentJMXHelper(helper);
 	}
 
 }

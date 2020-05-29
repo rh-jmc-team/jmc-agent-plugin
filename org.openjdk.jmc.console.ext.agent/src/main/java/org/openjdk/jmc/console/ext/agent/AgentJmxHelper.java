@@ -33,7 +33,10 @@
  */
 package org.openjdk.jmc.console.ext.agent;
 
+import org.openjdk.jmc.rjmx.IConnectionHandle;
+
 import java.io.IOException;
+import java.util.Objects;
 import java.util.logging.Level;
 
 import javax.management.InstanceNotFoundException;
@@ -44,19 +47,29 @@ import javax.management.ObjectName;
 import javax.management.ReflectionException;
 import javax.management.openmbean.CompositeData;
 
-public class AgentJMXHelper {
+public class AgentJmxHelper {
 	private static final String AGENT_OBJECT_NAME = "org.openjdk.jmc.jfr.agent:type=AgentController";
 	private static final String DEFINE_EVENT_PROBES = "defineEventProbes";
 	private static final String RETRIEVE_CURRENT_TRANSFORMS = "retrieveCurrentTransforms";
 
-	private MBeanServerConnection mbsc;
+	final private IConnectionHandle connectionHandle;
+	final private MBeanServerConnection mbsc;
 
-	public AgentJMXHelper(MBeanServerConnection mbsc) {
-		if (mbsc == null) {
-			AgentPlugin.getDefault().getLogger().log(Level.SEVERE, "The MBeanServerConnection cannot be null");
-			return;
-		}
-		this.mbsc = mbsc;
+	public AgentJmxHelper(IConnectionHandle connectionHandle) {
+		this.connectionHandle = Objects.requireNonNull(connectionHandle);
+		mbsc = connectionHandle.getServiceOrDummy(MBeanServerConnection.class);
+	}
+
+	public IConnectionHandle getConnectionHandle() {
+		return connectionHandle;
+	}
+
+	public MBeanServerConnection getMBeanServerConnection() {
+		return mbsc;
+	}
+
+	public boolean isLocalJvm() {
+		return connectionHandle.getServerDescriptor().getJvmInfo() != null;
 	}
 
 	public boolean isMXBeanRegistered() {

@@ -24,7 +24,7 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
-import org.openjdk.jmc.console.ext.agent.AgentJMXHelper;
+import org.openjdk.jmc.console.ext.agent.AgentJmxHelper;
 import org.openjdk.jmc.console.ext.agent.AgentPlugin;
 import org.openjdk.jmc.console.ext.agent.tabs.editor.internal.XmlEditor;
 import org.openjdk.jmc.console.ext.agent.tabs.presets.internal.ProbeValidator;
@@ -43,6 +43,7 @@ public class EditAgentSection extends Composite {
 
 	private AgentJMXHelper agentJMXHelper = null;
 	final private Text messageOutput;
+
 
 	public EditAgentSection(Composite parent) {
 		super(parent, SWT.NONE);
@@ -141,7 +142,7 @@ public class EditAgentSection extends Composite {
 		parent.layout(true, true);
 	}
 
-	public void setAgentJMXHelper(AgentJMXHelper agentJMXHelper) {
+	public void setAgentJMXHelper(AgentJmxHelper agentJMXHelper) {
 		this.agentJMXHelper = agentJMXHelper;
 	}
 

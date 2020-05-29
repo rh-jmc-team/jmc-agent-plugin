@@ -51,7 +51,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.ui.forms.widgets.FormToolkit;
-import org.openjdk.jmc.console.ext.agent.AgentJMXHelper;
+import org.openjdk.jmc.console.ext.agent.AgentJmxHelper;
 import org.openjdk.jmc.rjmx.ui.internal.TreeNodeBuilder;
 import org.openjdk.jmc.ui.common.tree.ITreeNode;
 import org.openjdk.jmc.ui.misc.MCLayoutFactory;
@@ -67,7 +67,7 @@ public class EventTreeSection extends Composite {
 			Arrays.asList("fields", "parameters"));
 
 	private final TreeViewer viewer;
-	private AgentJMXHelper agentJMXHelper;
+	private AgentJmxHelper agentJMXHelper;
 
 	public EventTreeSection(Composite parent, FormToolkit toolkit) {
 		super(parent, SWT.NONE);
@@ -100,7 +100,7 @@ public class EventTreeSection extends Composite {
 				.setLayoutData(MCLayoutFactory.createFormPageLayoutData(SWT.DEFAULT, SWT.DEFAULT, true, true));
 	}
 
-	public void setAgentJMXHelper(AgentJMXHelper agentJMXHelper) {
+	public void setAgentJMXHelper(AgentJmxHelper agentJMXHelper) {
 		this.agentJMXHelper = agentJMXHelper;
 	}
 
