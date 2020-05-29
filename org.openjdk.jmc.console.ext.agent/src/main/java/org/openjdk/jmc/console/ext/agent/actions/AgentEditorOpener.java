@@ -37,7 +37,6 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
-import org.openjdk.jmc.console.ext.agent.AgentPlugin;
 import org.openjdk.jmc.console.ext.agent.editor.AgentEditor;
 import org.openjdk.jmc.console.ext.agent.editor.AgentEditorInput;
 import org.openjdk.jmc.rjmx.IServerHandle;
@@ -46,6 +45,8 @@ import org.openjdk.jmc.ui.common.action.Executable;
 import org.openjdk.jmc.ui.misc.DialogToolkit;
 import org.openjdk.jmc.ui.misc.DisplayToolkit;
 
+// TODO: Export IActionFactory to this plug-in and remove @SuppressWarnings once it's official in JMC   
+@SuppressWarnings("restriction")
 public class AgentEditorOpener implements IActionFactory {
 
 	@Override
@@ -60,8 +61,7 @@ public class AgentEditorOpener implements IActionFactory {
 						IEditorInput ei = new AgentEditorInput(serverHandle);
 						window.getActivePage().openEditor(ei, AgentEditor.EDITOR_ID, true);
 					} catch (Exception e) {
-						DialogToolkit.showException(window.getShell(),
-								"Failed to open the JMC Agent Plugin.", e);
+						DialogToolkit.showException(window.getShell(), "Failed to open the JMC Agent Plugin.", e);
 					}
 				});
 			}
