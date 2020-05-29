@@ -7,7 +7,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.forms.IManagedForm;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.ScrolledForm;
-import org.openjdk.jmc.console.ext.agent.AgentJMXHelper;
+import org.openjdk.jmc.console.ext.agent.AgentJmxHelper;
 import org.openjdk.jmc.console.ext.agent.editor.AgentEditor;
 import org.openjdk.jmc.console.ext.agent.editor.AgentFormPage;
 import org.openjdk.jmc.rjmx.IConnectionHandle;
@@ -24,7 +24,7 @@ public class LiveConfigTab extends AgentFormPage {
 	}
 
 	@Inject
-	protected void createPageContent(IManagedForm managedForm, IConnectionHandle handle) {
+	protected void createPageContent(IManagedForm managedForm, AgentJmxHelper helper, IConnectionHandle handle) {
 		ScrolledForm form = managedForm.getForm();
 		FormToolkit toolkit = managedForm.getToolkit();
 
@@ -33,8 +33,7 @@ public class LiveConfigTab extends AgentFormPage {
 
 		MBeanServerConnection mbeanServer = handle.getServiceOrDummy(MBeanServerConnection.class);
 		eventTree = new EventTreeSection(container, toolkit);
-		AgentJMXHelper agentJMXHelper = new AgentJMXHelper(mbeanServer);
-		eventTree.setAgentJMXHelper(agentJMXHelper);
+		eventTree.setAgentJMXHelper(helper);
 	}
 
 }

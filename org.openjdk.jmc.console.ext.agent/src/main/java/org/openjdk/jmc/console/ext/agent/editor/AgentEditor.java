@@ -61,6 +61,7 @@ import org.eclipse.ui.forms.editor.FormEditor;
 import org.eclipse.ui.forms.editor.IFormPage;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.openjdk.jmc.common.io.IOToolkit;
+import org.openjdk.jmc.console.ext.agent.AgentJmxHelper;
 import org.openjdk.jmc.console.ext.agent.AgentPlugin;
 import org.openjdk.jmc.console.ext.agent.tabs.editor.EditorTab;
 import org.openjdk.jmc.console.ext.agent.tabs.liveconfig.LiveConfigTab;
@@ -104,17 +105,13 @@ public class AgentEditor extends FormEditor {
 					WorkbenchToolkit.asyncCloseEditor(AgentEditor.this);
 					return Status.CANCEL_STATUS;
 				}
-				DisplayToolkit.safeAsyncExec(new Runnable() {
-
-					@Override
-					public void run() {
-						if (!mainUi.isDisposed()) {
-							setUpInjectables();
-							doAddPages();
-							stackLayout.topControl.dispose();
-							stackLayout.topControl = mainUi;
-							mainUi.getParent().layout(true, true);
-						}
+				DisplayToolkit.safeAsyncExec(() -> {
+					if (!mainUi.isDisposed()) {
+						setUpInjectables();
+						doAddPages();
+						stackLayout.topControl.dispose();
+						stackLayout.topControl = mainUi;
+						mainUi.getParent().layout(true, true);
 					}
 				});
 				return Status.OK_STATUS;
@@ -198,7 +195,7 @@ public class AgentEditor extends FormEditor {
 	}
 
 	private void doAddPages() {
-		List<AgentFormPage> pages = new ArrayList<AgentFormPage>();
+		List<AgentFormPage> pages = new ArrayList<>();
 		pages.add(new OverviewTab(this));
 		pages.add(new LiveConfigTab(this));
 		pages.add(new PresetsTab(this));
@@ -281,9 +278,10 @@ public class AgentEditor extends FormEditor {
 		IEclipseContext context = this.getSite().getService(IEclipseContext.class);
 
 		// TODO: Consider carefully which services we want to support.
-		context.set(MBeanServerConnection.class, connection.getServiceOrDummy(MBeanServerConnection.class));
-		context.set(ISubscriptionService.class, connection.getServiceOrDummy(ISubscriptionService.class));
-		context.set(IConnectionHandle.class, connection);
+		AgentJmxHelper helper = new AgentJmxHelper(connection);
+		context.set(AgentJmxHelper.class, helper);
+		context.set(IConnectionHandle.class, helper.getConnectionHandle());
+		context.set(MBeanServerConnection.class, helper.getMBeanServerConnection());
 	}
 
 }
