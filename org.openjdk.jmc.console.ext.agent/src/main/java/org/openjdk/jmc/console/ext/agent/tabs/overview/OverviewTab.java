@@ -41,7 +41,7 @@ public class OverviewTab extends AgentFormPage {
 		this.container = form.getBody();
 		container.setLayout(MCLayoutFactory.createFormPageLayout());
 		String pid = handle.getServerDescriptor().getJvmInfo().getPid().toString();
-		vm  = initVM(pid);
+		vm = initVM(pid);
 		MBeanServerConnection mbsc = handle.getServiceOrDummy(MBeanServerConnection.class);
 
 		agentJMXHelper = new AgentJMXHelper(mbsc);
@@ -59,7 +59,8 @@ public class OverviewTab extends AgentFormPage {
 		try {
 			vm = VirtualMachine.attach(pid);
 		} catch (AttachNotSupportedException | IOException e) {
-			AgentPlugin.getDefault().getLogger().log(Level.SEVERE, "Could not attatch process with pid " + pid + " and create a VirtualMachine", e);
+			AgentPlugin.getDefault().getLogger().log(Level.SEVERE,
+					"Could not attatch process with pid " + pid + " and create a VirtualMachine", e);
 		}
 		return vm;
 	}

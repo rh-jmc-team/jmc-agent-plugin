@@ -37,7 +37,6 @@ import org.eclipse.jface.viewers.ColumnLabelProvider;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Image;
-
 import org.openjdk.jmc.ui.common.tree.ITreeNode;
 
 public class EventTreeLabelProvider extends ColumnLabelProvider {
@@ -53,8 +52,7 @@ public class EventTreeLabelProvider extends ColumnLabelProvider {
 		if (data instanceof String) {
 			return (String) data;
 		} else {
-			throw new IllegalArgumentException(
-					"This label provider only supports String types: " + data); //$NON-NLS-1$
+			throw new IllegalArgumentException("This label provider only supports String types: " + data); //$NON-NLS-1$
 		}
 	}
 

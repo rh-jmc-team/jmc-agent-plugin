@@ -42,6 +42,11 @@ import javax.management.MBeanServerConnection;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.e4.core.contexts.ContextInjectionFactory;
+import org.eclipse.e4.core.contexts.IEclipseContext;
+import org.eclipse.jface.dialogs.IMessageProvider;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.custom.StackLayout;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -71,11 +76,6 @@ import org.openjdk.jmc.ui.WorkbenchToolkit;
 import org.openjdk.jmc.ui.misc.CompositeToolkit;
 import org.openjdk.jmc.ui.misc.DialogToolkit;
 import org.openjdk.jmc.ui.misc.DisplayToolkit;
-import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.e4.core.contexts.ContextInjectionFactory;
-import org.eclipse.e4.core.contexts.IEclipseContext;
-import org.eclipse.jface.dialogs.IMessageProvider;
-import org.eclipse.osgi.util.NLS;
 
 public class AgentEditor extends FormEditor {
 
@@ -122,8 +122,7 @@ public class AgentEditor extends FormEditor {
 				WorkbenchToolkit.asyncCloseEditor(AgentEditor.this);
 				// FIXME: Show stacktrace? (Need to show our own ExceptionDialog in that case, or maybe create our own DetailsAreaProvider, see WorkbenchStatusDialogManager.setDetailsAreaProvider)
 				return new Status(IStatus.ERROR, AgentPlugin.PLUGIN_ID, IStatus.ERROR,
-						NLS.bind(COULD_NOT_CONNECT, getEditorInput().getName(), e.getMessage()),
-						e);
+						NLS.bind(COULD_NOT_CONNECT, getEditorInput().getName(), e.getMessage()), e);
 			}
 		}
 	}
@@ -142,8 +141,7 @@ public class AgentEditor extends FormEditor {
 							Object page = pages.get(i);
 							if (page instanceof IFormPage) {
 								IMessageManager mm = ((IFormPage) page).getManagedForm().getMessageManager();
-								mm.addMessage(this, CONNECTION_LOST, null,
-										IMessageProvider.ERROR);
+								mm.addMessage(this, CONNECTION_LOST, null, IMessageProvider.ERROR);
 							}
 						}
 					}
@@ -153,6 +151,7 @@ public class AgentEditor extends FormEditor {
 	}
 
 	private volatile IConnectionHandle connection;
+
 	@Override
 	public void init(IEditorSite site, IEditorInput input) throws PartInitException {
 		super.init(site, input);

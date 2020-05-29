@@ -1,13 +1,15 @@
 package org.openjdk.jmc.console.ext.agent.tabs.editor.internal;
 
-import org.eclipse.jface.text.rules.*;
+import org.eclipse.jface.text.rules.ICharacterScanner;
+import org.eclipse.jface.text.rules.IToken;
+import org.eclipse.jface.text.rules.MultiLineRule;
 
 public class TagRule extends MultiLineRule {
 
 	public TagRule(IToken token) {
 		super("<", ">", token);
 	}
-	
+
 	@Override
 	protected boolean sequenceDetected(ICharacterScanner scanner, char[] sequence, boolean eofAllowed) {
 		int c = scanner.read();

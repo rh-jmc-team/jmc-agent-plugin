@@ -55,9 +55,9 @@ import com.sun.tools.attach.VirtualMachine;
 
 public class LoadAgentSection extends Composite {
 
-    private static final String ENTER_PATH_MSG = "Enter Path...";
-    private static final String GIVE_ACCESS_ERROR_MSG = "Could not access jdk.internal.misc.Unsafe! Rerun your application with '--add-opens java.base/jdk.internal.misc=ALL-UNNAMED'.";
-    private VirtualMachine vm;
+	private static final String ENTER_PATH_MSG = "Enter Path...";
+	private static final String GIVE_ACCESS_ERROR_MSG = "Could not access jdk.internal.misc.Unsafe! Rerun your application with '--add-opens java.base/jdk.internal.misc=ALL-UNNAMED'.";
+	private VirtualMachine vm;
 	private Runnable loadAgentListener;
 	private GenericErrorMessage error;
 
@@ -87,7 +87,8 @@ public class LoadAgentSection extends Composite {
 				fd.setFilterExtensions(new String[] {"*.jar;*.JAR"});
 				String filename = fd.open();
 				if (filename != null) {
-					agentJarPath.setText(new StringBuilder().append(fd.getFilterPath()).append("/").append(fd.getFileName()).toString());
+					agentJarPath.setText(new StringBuilder().append(fd.getFilterPath()).append("/")
+							.append(fd.getFileName()).toString());
 				}
 			}
 		});
@@ -107,7 +108,8 @@ public class LoadAgentSection extends Composite {
 				fd.setFilterExtensions(new String[] {"*.xml;*.XML"});
 				String filename = fd.open();
 				if (filename != null) {
-					xmlPath.setText(new StringBuilder().append(fd.getFilterPath()).append("/").append(fd.getFileName()).toString());
+					xmlPath.setText(new StringBuilder().append(fd.getFilterPath()).append("/").append(fd.getFileName())
+							.toString());
 				}
 			}
 		});
@@ -151,7 +153,7 @@ public class LoadAgentSection extends Composite {
 			error.displayError(GIVE_ACCESS_ERROR_MSG);
 			return false;
 		} catch (Exception e) {
-		    throw new RuntimeException(e);
+			throw new RuntimeException(e);
 		}
 		return true;
 	}

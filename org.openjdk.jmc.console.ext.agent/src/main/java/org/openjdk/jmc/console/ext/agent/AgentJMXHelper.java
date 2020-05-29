@@ -33,8 +33,6 @@
  */
 package org.openjdk.jmc.console.ext.agent;
 
-import org.openjdk.jmc.console.ext.agent.AgentPlugin;
-
 import java.io.IOException;
 import java.util.logging.Level;
 
@@ -72,9 +70,13 @@ public class AgentJMXHelper {
 
 	public CompositeData[] retrieveCurrentTransforms() {
 		try {
-			Object result = mbsc.invoke(new ObjectName(AGENT_OBJECT_NAME), RETRIEVE_CURRENT_TRANSFORMS, new Object[0], new String[0]);
+			Object result = mbsc.invoke(new ObjectName(AGENT_OBJECT_NAME), RETRIEVE_CURRENT_TRANSFORMS, new Object[0],
+					new String[0]);
 			return (CompositeData[]) result;
-		} catch (InstanceNotFoundException | MalformedObjectNameException | MBeanException | ReflectionException
+		} catch (InstanceNotFoundException
+				| MalformedObjectNameException
+				| MBeanException
+				| ReflectionException
 				| IOException e) {
 			AgentPlugin.getDefault().getLogger().log(Level.WARNING, "Could not retrieve current transforms", e);
 		}
@@ -86,9 +88,13 @@ public class AgentJMXHelper {
 			Object[] params = {xmlDescription};
 			String[] signature = {String.class.getName()};
 			mbsc.invoke(new ObjectName(AGENT_OBJECT_NAME), DEFINE_EVENT_PROBES, params, signature);
-		} catch (InstanceNotFoundException | MalformedObjectNameException | MBeanException | ReflectionException
+		} catch (InstanceNotFoundException
+				| MalformedObjectNameException
+				| MBeanException
+				| ReflectionException
 				| IOException e) {
-			AgentPlugin.getDefault().getLogger().log(Level.WARNING, "Could not define event probes: " + xmlDescription, e);
+			AgentPlugin.getDefault().getLogger().log(Level.WARNING, "Could not define event probes: " + xmlDescription,
+					e);
 		}
 	}
 }

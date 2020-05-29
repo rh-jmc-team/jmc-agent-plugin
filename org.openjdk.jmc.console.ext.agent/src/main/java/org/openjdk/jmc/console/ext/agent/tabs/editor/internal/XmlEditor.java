@@ -29,7 +29,7 @@ public class XmlEditor extends TextEditor {
 	protected void doSetInput(IEditorInput input) throws CoreException {
 		System.out.println("doSetInput");
 		input = convertInput(input);
-		
+
 		super.doSetInput(input);
 		setDocumentProvider(input);
 	}
@@ -44,7 +44,7 @@ public class XmlEditor extends TextEditor {
 		colorManager.dispose();
 		super.dispose();
 	}
-	
+
 	public static IEditorInput convertInput(IEditorInput editorInput) {
 		if (editorInput instanceof IFileEditorInput || editorInput instanceof IStorageEditorInput) {
 			return editorInput;

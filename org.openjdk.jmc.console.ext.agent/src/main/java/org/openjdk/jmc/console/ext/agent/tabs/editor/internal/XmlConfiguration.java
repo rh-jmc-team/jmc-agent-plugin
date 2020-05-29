@@ -22,16 +22,12 @@ public class XmlConfiguration extends SourceViewerConfiguration {
 
 	@Override
 	public String[] getConfiguredContentTypes(ISourceViewer sourceViewer) {
-		return new String[] {
-			IDocument.DEFAULT_CONTENT_TYPE,
-			XmlPartitionScanner.XML_COMMENT,
-			XmlPartitionScanner.XML_TAG };
+		return new String[] {IDocument.DEFAULT_CONTENT_TYPE, XmlPartitionScanner.XML_COMMENT,
+				XmlPartitionScanner.XML_TAG};
 	}
 
 	@Override
-	public ITextDoubleClickStrategy getDoubleClickStrategy(
-		ISourceViewer sourceViewer,
-		String contentType) {
+	public ITextDoubleClickStrategy getDoubleClickStrategy(ISourceViewer sourceViewer, String contentType) {
 		if (doubleClickStrategy == null)
 			doubleClickStrategy = new XmlDoubleClickStrategy();
 		return doubleClickStrategy;
@@ -41,19 +37,16 @@ public class XmlConfiguration extends SourceViewerConfiguration {
 		if (scanner == null) {
 			scanner = new XmlScanner(colorManager);
 			scanner.setDefaultReturnToken(
-				new Token(
-					new TextAttribute(
-						colorManager.getColor(XmlColorConstants.DEFAULT))));
+					new Token(new TextAttribute(colorManager.getColor(XmlColorConstants.DEFAULT))));
 		}
 		return scanner;
 	}
+
 	protected XmlTagScanner getXMLTagScanner() {
 		if (tagScanner == null) {
 			tagScanner = new XmlTagScanner(colorManager);
-			tagScanner.setDefaultReturnToken(
-				new Token(
-					new TextAttribute(
-						colorManager.getColor(XmlColorConstants.TAG))));
+			tagScanner
+					.setDefaultReturnToken(new Token(new TextAttribute(colorManager.getColor(XmlColorConstants.TAG))));
 		}
 		return tagScanner;
 	}

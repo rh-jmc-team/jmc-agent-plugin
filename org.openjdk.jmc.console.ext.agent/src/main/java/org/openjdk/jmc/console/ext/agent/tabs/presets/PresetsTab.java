@@ -32,7 +32,7 @@ public class PresetsTab extends AgentFormPage {
 		AgentJMXHelper agentJMXHelper = new AgentJMXHelper(mbeanServer);
 
 		editAgentSection = new EditAgentSection(container);
-		editAgentSection.setAgentJMXHelper(agentJMXHelper );
+		editAgentSection.setAgentJMXHelper(agentJMXHelper);
 	}
 
 }

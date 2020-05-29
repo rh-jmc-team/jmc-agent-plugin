@@ -1,12 +1,20 @@
 package org.openjdk.jmc.console.ext.agent.tabs.presets;
 
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.logging.Level;
+
+import javax.xml.transform.stream.StreamSource;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
-
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Label;
@@ -14,21 +22,13 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
+import org.openjdk.jmc.console.ext.agent.AgentJMXHelper;
+import org.openjdk.jmc.console.ext.agent.AgentPlugin;
 import org.openjdk.jmc.console.ext.agent.tabs.editor.internal.XmlEditor;
 import org.openjdk.jmc.console.ext.agent.tabs.presets.internal.ProbeValidator;
 import org.openjdk.jmc.console.ext.agent.tabs.presets.internal.ValidationResult;
-import org.openjdk.jmc.console.ext.agent.AgentJMXHelper;
-import org.openjdk.jmc.console.ext.agent.AgentPlugin;
 import org.openjdk.jmc.ui.MCPathEditorInput;
 import org.xml.sax.SAXException;
-
-import javax.xml.transform.stream.StreamSource;
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.logging.Level;
 
 public class EditAgentSection extends Composite {
 	private static final String MESSAGE_ENTER_PATH = "Enter Path...";
@@ -40,7 +40,7 @@ public class EditAgentSection extends Composite {
 	private static final String MESSAGE_NO_WARNINGS_OR_ERRORS_FOUND = "No errors/warnings found!";
 
 	private AgentJMXHelper agentJMXHelper = null;
-	
+
 	private Label messageOutput;
 
 	public EditAgentSection(Composite parent) {
@@ -77,7 +77,7 @@ public class EditAgentSection extends Composite {
 
 			row = new Composite(this, SWT.NO_BACKGROUND);
 			row.setLayout(new GridLayout(3, false));
-			
+
 			Button edit = new Button(row, SWT.PUSH);
 			edit.setText(MESSAGE_EDIT);
 			edit.setLayoutData(gridData);
@@ -85,12 +85,13 @@ public class EditAgentSection extends Composite {
 				IEditorInput input = new MCPathEditorInput(new File(text.getText()), false);
 				input = XmlEditor.convertInput(input);
 				try {
-					PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().openEditor(input, XmlEditor.EDITOR_ID);
+					PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().openEditor(input,
+							XmlEditor.EDITOR_ID);
 				} catch (PartInitException e) {
 					AgentPlugin.getDefault().getLogger().log(Level.WARNING, "Could not open XML editor", e);
 				}
 			});
-			
+
 			Button validate = new Button(row, SWT.PUSH);
 			validate.setText(MESSAGE_VALIDATE);
 			validate.setLayoutData(gridData);
@@ -102,7 +103,7 @@ public class EditAgentSection extends Composite {
 					AgentPlugin.getDefault().getLogger().log(Level.WARNING, "Could not validate XML config", e);
 				}
 			});
-			
+
 			Button apply = new Button(row, SWT.PUSH);
 			apply.setText(MESSAGE_APPLY);
 			apply.setLayoutData(gridData);
@@ -120,7 +121,7 @@ public class EditAgentSection extends Composite {
 
 			messageOutput = new Label(row, SWT.WRAP);
 		}
-		
+
 		parent.layout(true, true);
 	}
 
@@ -157,7 +158,7 @@ public class EditAgentSection extends Composite {
 		if (message.isEmpty()) {
 			message = MESSAGE_NO_WARNINGS_OR_ERRORS_FOUND;
 		}
-		
+
 		messageOutput.setText(message);
 		this.layout();
 	}

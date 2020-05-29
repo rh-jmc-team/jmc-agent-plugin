@@ -14,7 +14,7 @@ public class ColorManager {
 	public void dispose() {
 		fColorTable.values().forEach(Color::dispose);
 	}
-	
+
 	public Color getColor(RGB rgb) {
 		Color color = fColorTable.get(rgb);
 		if (color == null) {

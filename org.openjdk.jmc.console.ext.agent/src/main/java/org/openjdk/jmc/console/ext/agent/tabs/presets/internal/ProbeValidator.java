@@ -1,9 +1,6 @@
 package org.openjdk.jmc.console.ext.agent.tabs.presets.internal;
 
-import org.w3c.dom.ls.LSResourceResolver;
-import org.xml.sax.ErrorHandler;
-import org.xml.sax.SAXException;
-import org.xml.sax.SAXParseException;
+import java.io.IOException;
 
 import javax.xml.XMLConstants;
 import javax.xml.transform.Result;
@@ -12,7 +9,11 @@ import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
-import java.io.IOException;
+
+import org.w3c.dom.ls.LSResourceResolver;
+import org.xml.sax.ErrorHandler;
+import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
 
 public class ProbeValidator extends Validator {
 	private Validator validator;
