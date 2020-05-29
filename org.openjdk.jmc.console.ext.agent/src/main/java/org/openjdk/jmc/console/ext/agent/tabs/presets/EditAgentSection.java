@@ -10,14 +10,16 @@ import java.util.logging.Level;
 import javax.xml.transform.stream.StreamSource;
 
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.layout.FillLayout;
+import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.PartInitException;
@@ -39,9 +41,9 @@ public class EditAgentSection extends Composite {
 	private static final String MESSAGE_APPLY = "Apply";
 	private static final String MESSAGE_NO_WARNINGS_OR_ERRORS_FOUND = "No errors/warnings found!";
 
-	private AgentJmxHelper agentJMXHelper = null;
+	private AgentJMXHelper agentJMXHelper = null;
+	final private Text messageOutput;
 
-	final private Label messageOutput;
 
 	public EditAgentSection(Composite parent) {
 		super(parent, SWT.NONE);
@@ -116,10 +118,25 @@ public class EditAgentSection extends Composite {
 				}
 			});
 
-			row = new Composite(this, SWT.NO_BACKGROUND);
-			row.setLayout(new FillLayout());
+			ScrolledComposite scRow = new ScrolledComposite(this, SWT.V_SCROLL);
+			scRow.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
-			messageOutput = new Label(row, SWT.WRAP);
+			messageOutput = new Text(scRow, SWT.WRAP | SWT.READ_ONLY | SWT.NO_BACKGROUND);
+			messageOutput.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+
+			scRow.setContent(messageOutput);
+			scRow.setExpandVertical(true);
+			scRow.setExpandHorizontal(true);
+			scRow.setAlwaysShowScrollBars(false);
+			scRow.addListener(SWT.Resize, new Listener() {
+
+				@Override
+				public void handleEvent(Event event) {
+					int height = messageOutput.computeSize(getClientArea().width, SWT.DEFAULT).y;
+					scRow.setMinHeight(height);
+				}
+			});
+
 		}
 
 		parent.layout(true, true);
