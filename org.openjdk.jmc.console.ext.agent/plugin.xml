@@ -36,19 +36,19 @@
 <plugin>
     <extension point="org.openjdk.jmc.rjmx.actionProvider">
         <action
-            factory="org.openjdk.jmc.console.ext.agent.ui.editor.AgentEditorOpener"
+            factory="org.openjdk.jmc.console.ext.agent.actions.AgentEditorOpener"
             icon="icons/agent-16.png"
             label="Agent Plugin">
         </action>
         <provider
             icon="icons/agent-16.png"
-            id="org.openjdk.jmc.console.ext.agent.ui"
+            id="org.openjdk.jmc.console.ext.agent"
             description="The JMC Agent Plugin can be used to add JFR instrumentation declaratively to a running program"
             label="Agent Plugin"
             priority="101"
             doubleClickActionIndex="0">
             <action
-                factory="org.openjdk.jmc.console.ext.agent.ui.editor.AgentEditorOpener"
+                factory="org.openjdk.jmc.console.ext.agent.actions.AgentEditorOpener"
                 icon="icons/agent-16.png"
                 label="Open the JMC Agent Plugin">
             </action>
@@ -57,20 +57,20 @@
 
     <extension point="org.eclipse.ui.editors">
         <editor
-            class="org.openjdk.jmc.console.ext.agent.ui.editor.AgentEditor"
+            class="org.openjdk.jmc.console.ext.agent.editor.AgentEditor"
             default="true"
-            id="org.openjdk.jmc.console.ext.agent.ui"
+            id="org.openjdk.jmc.console.ext.agent.editor.AgentEditor"
             icon="icons/agent-16.png"
             name="Agent Plugin"/>
     </extension>
     
     <extension point="org.eclipse.ui.editors">
       	<editor
-            id="org.openjdk.jmc.console.ext.agent.editor.XmlEditor"
+            id="org.openjdk.jmc.console.ext.agent.tabs.editor.internal.XmlEditor"
             name="Agent XML Editor"
             icon="icons/agent-16.png"
             extensions="xml"
-            class="org.openjdk.jmc.console.ext.agent.editor.XmlEditor"
+            class="org.openjdk.jmc.console.ext.agent.tabs.editor.internal.XmlEditor"
             contributorClass="org.eclipse.ui.texteditor.BasicTextEditorActionContributor">
       	</editor>
    </extension>
