@@ -41,7 +41,7 @@ public class EditAgentSection extends Composite {
 	private static final String MESSAGE_APPLY = "Apply";
 	private static final String MESSAGE_NO_WARNINGS_OR_ERRORS_FOUND = "No errors/warnings found!";
 
-	private AgentJMXHelper agentJMXHelper = null;
+	private AgentJmxHelper agentJMXHelper = null;
 	final private Text messageOutput;
 
 

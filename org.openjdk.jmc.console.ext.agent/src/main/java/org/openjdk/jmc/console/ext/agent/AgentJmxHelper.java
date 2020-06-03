@@ -47,7 +47,7 @@ import javax.management.ObjectName;
 import javax.management.ReflectionException;
 import javax.management.openmbean.CompositeData;
 
-public class AgentJmxHelper {
+public final class AgentJmxHelper {
 	private static final String AGENT_OBJECT_NAME = "org.openjdk.jmc.jfr.agent:type=AgentController";
 	private static final String DEFINE_EVENT_PROBES = "defineEventProbes";
 	private static final String RETRIEVE_CURRENT_TRANSFORMS = "retrieveCurrentTransforms";
