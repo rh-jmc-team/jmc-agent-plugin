@@ -33,6 +33,11 @@
  */
 package org.openjdk.jmc.console.ext.agent.tabs.liveconfig;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import javax.management.ObjectName;
 import javax.management.openmbean.CompositeData;
 
 import org.eclipse.jface.action.Action;
@@ -40,6 +45,7 @@ import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
@@ -104,6 +110,7 @@ public class EventTreeSection extends MCSectionPart {
 			final ITreeNode[] nodes = buildTreeModel(cds);
 			viewer.getControl().setRedraw(false);
 			viewer.setInput(nodes);
+			selectTopEvent();
 			viewer.getControl().setRedraw(true);
 			viewer.getControl().redraw();
 		}
@@ -115,10 +122,22 @@ public class EventTreeSection extends MCSectionPart {
 			@Override
 			public void selectionChanged(SelectionChangedEvent event) {
 				Object selected = ((IStructuredSelection) event.getSelection()).getFirstElement();
-				String eventName = ((DefaultTreeNode) selected).getUserData().toString();
-				infoPart.showEvent(eventName);
+				if (selected != null) {
+					String eventName = ((DefaultTreeNode) selected).getUserData().toString();
+					infoPart.showEvent(eventName);
+				}
 			}
 		});
+	}
+
+	public void selectTopEvent() {
+		List<ITreeNode> search = new ArrayList<>();
+		search.addAll(Arrays.asList((ITreeNode[]) viewer.getInput()));
+		if (!search.isEmpty()) {
+			ITreeNode node = search.remove(0);
+			viewer.setSelection(new StructuredSelection(node), true);
+			return;
+		}
 	}
 
 	private TreeViewer createViewer(Composite parent, FormToolkit formToolkit) {

@@ -132,6 +132,7 @@ public class FeatureTableSection extends MCSectionPart {
 		}
 		return attributes;
 	}
+
 	private boolean isEmptyCompositeData(CompositeData cd, String key) {
 		if (cd.get(key) == null) {
 			return true;

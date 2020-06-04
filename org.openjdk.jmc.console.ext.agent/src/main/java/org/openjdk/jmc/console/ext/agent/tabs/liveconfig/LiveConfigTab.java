@@ -43,7 +43,7 @@ public class LiveConfigTab extends AgentFormPage {
 
 		eventTable = new FeatureTableSection(sashForm, toolkit, handle, helper);
 		eventTree.addEventSelectionListener(eventTable);
-
+		eventTree.selectTopEvent();
 		sashForm.setWeights(new int[] {3, 4});
 
 	}
