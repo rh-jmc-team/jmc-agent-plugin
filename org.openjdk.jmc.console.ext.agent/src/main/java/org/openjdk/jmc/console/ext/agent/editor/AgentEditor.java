@@ -71,7 +71,6 @@ import org.openjdk.jmc.rjmx.ConnectionException;
 import org.openjdk.jmc.rjmx.IConnectionHandle;
 import org.openjdk.jmc.rjmx.IServerHandle;
 import org.openjdk.jmc.rjmx.JVMSupportToolkit;
-import org.openjdk.jmc.rjmx.subscription.ISubscriptionService;
 import org.openjdk.jmc.ui.UIPlugin;
 import org.openjdk.jmc.ui.WorkbenchToolkit;
 import org.openjdk.jmc.ui.misc.CompositeToolkit;
@@ -133,7 +132,6 @@ public class AgentEditor extends FormEditor {
 				@Override
 				public void run() {
 					if (pages != null) {
-						int count = pages.size();
 						for (Object page : pages) {
 							if (page instanceof IFormPage) {
 								IMessageManager mm = ((IFormPage) page).getManagedForm().getMessageManager();

@@ -41,7 +41,7 @@ public class EditAgentSection extends Composite {
 	private static final String MESSAGE_APPLY = "Apply";
 	private static final String MESSAGE_NO_WARNINGS_OR_ERRORS_FOUND = "No errors/warnings found!";
 
-	private AgentJMXHelper agentJMXHelper = null;
+	private AgentJmxHelper agentJmxHelper = null;
 	final private Text messageOutput;
 
 
@@ -112,7 +112,7 @@ public class EditAgentSection extends Composite {
 			apply.addListener(SWT.Selection, event -> {
 				try {
 					byte[] bytes = Files.readAllBytes(Paths.get(text.getText()));
-					agentJMXHelper.defineEventProbes(new String(bytes));
+					agentJmxHelper.defineEventProbes(new String(bytes));
 				} catch (IOException e) {
 					AgentPlugin.getDefault().getLogger().log(Level.WARNING, "Could not apply XML config", e);
 				}
@@ -143,7 +143,7 @@ public class EditAgentSection extends Composite {
 	}
 
 	public void setAgentJMXHelper(AgentJmxHelper agentJMXHelper) {
-		this.agentJMXHelper = agentJMXHelper;
+		this.agentJmxHelper = agentJMXHelper;
 	}
 
 	private void validateProbeDefinition(String configuration) {
