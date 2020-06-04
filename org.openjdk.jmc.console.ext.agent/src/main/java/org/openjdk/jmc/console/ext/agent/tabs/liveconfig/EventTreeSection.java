@@ -71,7 +71,7 @@ public class EventTreeSection extends MCSectionPart {
 	public EventTreeSection(Composite parent, FormToolkit toolkit, AgentJmxHelper helper) {
 		super(parent, toolkit, DEFAULT_TITLE_STYLE);
 		this.agentJmxHelper = helper;
-		getSection().setText("Event Tree");
+		getSection().setText("Event List");
 
 		Composite body = createSectionBody(MCLayoutFactory.createMarginFreeFormPageLayout());
 		Composite eventsControlContainer = new Composite(body, SWT.NO_BACKGROUND);
