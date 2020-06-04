@@ -1,8 +1,9 @@
 package org.openjdk.jmc.console.ext.agent.tabs.liveconfig;
 
 import javax.inject.Inject;
-import javax.management.MBeanServerConnection;
 
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.forms.IManagedForm;
 import org.eclipse.ui.forms.widgets.FormToolkit;
@@ -17,7 +18,9 @@ public class LiveConfigTab extends AgentFormPage {
 	private static final String ID = "org.openjdk.jmc.console.ext.agent.tabs.liveconfig.LiveConfigTab";
 	private static final String TITLE = "Live Config";
 
+	private SashForm sashForm;
 	private EventTreeSection eventTree;
+	private FeatureTableSection eventTable;
 
 	public LiveConfigTab(AgentEditor editor) {
 		super(editor, ID, TITLE);
@@ -28,12 +31,21 @@ public class LiveConfigTab extends AgentFormPage {
 		ScrolledForm form = managedForm.getForm();
 		FormToolkit toolkit = managedForm.getToolkit();
 
-		Composite container = form.getBody();
-		container.setLayout(MCLayoutFactory.createFormPageLayout());
+		Composite body = form.getBody();
+		body.setLayout(MCLayoutFactory.createFormPageLayout());
 
-		MBeanServerConnection mbeanServer = handle.getServiceOrDummy(MBeanServerConnection.class);
-		eventTree = new EventTreeSection(container, toolkit);
-		eventTree.setAgentJMXHelper(helper);
+		sashForm = new SashForm(body, SWT.HORIZONTAL);
+		sashForm.setLayoutData(MCLayoutFactory.createFormPageLayoutData());
+		toolkit.adapt(sashForm, false, false);
+
+		eventTree = new EventTreeSection(sashForm, toolkit, helper);
+		managedForm.addPart(eventTree);
+
+		eventTable = new FeatureTableSection(sashForm, toolkit, handle, helper);
+		eventTree.addEventSelectionListener(eventTable);
+		eventTree.selectTopEvent();
+		sashForm.setWeights(new int[] {3, 4});
+
 	}
 
 }
