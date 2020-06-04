@@ -107,7 +107,12 @@ public class AgentEditor extends FormEditor {
 				}
 				DisplayToolkit.safeAsyncExec(() -> {
 					if (!mainUi.isDisposed()) {
-						setUpInjectables();
+						try {
+							setUpInjectables();
+						} catch (ConnectionException e) {
+							// TODO
+							e.printStackTrace();
+						}
 						doAddPages();
 						stackLayout.topControl.dispose();
 						stackLayout.topControl = mainUi;
@@ -274,11 +279,11 @@ public class AgentEditor extends FormEditor {
 		return super.getAdapter(adapter);
 	}
 
-	private void setUpInjectables() {
+	private void setUpInjectables() throws ConnectionException {
 		IEclipseContext context = this.getSite().getService(IEclipseContext.class);
 
 		// TODO: Consider carefully which services we want to support.
-		AgentJmxHelper helper = new AgentJmxHelper(connection);
+		AgentJmxHelper helper = new AgentJmxHelper(getEditorInput().getServerHandle());
 		context.set(AgentJmxHelper.class, helper);
 		context.set(IConnectionHandle.class, helper.getConnectionHandle());
 		context.set(MBeanServerConnection.class, helper.getMBeanServerConnection());

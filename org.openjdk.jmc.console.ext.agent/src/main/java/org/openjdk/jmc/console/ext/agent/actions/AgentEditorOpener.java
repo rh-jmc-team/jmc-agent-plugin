@@ -65,7 +65,6 @@ import java.util.Objects;
 @SuppressWarnings("restriction")
 public class AgentEditorOpener implements IActionFactory {
 	private final static String JOB_NAME = "Connecting to RJMX service";
-	private final static String CONNECTION_USAGE = "Agent MBean";
 	private final static String MESSAGE_COULD_NOT_CONNECT = "Could not connect";
 	private final static String MESSAGE_STARTING_AGENT_ON_REMOTE_JVM_NOT_SUPPORTED = "Starting an agent on remote JVM is not supported";
 	private final static String MESSAGE_START_AGENT_MANUALLY = "Start the agent manually and try again";
@@ -100,17 +99,19 @@ public class AgentEditorOpener implements IActionFactory {
 		@Override
 		protected IStatus run(IProgressMonitor monitor) {
 			try {
-				connectionHandle = serverHandle.connect(CONNECTION_USAGE, this);
+				AgentJmxHelper helper = new AgentJmxHelper(serverHandle);
+				helper.addConnectionListener(this);
+				connectionHandle = helper.getConnectionHandle();
+
 				String[] error = JVMSupportToolkit.checkConsoleSupport(connectionHandle);
 				if (error.length == 2 && !DialogToolkit.openConfirmOnUiThread(error[0], error[1])) {
 					return Status.CANCEL_STATUS;
 				}
 
-				AgentJmxHelper helper = new AgentJmxHelper(connectionHandle);
-
 				// is local JVM but agent not running
 				if (!helper.isMXBeanRegistered() && helper.isLocalJvm()) {
-					DisplayToolkit.safeAsyncExec(Display.getDefault(), () -> DialogToolkit.openWizardWithHelp(new StartAgentWizard(helper)));
+					DisplayToolkit.safeAsyncExec(Display.getDefault(),
+							() -> DialogToolkit.openWizardWithHelp(new StartAgentWizard(helper)));
 					return Status.OK_STATUS;
 				}
 
@@ -155,7 +156,7 @@ public class AgentEditorOpener implements IActionFactory {
 			}
 
 			if (!connectionHandle.isConnected()) {
-				// notify the editor
+				// TODO: notify the editor
 			}
 		}
 	}
