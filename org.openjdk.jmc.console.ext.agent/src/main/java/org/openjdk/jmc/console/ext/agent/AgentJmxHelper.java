@@ -33,11 +33,10 @@
  */
 package org.openjdk.jmc.console.ext.agent;
 
+import org.openjdk.jmc.rjmx.ConnectionException;
 import org.openjdk.jmc.rjmx.IConnectionHandle;
-
-import java.io.IOException;
-import java.util.Objects;
-import java.util.logging.Level;
+import org.openjdk.jmc.rjmx.IConnectionListener;
+import org.openjdk.jmc.rjmx.IServerHandle;
 
 import javax.management.InstanceNotFoundException;
 import javax.management.MBeanException;
@@ -46,18 +45,32 @@ import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
 import javax.management.ReflectionException;
 import javax.management.openmbean.CompositeData;
+import java.io.IOException;
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Set;
+import java.util.logging.Level;
 
-public class AgentJmxHelper {
-	private static final String AGENT_OBJECT_NAME = "org.openjdk.jmc.jfr.agent:type=AgentController";
-	private static final String DEFINE_EVENT_PROBES = "defineEventProbes";
-	private static final String RETRIEVE_CURRENT_TRANSFORMS = "retrieveCurrentTransforms";
+public final class AgentJmxHelper {
+	private final static String AGENT_OBJECT_NAME = "org.openjdk.jmc.jfr.agent:type=AgentController";
+	private final static String DEFINE_EVENT_PROBES = "defineEventProbes";
+	private final static String RETRIEVE_CURRENT_TRANSFORMS = "retrieveCurrentTransforms";
+	private final static String CONNECTION_USAGE = "Agent MBean";
 
-	final private IConnectionHandle connectionHandle;
-	final private MBeanServerConnection mbsc;
+	private final IServerHandle serverHandle;
+	private final IConnectionHandle connectionHandle;
+	private final MBeanServerConnection mbsc;
 
-	public AgentJmxHelper(IConnectionHandle connectionHandle) {
-		this.connectionHandle = Objects.requireNonNull(connectionHandle);
+	private final Set<IConnectionListener> connectionListeners = new HashSet<>();
+
+	public AgentJmxHelper(IServerHandle serverHandle) throws ConnectionException {
+		this.serverHandle = Objects.requireNonNull(serverHandle);
+		connectionHandle = serverHandle.connect(CONNECTION_USAGE, this::onConnectionChange);
 		mbsc = connectionHandle.getServiceOrDummy(MBeanServerConnection.class);
+	}
+
+	public IServerHandle getServerHandle() {
+		return serverHandle;
 	}
 
 	public IConnectionHandle getConnectionHandle() {
@@ -66,6 +79,14 @@ public class AgentJmxHelper {
 
 	public MBeanServerConnection getMBeanServerConnection() {
 		return mbsc;
+	}
+
+	public void addConnectionChangedListener(IConnectionListener connectionListener) {
+		connectionListeners.add(Objects.requireNonNull(connectionListener));
+	}
+
+	public void removeConnectionChangedListener(IConnectionListener connectionListener) {
+		connectionListeners.remove(connectionListener);
 	}
 
 	public boolean isLocalJvm() {
@@ -101,13 +122,15 @@ public class AgentJmxHelper {
 			Object[] params = {xmlDescription};
 			String[] signature = {String.class.getName()};
 			mbsc.invoke(new ObjectName(AGENT_OBJECT_NAME), DEFINE_EVENT_PROBES, params, signature);
-		} catch (InstanceNotFoundException
-				| MalformedObjectNameException
-				| MBeanException
-				| ReflectionException
-				| IOException e) {
-			AgentPlugin.getDefault().getLogger().log(Level.WARNING, "Could not define event probes: " + xmlDescription,
-					e);
+		} catch (InstanceNotFoundException | MalformedObjectNameException | MBeanException | ReflectionException | IOException e) {
+			AgentPlugin.getDefault().getLogger()
+					.log(Level.WARNING, "Could not define event probes: " + xmlDescription, e);
+		}
+	}
+
+	public void onConnectionChange(IConnectionHandle connection) {
+		for (IConnectionListener listener : connectionListeners) {
+			listener.onConnectionChange(connection);
 		}
 	}
 }
