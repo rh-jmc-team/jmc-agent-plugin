@@ -125,7 +125,10 @@ public class EventTreeSection extends MCSectionPart {
 				if (selected != null) {
 					String eventName = ((DefaultTreeNode) selected).getUserData().toString();
 					infoPart.showEvent(eventName);
+				} else {
+					infoPart.showEvent(null);
 				}
+
 			}
 		});
 	}
