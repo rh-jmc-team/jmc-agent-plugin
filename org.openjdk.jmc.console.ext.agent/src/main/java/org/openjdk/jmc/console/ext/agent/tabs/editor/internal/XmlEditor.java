@@ -27,7 +27,6 @@ public class XmlEditor extends TextEditor {
 
 	@Override
 	protected void doSetInput(IEditorInput input) throws CoreException {
-		System.out.println("doSetInput");
 		input = convertInput(input);
 
 		super.doSetInput(input);

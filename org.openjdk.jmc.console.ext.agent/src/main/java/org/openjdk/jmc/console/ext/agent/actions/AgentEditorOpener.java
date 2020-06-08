@@ -73,22 +73,13 @@ public class AgentEditorOpener implements IActionFactory {
 	@Override
 	public Executable createAction(IServerHandle serverHandle) {
 		return () -> new ConnectJob(serverHandle).schedule();
-
-//		return () -> DisplayToolkit.safeAsyncExec(Display.getDefault(), () -> {
-//			IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-//			try {
-//				IEditorInput ei = new AgentEditorInput(serverHandle);
-//				window.getActivePage().openEditor(ei, AgentEditor.EDITOR_ID, true);
-//			} catch (PartInitException e) {
-//				DialogToolkit.showException(window.getShell(), "Failed to open the JMC Agent Plugin.", e);
-//			}
-//		});
 	}
 
 	private final static class ConnectJob extends Job implements IConnectionListener {
 
 		private final IServerHandle serverHandle;
 		private IConnectionHandle connectionHandle;
+		private AgentJmxHelper helper;
 
 		private ConnectJob(IServerHandle serverHandle) {
 			super(JOB_NAME);
@@ -99,48 +90,57 @@ public class AgentEditorOpener implements IActionFactory {
 		@Override
 		protected IStatus run(IProgressMonitor monitor) {
 			try {
-				AgentJmxHelper helper = new AgentJmxHelper(serverHandle);
-				helper.addConnectionListener(this);
+				helper = new AgentJmxHelper(serverHandle);
+				helper.addConnectionChangedListener(this);
 				connectionHandle = helper.getConnectionHandle();
 
-				String[] error = JVMSupportToolkit.checkConsoleSupport(connectionHandle);
-				if (error.length == 2 && !DialogToolkit.openConfirmOnUiThread(error[0], error[1])) {
-					return Status.CANCEL_STATUS;
-				}
+				IStatus ret = doRun(monitor);
 
-				// is local JVM but agent not running
-				if (!helper.isMXBeanRegistered() && helper.isLocalJvm()) {
-					DisplayToolkit.safeAsyncExec(Display.getDefault(),
-							() -> DialogToolkit.openWizardWithHelp(new StartAgentWizard(helper)));
-					return Status.OK_STATUS;
-				}
-
-				// is remote JVM and agent not running
-				if (!helper.isMXBeanRegistered() && !helper.isLocalJvm()) {
-					DisplayToolkit.safeAsyncExec(Display.getDefault(), () -> {
-						IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-						DialogToolkit.showError(window.getShell(), MESSAGE_STARTING_AGENT_ON_REMOTE_JVM_NOT_SUPPORTED, MESSAGE_START_AGENT_MANUALLY);
-					});
-					return Status.OK_STATUS;
-				}
-
-				// agent running
-				DisplayToolkit.safeAsyncExec(Display.getDefault(), () -> {
-					IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-					try {
-						IEditorInput ei = new AgentEditorInput(serverHandle);
-						window.getActivePage().openEditor(ei, AgentEditor.EDITOR_ID, true);
-					} catch (PartInitException e) {
-						DialogToolkit.showException(window.getShell(), MESSAGE_FAILED_TO_OPEN_AGENT_EDITOR, e);
-					}
-				});
-
-				return Status.OK_STATUS;
+				helper.removeConnectionChangedListener(this);
+				return ret;
 			} catch (ConnectionException e) {
 				// FIXME: Show stacktrace? (Need to show our own ExceptionDialog in that case, or maybe create our own DetailsAreaProvider, see WorkbenchStatusDialogManager.setDetailsAreaProvider)
 				return new Status(IStatus.ERROR, AgentPlugin.PLUGIN_ID, IStatus.ERROR,
-						NLS.bind(MESSAGE_COULD_NOT_CONNECT, serverHandle.getServerDescriptor().getDisplayName(), e.getMessage()), e);
+						NLS.bind(MESSAGE_COULD_NOT_CONNECT, serverHandle.getServerDescriptor().getDisplayName(),
+								e.getMessage()), e);
 			}
+		}
+
+		private IStatus doRun(IProgressMonitor monitor) {
+			String[] error = JVMSupportToolkit.checkConsoleSupport(connectionHandle);
+			if (error.length == 2 && !DialogToolkit.openConfirmOnUiThread(error[0], error[1])) {
+				return Status.CANCEL_STATUS;
+			}
+
+			// local JVM but agent not running
+			if (!helper.isMXBeanRegistered() && helper.isLocalJvm()) {
+				DisplayToolkit.safeAsyncExec(Display.getDefault(),
+						() -> DialogToolkit.openWizardWithHelp(new StartAgentWizard(helper)));
+				return Status.OK_STATUS;
+			}
+
+			// remote JVM and agent not running
+			if (!helper.isMXBeanRegistered() && !helper.isLocalJvm()) {
+				DisplayToolkit.safeAsyncExec(Display.getDefault(), () -> {
+					IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+					DialogToolkit.showError(window.getShell(), MESSAGE_STARTING_AGENT_ON_REMOTE_JVM_NOT_SUPPORTED,
+							MESSAGE_START_AGENT_MANUALLY);
+				});
+				return Status.OK_STATUS;
+			}
+
+			// agent already running
+			DisplayToolkit.safeAsyncExec(Display.getDefault(), () -> {
+				IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+				try {
+					IEditorInput ei = new AgentEditorInput(serverHandle, helper.getConnectionHandle(), helper);
+					window.getActivePage().openEditor(ei, AgentEditor.EDITOR_ID, true);
+				} catch (PartInitException e) {
+					DialogToolkit.showException(window.getShell(), MESSAGE_FAILED_TO_OPEN_AGENT_EDITOR, e);
+				}
+			});
+			
+			return Status.OK_STATUS;
 		}
 
 		@Override
@@ -153,10 +153,6 @@ public class AgentEditorOpener implements IActionFactory {
 			if (serverHandle.getState() == IServerHandle.State.DISPOSED) {
 				cancel();
 				return;
-			}
-
-			if (!connectionHandle.isConnected()) {
-				// TODO: notify the editor
 			}
 		}
 	}

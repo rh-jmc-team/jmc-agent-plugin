@@ -81,11 +81,11 @@ public final class AgentJmxHelper {
 		return mbsc;
 	}
 
-	public void addConnectionListener(IConnectionListener connectionListener) {
+	public void addConnectionChangedListener(IConnectionListener connectionListener) {
 		connectionListeners.add(Objects.requireNonNull(connectionListener));
 	}
 
-	public void removeConnectionListener(IConnectionListener connectionListener) {
+	public void removeConnectionChangedListener(IConnectionListener connectionListener) {
 		connectionListeners.remove(connectionListener);
 	}
 

@@ -33,20 +33,10 @@
  */
 package org.openjdk.jmc.console.ext.agent.editor;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.logging.Level;
-
-import javax.management.MBeanServerConnection;
-
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.jface.dialogs.IMessageProvider;
-import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.custom.StackLayout;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -67,81 +57,42 @@ import org.openjdk.jmc.console.ext.agent.tabs.editor.EditorTab;
 import org.openjdk.jmc.console.ext.agent.tabs.liveconfig.LiveConfigTab;
 import org.openjdk.jmc.console.ext.agent.tabs.overview.OverviewTab;
 import org.openjdk.jmc.console.ext.agent.tabs.presets.PresetsTab;
-import org.openjdk.jmc.rjmx.ConnectionException;
 import org.openjdk.jmc.rjmx.IConnectionHandle;
+import org.openjdk.jmc.rjmx.IConnectionListener;
 import org.openjdk.jmc.rjmx.IServerHandle;
-import org.openjdk.jmc.rjmx.JVMSupportToolkit;
 import org.openjdk.jmc.ui.UIPlugin;
 import org.openjdk.jmc.ui.WorkbenchToolkit;
 import org.openjdk.jmc.ui.misc.CompositeToolkit;
-import org.openjdk.jmc.ui.misc.DialogToolkit;
 import org.openjdk.jmc.ui.misc.DisplayToolkit;
 
-public class AgentEditor extends FormEditor {
+import javax.management.MBeanServerConnection;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.logging.Level;
+
+public class AgentEditor extends FormEditor implements IConnectionListener {
 
 	public static final String EDITOR_ID = "org.openjdk.jmc.console.ext.agent.editor.AgentEditor"; //$NON-NLS-1$
 
 	private static final String CONNECTION_LOST = "Connection Lost";
 	private static final String COULD_NOT_CONNECT = "Could not connect";
 
-	private final class ConnectJob extends Job {
-		private final StackLayout stackLayout;
-		private final Composite mainUi;
+	private volatile IConnectionHandle connection;
 
-		private ConnectJob(StackLayout stackLayout, Composite mainUi) {
-			super("Opening Agent Plugin");
-			this.stackLayout = stackLayout;
-			this.mainUi = mainUi;
-		}
+	private StackLayout stackLayout;
+	private Composite mainUi;
 
-		@Override
-		protected IStatus run(IProgressMonitor monitor) {
-			try {
-				connection = getEditorInput().getServerHandle().connect("Agent MBean",
-						AgentEditor.this::onConnectionChange);
-				String[] error = JVMSupportToolkit.checkConsoleSupport(connection);
-				if (error.length == 2 && !DialogToolkit.openConfirmOnUiThread(error[0], error[1])) {
-					WorkbenchToolkit.asyncCloseEditor(AgentEditor.this);
-					return Status.CANCEL_STATUS;
-				}
-				DisplayToolkit.safeAsyncExec(() -> {
-					if (!mainUi.isDisposed()) {
-						try {
-							setUpInjectables();
-						} catch (ConnectionException e) {
-							// TODO
-							e.printStackTrace();
-						}
-						doAddPages();
-						stackLayout.topControl.dispose();
-						stackLayout.topControl = mainUi;
-						mainUi.getParent().layout(true, true);
-					}
-				});
-				return Status.OK_STATUS;
-			} catch (ConnectionException e) {
-				WorkbenchToolkit.asyncCloseEditor(AgentEditor.this);
-				// FIXME: Show stacktrace? (Need to show our own ExceptionDialog in that case, or maybe create our own DetailsAreaProvider, see WorkbenchStatusDialogManager.setDetailsAreaProvider)
-				return new Status(IStatus.ERROR, AgentPlugin.PLUGIN_ID, IStatus.ERROR,
-						NLS.bind(COULD_NOT_CONNECT, getEditorInput().getName(), e.getMessage()), e);
-			}
-		}
-	}
-
-	private void onConnectionChange(IConnectionHandle connection) {
+	public void onConnectionChange(IConnectionHandle connection) {
 		boolean serverDisposed = getEditorInput().getServerHandle().getState() == IServerHandle.State.DISPOSED;
 		if (serverDisposed) {
 			WorkbenchToolkit.asyncCloseEditor(AgentEditor.this);
 		} else if (!connection.isConnected()) {
-			DisplayToolkit.safeAsyncExec(new Runnable() {
-				@Override
-				public void run() {
-					if (pages != null) {
-						for (Object page : pages) {
-							if (page instanceof IFormPage) {
-								IMessageManager mm = ((IFormPage) page).getManagedForm().getMessageManager();
-								mm.addMessage(this, CONNECTION_LOST, null, IMessageProvider.ERROR);
-							}
+			DisplayToolkit.safeAsyncExec(() -> {
+				if (pages != null) {
+					for (Object page : pages) {
+						if (page instanceof IFormPage) {
+							IMessageManager mm = ((IFormPage) page).getManagedForm().getMessageManager();
+							mm.addMessage(this, CONNECTION_LOST, null, IMessageProvider.ERROR);
 						}
 					}
 				}
@@ -149,27 +100,29 @@ public class AgentEditor extends FormEditor {
 		}
 	}
 
-	private volatile IConnectionHandle connection;
-
 	@Override
 	public void init(IEditorSite site, IEditorInput input) throws PartInitException {
 		super.init(site, input);
 		setPartName("JMC Agent Plugin: " + getEditorInput().getName());
+
+		connection = getEditorInput().getConnectionHandle();
+		setUpInjectables();
+
+		getEditorInput().getAgentJmxHelper().addConnectionChangedListener(this);
 	}
 
 	@Override
 	protected Composite createPageContainer(Composite parent) {
 		parent = super.createPageContainer(parent);
 		FormToolkit toolkit = getToolkit();
-		Composite container = toolkit.createComposite(parent);
+		mainUi = toolkit.createComposite(parent);
 		Composite progress = toolkit.createComposite(parent);
 		CompositeToolkit.createWaitIndicator(progress, toolkit);
-		StackLayout stackLayout = new StackLayout();
+		stackLayout = new StackLayout();
 		parent.setLayout(stackLayout);
 		stackLayout.topControl = progress;
-		new ConnectJob(stackLayout, container).schedule();
-		container.setLayout(new FillLayout());
-		return container;
+		mainUi.setLayout(new FillLayout());
+		return mainUi;
 	}
 
 	@Override
@@ -194,7 +147,11 @@ public class AgentEditor extends FormEditor {
 
 	@Override
 	protected void addPages() {
-		// TODO Auto-generated method stub
+		doAddPages();
+
+		stackLayout.topControl.dispose();
+		stackLayout.topControl = mainUi;
+		mainUi.getParent().layout(true, true);
 	}
 
 	private void doAddPages() {
@@ -206,7 +163,7 @@ public class AgentEditor extends FormEditor {
 
 		for (AgentFormPage page : pages) {
 			try {
-				add(page);
+				addPage(page);
 				final IEclipseContext eclipseContext = this.getSite().getService(IEclipseContext.class);
 				IEclipseContext childContext = eclipseContext.createChild();
 				childContext.set(IManagedForm.class, page.getManagedForm());
@@ -219,8 +176,9 @@ public class AgentEditor extends FormEditor {
 		setActivePage(0);
 	}
 
-	private void add(IFormPage page) throws PartInitException {
-		int index = addPage(page);
+	@Override
+	public int addPage(IFormPage page) throws PartInitException {
+		int index = super.addPage(page);
 		/*
 		 * NOTE: Calling setActivePage(index) causes AgentFormPage.createPartControl to be called
 		 * which is needed since it creates the IManagedForm which is fetched in doAddPages() (using
@@ -229,6 +187,8 @@ public class AgentEditor extends FormEditor {
 		 */
 		setActivePage(index);
 		setPageImage(index, page.getTitleImage());
+
+		return index;
 	}
 
 	@Override
@@ -266,6 +226,7 @@ public class AgentEditor extends FormEditor {
 	@Override
 	public void dispose() {
 		super.dispose();
+		getEditorInput().getAgentJmxHelper().removeConnectionChangedListener(this);
 		IOToolkit.closeSilently(connection);
 	}
 
@@ -277,11 +238,11 @@ public class AgentEditor extends FormEditor {
 		return super.getAdapter(adapter);
 	}
 
-	private void setUpInjectables() throws ConnectionException {
+	private void setUpInjectables() {
 		IEclipseContext context = this.getSite().getService(IEclipseContext.class);
 
 		// TODO: Consider carefully which services we want to support.
-		AgentJmxHelper helper = new AgentJmxHelper(getEditorInput().getServerHandle());
+		AgentJmxHelper helper = getEditorInput().getAgentJmxHelper();
 		context.set(AgentJmxHelper.class, helper);
 		context.set(IConnectionHandle.class, helper.getConnectionHandle());
 		context.set(MBeanServerConnection.class, helper.getMBeanServerConnection());

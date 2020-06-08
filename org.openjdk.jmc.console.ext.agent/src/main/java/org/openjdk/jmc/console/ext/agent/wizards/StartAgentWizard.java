@@ -45,7 +45,7 @@ public class StartAgentWizard extends Wizard {
 		try {
 			VirtualMachine vm = VirtualMachine.attach(targetJvm.getPid() + "");
 			loadAgent(vm, agentJarPath, agentXmlPath);
-			IEditorInput ei = new AgentEditorInput(helper.getServerHandle());
+			IEditorInput ei = new AgentEditorInput(helper.getServerHandle(), helper.getConnectionHandle(), helper);
 			window.getActivePage().openEditor(ei, AgentEditor.EDITOR_ID, true);
 		} catch (AttachNotSupportedException | IOException | AgentLoadException e) {
 			DialogToolkit.showException(window.getShell(), MESSAGE_FAILED_TO_START_AGENT,

@@ -37,14 +37,20 @@ import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IPersistableElement;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
+import org.openjdk.jmc.console.ext.agent.AgentJmxHelper;
+import org.openjdk.jmc.rjmx.IConnectionHandle;
 import org.openjdk.jmc.rjmx.IServerHandle;
 
 public class AgentEditorInput implements IEditorInput {
 
-	private final IServerHandle server;
+	private final IServerHandle serverHandle;
+	private final IConnectionHandle connectionHandle;
+	private final AgentJmxHelper agentJmxHelper;
 
-	public AgentEditorInput(IServerHandle jvm) {
-		server = jvm;
+	public AgentEditorInput(IServerHandle serverHandle, IConnectionHandle connectionHandle, AgentJmxHelper agentJmxHelper) {
+		this.serverHandle = serverHandle;
+		this.connectionHandle = connectionHandle;
+		this.agentJmxHelper = agentJmxHelper;
 	}
 
 	@Override
@@ -53,7 +59,15 @@ public class AgentEditorInput implements IEditorInput {
 	}
 
 	public IServerHandle getServerHandle() {
-		return server;
+		return serverHandle;
+	}
+
+	public IConnectionHandle getConnectionHandle() {
+		return connectionHandle;
+	}
+
+	public AgentJmxHelper getAgentJmxHelper() {
+		return agentJmxHelper;
 	}
 
 	@Override
@@ -63,7 +77,7 @@ public class AgentEditorInput implements IEditorInput {
 
 	@Override
 	public String getName() {
-		return server.getServerDescriptor().getDisplayName();
+		return serverHandle.getServerDescriptor().getDisplayName();
 	}
 
 	@Override
@@ -73,17 +87,17 @@ public class AgentEditorInput implements IEditorInput {
 
 	@Override
 	public String getToolTipText() {
-		return server.getServerDescriptor().getDisplayName();
+		return serverHandle.getServerDescriptor().getDisplayName();
 	}
 
 	@Override
 	public boolean equals(Object obj) {
-		return obj instanceof AgentEditorInput && ((AgentEditorInput) obj).server.equals(server);
+		return obj instanceof AgentEditorInput && ((AgentEditorInput) obj).serverHandle.equals(serverHandle);
 	}
 
 	@Override
 	public int hashCode() {
-		return server.hashCode();
+		return serverHandle.hashCode();
 	}
 
 	@Override
