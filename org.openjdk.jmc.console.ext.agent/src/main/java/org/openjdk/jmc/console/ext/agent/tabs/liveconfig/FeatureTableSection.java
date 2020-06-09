@@ -112,11 +112,13 @@ public class FeatureTableSection extends MCSectionPart {
 
 	private List<Object> createEventProperties(CompositeData cd) throws Exception {
 		List<Object> attributes = new ArrayList<>();
-		Set<String> keys = cd.getCompositeType().keySet();
-		for (String key : keys) {
-			if (!isEmptyCompositeData(cd, key) && !EventAttributes.ATTRIBUTE_LIST.contains(key)) {
-				attributes.add(
-						new EventReadOnlyAttribute(key, cd.getCompositeType().getType(key).getClassName(), cd.get(key)));
+		if (cd != null) {
+			Set<String> keys = cd.getCompositeType().keySet();
+			for (String key : keys) {
+				if (!isEmptyCompositeData(cd, key) && !EventAttributes.ATTRIBUTE_LIST.contains(key)) {
+					attributes.add(
+							new EventReadOnlyAttribute(key, cd.getCompositeType().getType(key).getClassName(), cd.get(key)));
+				}
 			}
 		}
 		return attributes;
@@ -124,10 +126,12 @@ public class FeatureTableSection extends MCSectionPart {
 
 	private List<Object> createEventAttributes(CompositeData cd) throws Exception {
 		List<Object> attributes = new ArrayList<>();
-		for (String key : EventAttributes.ATTRIBUTE_LIST) {
-			if (!isEmptyCompositeData(cd, key)) {
-				attributes.add(
-						new EventReadOnlyAttribute(key, cd.getCompositeType().getType(key).getClassName(), cd.get(key)));
+		if (cd != null) {
+			for (String key : EventAttributes.ATTRIBUTE_LIST) {
+				if (!isEmptyCompositeData(cd, key)) {
+					attributes.add(
+							new EventReadOnlyAttribute(key, cd.getCompositeType().getType(key).getClassName(), cd.get(key)));
+				}
 			}
 		}
 		return attributes;
