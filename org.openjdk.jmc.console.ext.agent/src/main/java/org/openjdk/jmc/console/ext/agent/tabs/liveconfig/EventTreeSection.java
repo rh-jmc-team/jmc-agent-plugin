@@ -128,7 +128,6 @@ public class EventTreeSection extends MCSectionPart {
 				} else {
 					infoPart.showEvent(null);
 				}
-
 			}
 		});
 	}
