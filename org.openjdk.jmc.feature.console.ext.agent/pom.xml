@@ -48,7 +48,8 @@
 	<packaging>eclipse-feature</packaging>
 	
 	<properties>
-		<!--TODO: uncomment this when merging to JMC repo-->
 		<!--spotless.config.path>${basedir}/../../configuration/ide/eclipse/formatting/formatting.xml</spotless.config.path-->
+		<!--TODO: replace this with above when merging to JMC repo-->
+		<spotless.config.path>${basedir}/../configuration/ide/eclipse/formatting/formatting.xml</spotless.config.path>
 	</properties>
 </project>
