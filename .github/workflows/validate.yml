@@ -1,0 +1,15 @@
+name: Check formatting and run tests
+
+on: [push, pull_request]
+
+jobs:
+    linux:
+      runs-on: 'ubuntu-latest'
+      steps:
+      - uses: actions/checkout@v1
+      - name: Build JMC
+        run: ./scripts/buildjmc.sh
+      - name: Check formatting
+        run: ./scripts/checkformatting.sh
+      - name: Run tests
+        run: ./scripts/runtests.sh
