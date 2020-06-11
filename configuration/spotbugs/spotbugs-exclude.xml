@@ -33,4 +33,72 @@
    WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 -->
 <FindBugsFilter>
+	<Match>
+		<Class name="org.openjdk.jmc.console.ext.agent.AgentJmxHelper"/>
+		<Method name="retrieveCurrentTransforms"/>
+		<Bug pattern="PZLA_PREFER_ZERO_LENGTH_ARRAYS"/>
+	</Match>
+	<Match>
+		<Class name="org.openjdk.jmc.console.ext.agent.editor.AgentEditor"/>
+		<Method name="doAddPages"/>
+		<Bug pattern="REC_CATCH_EXCEPTION"/>
+	</Match>
+	<Match>
+		<Class name="org.openjdk.jmc.console.ext.agent.editor.AgentEditor"/>
+		<Bug pattern="UWF_FIELD_NOT_INITIALIZED_IN_CONSTRUCTOR"/>
+	</Match>
+	<Match>
+		<Class name="org.openjdk.jmc.console.ext.agent.editor.AgentFormPage"/>
+		<Bug pattern="UWF_UNWRITTEN_FIELD"/>
+	</Match>
+	<Match>
+		<Class name="org.openjdk.jmc.console.ext.agent.tabs.editor.internal.XmlDocumentProvider"/>
+		<Method name="doSaveDocument"/>
+		<Bug pattern="RV_RETURN_VALUE_IGNORED_BAD_PRACTICE"/>
+	</Match>
+	<Match>
+		<Class name="org.openjdk.jmc.console.ext.agent.tabs.editor.internal.XmlDocumentProvider"/>
+		<Method name="doSaveDocument"/>
+		<Bug pattern="DM_DEFAULT_ENCODING"/>
+	</Match>
+	<Match>
+		<Class name="org.openjdk.jmc.console.ext.agent.tabs.presets.EditAgentSection" />
+		<Bug pattern="DM_DEFAULT_ENCODING"/>
+	</Match>
+	<Match>
+		<Class name="org.openjdk.jmc.console.ext.agent.tabs.liveconfig.EventTableInspector"/>
+		<Bug pattern="SIC_INNER_SHOULD_BE_STATIC_ANON"/>
+	</Match>
+	<Match>
+		<Class name="org.openjdk.jmc.console.ext.agent.tabs.overview.OverviewTab"/>
+		<Method name="loadAgentListener"/>
+		<Bug pattern="UPM_UNCALLED_PRIVATE_METHOD"/>
+	</Match>
+	<Match>
+		<Class name="org.openjdk.jmc.console.ext.agent.tabs.overview.OverviewTab"/>
+		<Bug pattern="URF_UNREAD_FIELD"/>
+	</Match>
+	<Match>
+		<Class name="org.openjdk.jmc.console.ext.agent.tabs.overview.OverviewTab"/>
+		<Bug pattern="UUF_UNUSED_FIELD"/>
+	</Match>
+	<Match>
+		<Class name="org.openjdk.jmc.console.ext.agent.tabs.editor.internal.NonRuleBasedDamagerRepairer"/>
+		<Method name="endOfLineOf"/>
+		<Bug pattern="UWF_FIELD_NOT_INITIALIZED_IN_CONSTRUCTOR"/>
+	</Match>
+	<Match>
+		<Class name="org.openjdk.jmc.console.ext.agent.tabs.editor.internal.NonRuleBasedDamagerRepairer"/>
+		<Method name="getDamageRegion"/>
+		<Bug pattern="UWF_FIELD_NOT_INITIALIZED_IN_CONSTRUCTOR"/>
+	</Match>
+	<Match>
+		<Class name="org.openjdk.jmc.console.ext.agent.tabs.editor.internal.XmlDoubleClickStrategy"/>
+		<Bug pattern="UWF_FIELD_NOT_INITIALIZED_IN_CONSTRUCTOR"/>
+	</Match>
+	<Match>
+		<Class name="org.openjdk.jmc.console.ext.agent.tabs.overview.OverviewTab"/>
+		<Method name="loadAgentListener"/>
+		<Bug pattern="UWF_FIELD_NOT_INITIALIZED_IN_CONSTRUCTOR"/>
+	</Match>
 </FindBugsFilter>
