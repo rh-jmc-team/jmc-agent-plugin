@@ -3,7 +3,7 @@
 set -e
 echo "======== Building JMC ======================="
 cd $HOME
-sh -c "git clone -–depth 1 https://github.com/openjdk/jmc.git"
+sh -c "git clone --depth 1 https://github.com/openjdk/jmc.git"
 
 echo "======== Building p2 repo ==================="
 cd jmc/releng/third-party
