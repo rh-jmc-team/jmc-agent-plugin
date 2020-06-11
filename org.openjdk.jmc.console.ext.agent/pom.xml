@@ -39,21 +39,26 @@
 
 	<parent>
 		<groupId>org.openjdk.jmc</groupId>
-		<artifactId>missioncontrol.application</artifactId>
+		<!--artifactId>missioncontrol.application</artifactId-->
+		<!--TODO: replace this with above when merging to JMC repo-->
+		<artifactId>missioncontrol.application.jmc-agent-plugin</artifactId>
 		<version>8.0.0-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>org.openjdk.jmc.console.ext.agent</artifactId>
-	<packaging>eclipse-plugin</packaging>
 	<version>8.0.0-SNAPSHOT</version>
+	<packaging>eclipse-plugin</packaging>
 
 	<properties>
 		<jmc.agent.version>1.0.0-SNAPSHOT</jmc.agent.version>
 		<java.version>1.8</java.version>
-		<tycho.version>1.6.0</tycho.version>
-		<maven.compiler.target>${java.version}</maven.compiler.target>
-		<maven.compiler.source>${java.version}</maven.compiler.source>
-		<spotless.config.path>${basedir}/../configuration/formatting.xml</spotless.config.path>
+
+		<!--spotless.config.path>${basedir}/../../configuration/ide/eclipse/formatting/formatting.xml</spotless.config.path-->
+		<!--TODO: replace this with above when merging to JMC repo-->
+		<spotless.config.path>${basedir}/../configuration/ide/eclipse/formatting/formatting.xml</spotless.config.path>
+
+		<!--TODO: remove this when merging to JMC repo-->
+		<spotbugs.config.path>${basedir}/../configuration/spotbugs/spotbugs-exclude.xml</spotbugs.config.path>
 	</properties>
 
 	<dependencies>
