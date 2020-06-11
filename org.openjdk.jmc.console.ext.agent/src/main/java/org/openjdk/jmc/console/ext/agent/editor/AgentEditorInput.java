@@ -47,7 +47,8 @@ public class AgentEditorInput implements IEditorInput {
 	private final IConnectionHandle connectionHandle;
 	private final AgentJmxHelper agentJmxHelper;
 
-	public AgentEditorInput(IServerHandle serverHandle, IConnectionHandle connectionHandle, AgentJmxHelper agentJmxHelper) {
+	public AgentEditorInput(IServerHandle serverHandle, IConnectionHandle connectionHandle,
+			AgentJmxHelper agentJmxHelper) {
 		this.serverHandle = serverHandle;
 		this.connectionHandle = connectionHandle;
 		this.agentJmxHelper = agentJmxHelper;

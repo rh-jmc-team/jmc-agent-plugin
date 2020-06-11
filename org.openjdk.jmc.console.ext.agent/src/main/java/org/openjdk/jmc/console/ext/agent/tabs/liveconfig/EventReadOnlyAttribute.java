@@ -84,7 +84,8 @@ public class EventReadOnlyAttribute extends AbstractReadOnlyAttribute {
 		List<IReadOnlyAttribute> elements = new ArrayList<>();
 		for (String key : cd.getCompositeType().keySet()) {
 			if (cd.get(key) != null) {
-				elements.add(new EventReadOnlyAttribute(parent, key, cd.getCompositeType().getType(key).getClassName(), cd.get(key)));
+				elements.add(new EventReadOnlyAttribute(parent, key, cd.getCompositeType().getType(key).getClassName(),
+						cd.get(key)));
 			}
 		}
 		return PartitionedList.create(elements);

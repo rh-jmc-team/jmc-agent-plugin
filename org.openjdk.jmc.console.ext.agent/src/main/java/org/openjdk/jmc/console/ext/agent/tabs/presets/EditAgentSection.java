@@ -44,7 +44,6 @@ public class EditAgentSection extends Composite {
 	private AgentJmxHelper agentJmxHelper = null;
 	final private Text messageOutput;
 
-
 	public EditAgentSection(Composite parent) {
 		super(parent, SWT.NONE);
 		this.setLayout(new GridLayout());
