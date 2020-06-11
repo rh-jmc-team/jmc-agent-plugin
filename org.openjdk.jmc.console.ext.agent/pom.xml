@@ -61,14 +61,6 @@
 		<spotbugs.config.path>${basedir}/../configuration/spotbugs/spotbugs-exclude.xml</spotbugs.config.path>
 	</properties>
 
-	<dependencies>
-		<dependency>
-			<groupId>org.openjdk.jmc</groupId>
-			<artifactId>org.openjdk.jmc.agent</artifactId>
-			<version>${jmc.agent.version}</version>
-		</dependency>
-	</dependencies>
-
 	<build>
 		<plugins>
 			<plugin>
