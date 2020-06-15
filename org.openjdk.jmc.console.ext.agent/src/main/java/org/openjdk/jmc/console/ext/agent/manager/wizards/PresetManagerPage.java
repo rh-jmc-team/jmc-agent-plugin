@@ -13,10 +13,10 @@ import org.openjdk.jmc.ui.misc.DialogToolkit;
 public class PresetManagerPage extends WizardPage {
 	private static final String PAGE_NAME = "Agent Preset Manager";
 	private static final String MESSAGE_PRESET_MANAGER_PAGE_TITLE = "JMC Agent Configuration Preset Manager";
-	private static final String MESSAGE_PRESET_MANAGER_PAGE_DESCRIPTION= "Presets for JMC agent are useful to repeatedly apply configurations to a running JMC agent.";
-	
+	private static final String MESSAGE_PRESET_MANAGER_PAGE_DESCRIPTION = "Presets for JMC agent are useful to repeatedly apply configurations to a running JMC agent.";
+
 	private final PresetRepository repository;
-	
+
 	public PresetManagerPage(PresetRepository repository) {
 		super(PAGE_NAME);
 

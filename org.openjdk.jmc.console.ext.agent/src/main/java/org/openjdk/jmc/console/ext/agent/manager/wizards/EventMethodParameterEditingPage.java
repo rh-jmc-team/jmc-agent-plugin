@@ -11,7 +11,7 @@ import org.openjdk.jmc.console.ext.agent.manager.model.ICapturedValue;
 public class EventMethodParameterEditingPage extends WizardPage {
 	private static final String PAGE_NAME = "Agent Parameter Editing";
 	private static final String MESSAGE_PRESET_MANAGER_PAGE_TITLE = "Editing a Parameter or Return Value Capturing";
-	private static final String MESSAGE_PRESET_MANAGER_PAGE_DESCRIPTION= "Define the capturing of a parameter or return value by its index.";
+	private static final String MESSAGE_PRESET_MANAGER_PAGE_DESCRIPTION = "Define the capturing of a parameter or return value by its index.";
 
 	private final ICapturedValue capturedValue;
 

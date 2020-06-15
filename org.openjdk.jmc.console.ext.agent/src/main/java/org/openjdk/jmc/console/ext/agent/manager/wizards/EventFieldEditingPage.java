@@ -11,7 +11,7 @@ import org.openjdk.jmc.console.ext.agent.manager.model.IField;
 public class EventFieldEditingPage extends WizardPage {
 	private static final String PAGE_NAME = "Agent Parameter Editing";
 	private static final String MESSAGE_PRESET_MANAGER_PAGE_TITLE = "Editing a Parameter or Return Value Capturing";
-	private static final String MESSAGE_PRESET_MANAGER_PAGE_DESCRIPTION= "Define a custom evaluation and capturing with an expression";
+	private static final String MESSAGE_PRESET_MANAGER_PAGE_DESCRIPTION = "Define a custom evaluation and capturing with an expression";
 
 	private final IField field;
 

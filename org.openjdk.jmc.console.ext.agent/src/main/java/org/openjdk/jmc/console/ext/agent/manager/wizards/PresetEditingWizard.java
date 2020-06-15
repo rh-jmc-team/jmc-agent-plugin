@@ -6,11 +6,11 @@ import org.openjdk.jmc.console.ext.agent.manager.model.IPreset;
 public class PresetEditingWizard extends Wizard {
 
 	private final IPreset preset;
-	
+
 	protected PresetEditingWizard(IPreset preset) {
 		this.preset = preset;
 	}
-	
+
 	@Override
 	public boolean performFinish() {
 		return false;
