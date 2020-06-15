@@ -122,9 +122,13 @@ public final class AgentJmxHelper {
 			Object[] params = {xmlDescription};
 			String[] signature = {String.class.getName()};
 			mbsc.invoke(new ObjectName(AGENT_OBJECT_NAME), DEFINE_EVENT_PROBES, params, signature);
-		} catch (InstanceNotFoundException | MalformedObjectNameException | MBeanException | ReflectionException | IOException e) {
-			AgentPlugin.getDefault().getLogger()
-					.log(Level.WARNING, "Could not define event probes: " + xmlDescription, e);
+		} catch (InstanceNotFoundException
+				| MalformedObjectNameException
+				| MBeanException
+				| ReflectionException
+				| IOException e) {
+			AgentPlugin.getDefault().getLogger().log(Level.WARNING, "Could not define event probes: " + xmlDescription,
+					e);
 		}
 	}
 

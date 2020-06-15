@@ -102,7 +102,8 @@ public class AgentEditorOpener implements IActionFactory {
 				// FIXME: Show stacktrace? (Need to show our own ExceptionDialog in that case, or maybe create our own DetailsAreaProvider, see WorkbenchStatusDialogManager.setDetailsAreaProvider)
 				return new Status(IStatus.ERROR, AgentPlugin.PLUGIN_ID, IStatus.ERROR,
 						NLS.bind(MESSAGE_COULD_NOT_CONNECT, serverHandle.getServerDescriptor().getDisplayName(),
-								e.getMessage()), e);
+								e.getMessage()),
+						e);
 			}
 		}
 
@@ -139,7 +140,7 @@ public class AgentEditorOpener implements IActionFactory {
 					DialogToolkit.showException(window.getShell(), MESSAGE_FAILED_TO_OPEN_AGENT_EDITOR, e);
 				}
 			});
-			
+
 			return Status.OK_STATUS;
 		}
 

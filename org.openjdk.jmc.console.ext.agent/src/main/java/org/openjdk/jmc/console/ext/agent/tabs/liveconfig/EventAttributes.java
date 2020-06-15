@@ -42,9 +42,10 @@ public final class EventAttributes {
 	private static final String EVENT_ID = "id";
 
 	@SuppressWarnings("serial")
-	public static final List<String> ATTRIBUTE_LIST = Collections.unmodifiableList(
-		    new ArrayList<String>() {{
-		        add(EVENT_ID);
-		    }});
+	public static final List<String> ATTRIBUTE_LIST = Collections.unmodifiableList(new ArrayList<String>() {
+		{
+			add(EVENT_ID);
+		}
+	});
 
 }

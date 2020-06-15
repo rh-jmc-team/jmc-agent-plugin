@@ -33,7 +33,6 @@
  */
 package org.openjdk.jmc.console.ext.agent.tabs.liveconfig;
 
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -76,7 +75,7 @@ public class EventTableInspector {
 		public String getText(Object element) {
 			if (element instanceof IReadOnlyAttribute) {
 				Object value = ((IReadOnlyAttribute) element).getValue();
-				return value == null ? "" :  TypeHandling.getValueString(value);
+				return value == null ? "" : TypeHandling.getValueString(value);
 			}
 			return "";
 		}
@@ -92,12 +91,10 @@ public class EventTableInspector {
 		tree.setData("name", LIVECONFIG_PROPERTIESTAB_EVENTTREE_NAME); //$NON-NLS-1$
 
 		List<IColumn> columns = new ArrayList<>();
-		columns.add(
-				new ColumnBuilder("Name", "name", nameLabelProvider).comparator( //$NON-NLS-1$
-						new OptimisticComparator(nameLabelProvider)).build());
+		columns.add(new ColumnBuilder("Name", "name", nameLabelProvider).comparator( //$NON-NLS-1$
+				new OptimisticComparator(nameLabelProvider)).build());
 		IColumn valueColumn = new ColumnBuilder("Value", "value", //$NON-NLS-1$
-				valueLabelProvider)
-						.comparator(new OptimisticComparator(valueLabelProvider)).build();
+				valueLabelProvider).comparator(new OptimisticComparator(valueLabelProvider)).build();
 		columns.add(valueColumn);
 		ColumnManager.build(viewer, columns, null);
 	}
