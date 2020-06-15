@@ -74,4 +74,26 @@
             contributorClass="org.eclipse.ui.texteditor.BasicTextEditorActionContributor">
       	</editor>
    </extension>
+
+    <extension point="org.eclipse.ui.commands">
+		<command
+        id="org.openjdk.jmc.console.ext.agent.openPresetManagerHandler"
+		defaultHandler="org.openjdk.jmc.console.ext.agent.manager.OpenPresetManagerHandler"
+		name="Open Agent Preset Manager">
+		</command>
+    </extension>
+
+    <extension
+      point="org.eclipse.ui.menus">
+    <menuContribution
+        allPopups="false"
+        locationURI="menu:window?after=additions">
+      <command
+            commandId="org.openjdk.jmc.console.ext.agent.openPresetManagerHandler"
+            icon="icons/agent-16.png"
+            label="Agent Preset Manager"
+            style="push">
+      </command>
+    </menuContribution>
+  </extension>
 </plugin>
