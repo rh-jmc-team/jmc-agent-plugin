@@ -116,8 +116,8 @@ public class FeatureTableSection extends MCSectionPart {
 			Set<String> keys = cd.getCompositeType().keySet();
 			for (String key : keys) {
 				if (!isEmptyCompositeData(cd, key) && !EventAttributes.ATTRIBUTE_LIST.contains(key)) {
-					attributes.add(
-							new EventReadOnlyAttribute(key, cd.getCompositeType().getType(key).getClassName(), cd.get(key)));
+					attributes.add(new EventReadOnlyAttribute(key, cd.getCompositeType().getType(key).getClassName(),
+							cd.get(key)));
 				}
 			}
 		}
@@ -129,8 +129,8 @@ public class FeatureTableSection extends MCSectionPart {
 		if (cd != null) {
 			for (String key : EventAttributes.ATTRIBUTE_LIST) {
 				if (!isEmptyCompositeData(cd, key)) {
-					attributes.add(
-							new EventReadOnlyAttribute(key, cd.getCompositeType().getType(key).getClassName(), cd.get(key)));
+					attributes.add(new EventReadOnlyAttribute(key, cd.getCompositeType().getType(key).getClassName(),
+							cd.get(key)));
 				}
 			}
 		}
