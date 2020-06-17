@@ -31,31 +31,67 @@
  * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.openjdk.jmc.console.ext.agent.manager.model;
+package org.openjdk.jmc.console.ext.agent.manager.internal;
 
-public interface IPreset {
+import org.openjdk.jmc.console.ext.agent.manager.model.IMethodParameter;
 
-	String getFileName();
+public class MethodParameter implements IMethodParameter {
 
-	void setFileName(String fileName);
+	private String name;
+	private String description;
+	private ContentType contentType;
+	private String relationKey;
+	private String converter;
 
-	void setClassPrefix(String prefix);
+	@Override
+	public String getName() {
+		return name;
+	}
 
-	String getClassPrefix();
+	@Override
+	public void setName(String name) {
+		this.name = name;
+	}
 
-	void setAllowToString(boolean allowed);
+	@Override
+	public String getDescription() {
+		return description;
+	}
 
-	boolean getAllowToString();
+	@Override
+	public void setDescription(String description) {
+		this.description = description;
 
-	void setAllowConverter(boolean allowed);
+	}
 
-	boolean getAllowConverter();
+	@Override
+	public ContentType getContentType() {
+		return contentType;
+	}
 
-	IEvent[] getEvents();
+	@Override
+	public void setContentType(ContentType contentType) {
+		this.contentType = contentType;
+	}
 
-	void addEvent(IEvent event);
+	@Override
+	public String getRelationKey() {
+		return relationKey;
+	}
 
-	void removeEvent(IEvent event);
+	@Override
+	public void setRelationKey(String relationKey) {
+		this.relationKey = relationKey;
+	}
 
-	boolean containEvent(IEvent event);
+	@Override
+	public String getConverter() {
+		return converter;
+	}
+
+	@Override
+	public void setConverter(String converter) {
+		this.converter = converter;
+	}
+
 }

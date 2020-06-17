@@ -31,31 +31,80 @@
  * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.openjdk.jmc.console.ext.agent.manager.model;
+package org.openjdk.jmc.console.ext.agent.manager.internal;
 
-public interface IPreset {
+import java.util.ArrayList;
+import java.util.List;
 
-	String getFileName();
+import org.openjdk.jmc.console.ext.agent.manager.model.IEvent;
+import org.openjdk.jmc.console.ext.agent.manager.model.IPreset;
 
-	void setFileName(String fileName);
+public class Preset implements IPreset {
 
-	void setClassPrefix(String prefix);
+	private String fileName;
+	private String classPrefix;
+	private boolean allowToString;
+	private boolean allowConverter;
+	private List<IEvent> events = new ArrayList<>();
 
-	String getClassPrefix();
+	@Override
+	public String getFileName() {
+		return fileName;
+	}
 
-	void setAllowToString(boolean allowed);
+	@Override
+	public void setFileName(String fileName) {
+		this.fileName = fileName;
+	}
 
-	boolean getAllowToString();
+	@Override
+	public void setClassPrefix(String prefix) {
+		this.classPrefix = prefix;
+	}
 
-	void setAllowConverter(boolean allowed);
+	@Override
+	public String getClassPrefix() {
+		return classPrefix;
+	}
 
-	boolean getAllowConverter();
+	@Override
+	public void setAllowToString(boolean allowed) {
+		allowToString = allowed;
+	}
 
-	IEvent[] getEvents();
+	@Override
+	public boolean getAllowToString() {
+		return allowToString;
+	}
 
-	void addEvent(IEvent event);
+	@Override
+	public void setAllowConverter(boolean allowed) {
+		allowConverter = allowed;
+	}
 
-	void removeEvent(IEvent event);
+	@Override
+	public boolean getAllowConverter() {
+		return allowConverter;
+	}
 
-	boolean containEvent(IEvent event);
+	@Override
+	public IEvent[] getEvents() {
+		return events.toArray(new IEvent[0]);
+	}
+
+	@Override
+	public void addEvent(IEvent event) {
+		events.add(event);
+	}
+
+	@Override
+	public void removeEvent(IEvent event) {
+		events.remove(event);
+	}
+
+	@Override
+	public boolean containEvent(IEvent event) {
+		return events.contains(event);
+	}
+
 }
