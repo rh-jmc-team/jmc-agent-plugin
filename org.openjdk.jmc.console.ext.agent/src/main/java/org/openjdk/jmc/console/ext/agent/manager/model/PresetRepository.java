@@ -33,17 +33,29 @@
  */
 package org.openjdk.jmc.console.ext.agent.manager.model;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class PresetRepository {
+	private List<IPreset> presets = new ArrayList<>();
 
 	public void remove(IPreset configuration) {
 		// TODO: implementation
+		presets.remove(configuration);
 	}
 
 	public void add(IPreset configuration) {
 		// TODO: implementation
+		presets.add(configuration);
 	}
 
-	public void contains(IPreset configuration) {
+	public boolean contains(IPreset configuration) {
 		// TODO: implementation
+		return presets.contains(configuration);
+	}
+
+	public IPreset[] list() {
+		// TODO: implementation
+		return presets.toArray(new IPreset[0]);
 	}
 }
