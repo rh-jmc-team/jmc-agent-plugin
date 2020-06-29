@@ -132,7 +132,6 @@ public class PresetManagerPage extends WizardPage {
 		return button;
 	}
 
-	// TODO: call this function when "New" or "Edit" button clicked
 	private void openPresetEditingWizardFor(IPreset preset) {
 		if (!DialogToolkit.openWizardWithHelp(new PresetEditingWizard(preset))) {
 			return;
