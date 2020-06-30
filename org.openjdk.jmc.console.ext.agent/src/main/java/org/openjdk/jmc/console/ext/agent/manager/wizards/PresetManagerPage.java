@@ -242,7 +242,7 @@ public class PresetManagerPage extends WizardPage {
 		@Override
 		public String getText(Object element) {
 			if (!(element instanceof IPreset)) {
-				throw new IllegalArgumentException("element must be a IPreset");
+				throw new IllegalArgumentException("element must be an IPreset");
 			}
 
 			IPreset preset = (IPreset) element;

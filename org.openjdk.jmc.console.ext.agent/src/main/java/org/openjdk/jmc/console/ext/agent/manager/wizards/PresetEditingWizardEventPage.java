@@ -34,6 +34,8 @@
 package org.openjdk.jmc.console.ext.agent.manager.wizards;
 
 import com.sun.tools.javac.util.List;
+import org.eclipse.jface.viewers.IContentProvider;
+import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
@@ -48,6 +50,7 @@ import org.eclipse.swt.widgets.Label;
 import org.openjdk.jmc.console.ext.agent.manager.internal.Event;
 import org.openjdk.jmc.console.ext.agent.manager.model.IEvent;
 import org.openjdk.jmc.console.ext.agent.manager.model.IPreset;
+import org.openjdk.jmc.ui.misc.AbstractStructuredContentProvider;
 import org.openjdk.jmc.ui.misc.DialogToolkit;
 
 public class PresetEditingWizardEventPage extends WizardPage {
@@ -123,7 +126,9 @@ public class PresetEditingWizardEventPage extends WizardPage {
 	private void createEventTable(Composite parent) {
 		tableViewer = new TableViewer(parent, SWT.V_SCROLL | SWT.BORDER);
 		tableViewer.getControl().setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-		// TODO: add cols, set content/label providers
+		tableViewer.setContentProvider(new EventTableContentProvider());
+		tableViewer.setLabelProvider(new EventTableLabelProvider());
+		tableViewer.setInput(preset);
 	}
 
 	private Composite createEventButtons(Composite parent) {
@@ -185,6 +190,7 @@ public class PresetEditingWizardEventPage extends WizardPage {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				preset.removeEvent((IEvent) tableViewer.getStructuredSelection().getFirstElement());
+				tableViewer.refresh();
 			}
 		});
 		removeButton.setEnabled(false);
@@ -201,5 +207,31 @@ public class PresetEditingWizardEventPage extends WizardPage {
 
 		// TODO: save the modified event to the preset
 		preset.addEvent(event);
+	}
+
+	private static class EventTableContentProvider extends AbstractStructuredContentProvider
+			implements IContentProvider {
+
+		@Override
+		public Object[] getElements(Object inputElement) {
+			if (!(inputElement instanceof IPreset)) {
+				throw new IllegalArgumentException("input element must be a IPreset");
+			}
+
+			IPreset preset = (IPreset) inputElement;
+			return preset.getEvents();
+		}
+	}
+	
+	private static class EventTableLabelProvider extends LabelProvider {
+		@Override
+		public String getText(Object element) {
+			if (!(element instanceof IEvent)) {
+				throw new IllegalArgumentException("element must be an IEvent");
+			}
+
+			IEvent event = (IEvent) element;
+			return event.getName();
+		}
 	}
 }
