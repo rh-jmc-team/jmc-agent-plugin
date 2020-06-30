@@ -33,13 +33,21 @@
  */
 package org.openjdk.jmc.console.ext.agent.manager.wizards;
 
+import org.eclipse.jface.text.Document;
+import org.eclipse.jface.text.IDocument;
+import org.eclipse.jface.text.IDocumentPartitioner;
+import org.eclipse.jface.text.rules.FastPartitioner;
+import org.eclipse.jface.text.source.SourceViewer;
+import org.eclipse.jface.text.source.VerticalRuler;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Label;
 import org.openjdk.jmc.console.ext.agent.manager.model.IPreset;
+import org.openjdk.jmc.console.ext.agent.tabs.editor.internal.ColorManager;
+import org.openjdk.jmc.console.ext.agent.tabs.editor.internal.XmlConfiguration;
+import org.openjdk.jmc.console.ext.agent.tabs.editor.internal.XmlPartitionScanner;
 
 public class PresetEditingWizardPreviewPage extends WizardPage {
 	private static final String PAGE_NAME = "Agent Preset Editing";
@@ -65,13 +73,30 @@ public class PresetEditingWizardPreviewPage extends WizardPage {
 		Composite container = new Composite(sc, SWT.NONE);
 		sc.setContent(container);
 
-		// TODO: create preview page control here
 		container.setLayout(new FillLayout());
-		new Label(container, SWT.NONE).setText("TODO: create preview page control here");
+
+		createPreviewViewer(container);
 
 		sc.setExpandHorizontal(true);
 		sc.setExpandVertical(true);
 		sc.setMinSize(container.computeSize(SWT.DEFAULT, SWT.DEFAULT));
 		setControl(sc);
+	}
+
+	private void createPreviewViewer(Composite container) {
+		Composite parent = new Composite(container, SWT.NONE);
+		parent.setLayout(new FillLayout());
+
+		VerticalRuler ruler = new VerticalRuler(0);
+		SourceViewer editor = new SourceViewer(parent, ruler, SWT.NONE);
+		editor.configure(new XmlConfiguration(new ColorManager()));
+
+		IDocument document = new Document();
+		document.set("<jfragent>\n</jfragent>"); // TODO: generate real output preview
+		IDocumentPartitioner partitioner = new FastPartitioner(new XmlPartitionScanner(),
+				new String[] {XmlPartitionScanner.XML_TAG, XmlPartitionScanner.XML_COMMENT});
+		partitioner.connect(document);
+		document.setDocumentPartitioner(partitioner);
+		editor.setDocument(document);
 	}
 }
