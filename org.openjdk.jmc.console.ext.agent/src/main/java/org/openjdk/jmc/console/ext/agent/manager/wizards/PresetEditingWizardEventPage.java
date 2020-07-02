@@ -34,9 +34,14 @@
 package org.openjdk.jmc.console.ext.agent.manager.wizards;
 
 import com.sun.tools.javac.util.List;
+import org.eclipse.jface.viewers.CellLabelProvider;
+import org.eclipse.jface.viewers.ColumnLabelProvider;
+import org.eclipse.jface.viewers.ColumnViewerToolTipSupport;
 import org.eclipse.jface.viewers.IContentProvider;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.TableViewer;
+import org.eclipse.jface.viewers.TableViewerColumn;
+import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
@@ -124,10 +129,39 @@ public class PresetEditingWizardEventPage extends WizardPage {
 	}
 
 	private void createEventTable(Composite parent) {
-		tableViewer = new TableViewer(parent, SWT.V_SCROLL | SWT.BORDER);
+		tableViewer = new TableViewer(parent, SWT.V_SCROLL | SWT.BORDER | SWT.FULL_SELECTION);
 		tableViewer.getControl().setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 		tableViewer.setContentProvider(new EventTableContentProvider());
-		tableViewer.setLabelProvider(new EventTableLabelProvider());
+		tableViewer.getTable().setHeaderVisible(true);
+
+		TableViewerColumn idColumn = new TableViewerColumn(tableViewer, SWT.NONE);
+		idColumn.getColumn().setText("ID");
+		idColumn.getColumn().setWidth(200);
+		idColumn.getColumn().setMoveable(true);
+		idColumn.setLabelProvider(new EventTableLabelProvider() {
+			@Override
+			protected String doGetText(IEvent event) {
+				return event.getId();
+			}
+		});
+
+		TableViewerColumn nameColumn = new TableViewerColumn(tableViewer, SWT.NONE);
+		nameColumn.getColumn().setText("Name");
+		nameColumn.getColumn().setWidth(200);
+		nameColumn.getColumn().setMoveable(true);
+		nameColumn.setLabelProvider(new EventTableLabelProvider() {
+			@Override
+			protected String doGetText(IEvent event) {
+				return event.getName();
+			}
+		});
+		
+		tableViewer.getTable().setSortColumn(idColumn.getColumn());
+		tableViewer.getTable().setSortDirection(SWT.DOWN);
+		tableViewer.getTable().setLinesVisible(true);
+		tableViewer.getTable().setHeaderVisible(true);
+		ColumnViewerToolTipSupport.enableFor(tableViewer); // TODO:???
+
 		tableViewer.setInput(preset);
 	}
 
@@ -154,7 +188,6 @@ public class PresetEditingWizardEventPage extends WizardPage {
 	}
 
 	private void bindListeners() {
-		// TODO: as the name suggests
 		addButton.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
@@ -222,16 +255,17 @@ public class PresetEditingWizardEventPage extends WizardPage {
 			return preset.getEvents();
 		}
 	}
-	
-	private static class EventTableLabelProvider extends LabelProvider {
+
+	private static abstract class EventTableLabelProvider extends ColumnLabelProvider {
 		@Override
 		public String getText(Object element) {
 			if (!(element instanceof IEvent)) {
 				throw new IllegalArgumentException("element must be an IEvent");
 			}
 
-			IEvent event = (IEvent) element;
-			return event.getName();
+			return doGetText((IEvent) element);
 		}
+
+		protected abstract String doGetText(IEvent event);
 	}
 }

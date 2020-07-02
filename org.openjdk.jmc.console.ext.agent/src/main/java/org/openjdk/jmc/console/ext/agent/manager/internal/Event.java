@@ -43,6 +43,7 @@ import org.openjdk.jmc.console.ext.agent.manager.model.IMethodReturnValue;
 
 public class Event implements IEvent {
 
+	private String id;
 	private String name;
 	private String clazz;
 	private String description;
@@ -56,6 +57,16 @@ public class Event implements IEvent {
 	private IMethodReturnValue returnValue;
 	private List<IField> fields = new ArrayList<>();
 
+	@Override
+	public String getId() {
+		return id;
+	}
+	
+	@Override
+	public void setId(String id) {
+		this.id = id;
+	}
+	
 	@Override
 	public String getName() {
 		return name;
