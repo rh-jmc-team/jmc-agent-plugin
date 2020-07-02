@@ -33,26 +33,55 @@
  */
 package org.openjdk.jmc.console.ext.agent.manager.wizards;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
-import org.eclipse.swt.layout.FillLayout;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.Spinner;
+import org.eclipse.swt.widgets.Text;
+import org.openjdk.jmc.console.ext.agent.manager.internal.MethodParameter;
+import org.openjdk.jmc.console.ext.agent.manager.internal.MethodReturnValue;
 import org.openjdk.jmc.console.ext.agent.manager.model.ICapturedValue;
+import org.openjdk.jmc.ui.wizards.IPerformFinishable;
+import org.openjdk.jmc.console.ext.agent.manager.model.IMethodParameter;
+import org.openjdk.jmc.console.ext.agent.manager.model.INamedCapturedValue;
 
-public class EventMethodParameterEditingPage extends WizardPage {
+public class EventMethodParameterEditingPage extends WizardPage implements IPerformFinishable {
 	private static final String PAGE_NAME = "Agent Parameter Editing";
-	private static final String MESSAGE_PRESET_MANAGER_PAGE_TITLE = "Editing a Parameter or Return Value Capturing";
+	private static final String MESSAGE_PRESET_MANAGER_PAGE_TITLE = "Edit a Parameter or Return Value Capturing";
 	private static final String MESSAGE_PRESET_MANAGER_PAGE_DESCRIPTION = "Define the capturing of a parameter or return value by its index.";
-
-	private final ICapturedValue capturedValue;
+	private ICapturedValue capturedValue;
+	private Text name;
+	private Spinner index;
+	private Button returnValueBtn;
+	private Text description;
+	private Combo contentType;
+	private Text relationalKey;
+	private Text converterType;
 
 	public EventMethodParameterEditingPage(ICapturedValue capturedValue) {
 		super(PAGE_NAME);
 
 		// The capturedValue could be a IMethodParameter or IMethodReturnValue
 		this.capturedValue = capturedValue;
+	}
+
+	public EventMethodParameterEditingPage() {
+		super(PAGE_NAME);
+	}
+
+	public ICapturedValue getCapturedValue() {
+		return capturedValue;
 	}
 
 	@Override
@@ -66,13 +95,159 @@ public class EventMethodParameterEditingPage extends WizardPage {
 		Composite container = new Composite(sc, SWT.NONE);
 		sc.setContent(container);
 
-		// TODO: create parameter editor control here
-		container.setLayout(new FillLayout());
-		new Label(container, SWT.NONE).setText("TODO: create parameter editor control here");
+		container.setLayout(new GridLayout());
+		container.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+
+		Composite gridSection = new Composite(container, SWT.NONE);
+		gridSection.setLayout(new GridLayout(2, false));
+
+		createPageContent(gridSection);
+		gridSection.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
+
+		populateStoredValues();
 
 		sc.setExpandHorizontal(true);
 		sc.setExpandVertical(true);
 		sc.setMinSize(container.computeSize(SWT.DEFAULT, SWT.DEFAULT));
 		setControl(sc);
 	}
+
+	private void createPageContent(Composite parent) {
+		GridData gdLabel = new GridData(SWT.BEGINNING, SWT.CENTER, false, false);
+		GridData gdText = new GridData(SWT.FILL, SWT.CENTER, true, true);
+		gdText.minimumWidth = 0;
+		gdText.widthHint = 300;
+
+		Label label = createLabel(parent, "Name:");
+		label.setLayoutData(gdLabel);
+
+		name = createText(parent);
+		name.setMessage("Parameter or Return Value Name");
+		name.setLayoutData(gdText);
+
+		label = createLabel(parent, "Index:");
+		label.setLayoutData(gdLabel);
+
+		Composite indexContainer = new Composite(parent, SWT.NONE);
+		indexContainer.setLayout(new GridLayout(3, false));
+		indexContainer.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+
+		index = new Spinner(indexContainer, SWT.NONE);
+		index.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
+
+		label = createLabel(indexContainer, "This is a return value");
+		label.setLayoutData(new GridData(SWT.CENTER, SWT.CENTER, true, true));
+
+		returnValueBtn = new Button(indexContainer, SWT.CHECK);
+		returnValueBtn.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
+		returnValueBtn.addListener(SWT.Selection, new Listener() {
+
+			@Override
+			public void handleEvent(Event event) {
+				if (returnValueBtn.getSelection()) {
+					//index.deselectAll();
+					index.setEnabled(false);
+				} else {
+					index.setEnabled(true);
+				}
+
+			}
+
+		});
+
+		label = createLabel(parent, "Description:");
+		label.setLayoutData(gdLabel);
+
+		GridData largeText = new GridData(SWT.FILL, SWT.CENTER, true, true);
+		largeText.minimumWidth = 0;
+		largeText.widthHint = 300;
+		largeText.heightHint = 100;
+		largeText.horizontalSpan = 2;
+
+		description = createTextMulti(parent);
+		description.setMessage("Description of this parameter or return value");
+		description.setLayoutData(largeText);
+
+		label = createLabel(parent, "Content Type:");
+		label.setLayoutData(gdLabel);
+
+		contentType = new Combo(parent, SWT.DROP_DOWN | SWT.READ_ONLY);
+		List<String> contentTypes = new ArrayList<>();
+		for (ICapturedValue.ContentType type : IMethodParameter.ContentType.values()) {
+			contentTypes.add(type.name());
+		}
+		contentType.setItems(contentTypes.toArray(new String[0]));
+		contentType.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
+
+		label = createLabel(parent, "Relational Key:");
+		label.setLayoutData(gdLabel);
+
+		relationalKey = createText(parent);
+		relationalKey.setMessage("schema://some-uri");
+		relationalKey.setLayoutData(gdText);
+
+		label = createLabel(parent, "Converter Type:");
+		label.setLayoutData(gdLabel);
+
+		converterType = createText(parent);
+		converterType.setMessage("com.company.project.MyConverter");
+		converterType.setLayoutData(gdText);
+	}
+
+	private Label createLabel(Composite parent, String text) {
+		Label label = new Label(parent, SWT.NONE);
+		label.setText(text);
+		return label;
+	}
+
+	private Text createText(Composite parent) {
+		Text text = new Text(parent, SWT.BORDER);
+		text.setEnabled(true);
+		return text;
+	}
+
+	private Text createTextMulti(Composite parent) {
+		Text text = new Text(parent, SWT.BORDER | SWT.MULTI | SWT.V_SCROLL);
+		text.setEnabled(true);
+		return text;
+	}
+
+	private void populateStoredValues() {
+		if (capturedValue == null) {
+			return;
+		}
+		converterType.setText(capturedValue.getConverter());
+		description.setText(capturedValue.getDescription());
+		relationalKey.setText(capturedValue.getRelationKey());
+		name.setText(((INamedCapturedValue) capturedValue).getName());
+		contentType.setText(capturedValue.getContentType().toString());
+		if (capturedValue instanceof IMethodParameter) {
+			index.setSelection(((IMethodParameter) capturedValue).getIndex());
+			returnValueBtn.setEnabled(false);
+		} else {
+			index.setEnabled(false);
+			returnValueBtn.setSelection(true);
+		}
+	}
+
+	@Override
+	public boolean performFinish() {
+		if (capturedValue == null) {
+			capturedValue = returnValueBtn.getSelection() ? new MethodReturnValue() : new MethodParameter();
+		}
+
+		capturedValue.setConverter(converterType.getText());
+		capturedValue.setDescription(description.getText());
+		capturedValue.setRelationKey(relationalKey.getText());
+		((INamedCapturedValue) capturedValue).setName(name.getText());
+		if (contentType.getSelectionIndex() >= 0) {
+			capturedValue.setContentType(ICapturedValue.ContentType.valueOf(contentType.getText()));
+		}
+		if (!returnValueBtn.getSelection()) {
+			((IMethodParameter) capturedValue).setIndex(index.getSelection());
+		}
+
+		return true;
+	}
+
 }

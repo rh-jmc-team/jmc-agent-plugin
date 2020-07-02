@@ -33,19 +33,34 @@
  */
 package org.openjdk.jmc.console.ext.agent.manager.wizards;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
-import org.eclipse.swt.layout.FillLayout;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Text;
+import org.openjdk.jmc.console.ext.agent.manager.model.ICapturedValue;
 import org.openjdk.jmc.console.ext.agent.manager.model.IField;
+import org.openjdk.jmc.console.ext.agent.manager.model.IMethodParameter;
 
 public class EventFieldEditingPage extends WizardPage {
 	private static final String PAGE_NAME = "Agent Parameter Editing";
-	private static final String MESSAGE_PRESET_MANAGER_PAGE_TITLE = "Editing a Parameter or Return Value Capturing";
-	private static final String MESSAGE_PRESET_MANAGER_PAGE_DESCRIPTION = "Define a custom evaluation and capturing with an expression";
-
+	private static final String MESSAGE_FIELD_EDITING_PAGE_TITLE = "Editing a Field";
+	private static final String MESSAGE_FIELD_EDITING_PAGE_DESCRIPTION = "Define a custom evaluation and capturing with an expression";
+	private Text name;
+	private Text expression;
+	private Text description;
+	private Combo contentType;
+	private Text relationalKey;
+	private Text converterType;
 	private final IField field;
 
 	public EventFieldEditingPage(IField field) {
@@ -59,20 +74,168 @@ public class EventFieldEditingPage extends WizardPage {
 	public void createControl(Composite parent) {
 		initializeDialogUnits(parent);
 
-		setTitle(MESSAGE_PRESET_MANAGER_PAGE_TITLE);
-		setDescription(MESSAGE_PRESET_MANAGER_PAGE_DESCRIPTION);
+		setTitle(MESSAGE_FIELD_EDITING_PAGE_TITLE);
+		setDescription(MESSAGE_FIELD_EDITING_PAGE_DESCRIPTION);
 
 		ScrolledComposite sc = new ScrolledComposite(parent, SWT.H_SCROLL | SWT.V_SCROLL);
 		Composite container = new Composite(sc, SWT.NONE);
 		sc.setContent(container);
 
-		// TODO: create field editor control here
-		container.setLayout(new FillLayout());
-		new Label(container, SWT.NONE).setText("TODO: create field editor control here");
+		container.setLayout(new GridLayout());
+		container.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+
+		Composite gridSection = new Composite(container, SWT.NONE);
+		gridSection.setLayout(new GridLayout(2, false));
+
+		createPageContent(gridSection);
+		gridSection.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
+
+		popuateStoredValues();
+		bindListeners();
 
 		sc.setExpandHorizontal(true);
 		sc.setExpandVertical(true);
 		sc.setMinSize(container.computeSize(SWT.DEFAULT, SWT.DEFAULT));
 		setControl(sc);
+	}
+
+	private void createPageContent(Composite parent) {
+		GridData gdLabel = new GridData(SWT.BEGINNING, SWT.CENTER, false, false);
+		GridData gdText = new GridData(SWT.FILL, SWT.CENTER, true, true);
+		gdText.minimumWidth = 0;
+		gdText.widthHint = 300;
+
+		Label label = createLabel(parent, "Name:");
+		label.setLayoutData(gdLabel);
+
+		name = createText(parent);
+		name.setMessage("Field Name");
+		name.setLayoutData(gdText);
+
+		label = createLabel(parent, "Expression:");
+		label.setLayoutData(gdLabel);
+
+		expression = createText(parent);
+		expression.setMessage("Expression to capture");
+		expression.setLayoutData(gdText);
+
+		label = createLabel(parent, "Description:");
+		label.setLayoutData(gdLabel);
+
+		GridData largeText = new GridData(SWT.FILL, SWT.CENTER, true, true);
+		largeText.minimumWidth = 0;
+		largeText.widthHint = 300;
+		largeText.heightHint = 100;
+		largeText.horizontalSpan = 2;
+
+		description = createTextMulti(parent);
+		description.setMessage("Description of field");
+		description.setLayoutData(largeText);
+
+		label = createLabel(parent, "Content Type:");
+		label.setLayoutData(gdLabel);
+
+		contentType = new Combo(parent, SWT.DROP_DOWN | SWT.READ_ONLY);
+		List<String> contentTypes = new ArrayList<>();
+		for (ICapturedValue.ContentType type : IMethodParameter.ContentType.values()) {
+			contentTypes.add(type.name());
+		}
+		contentType.setItems(contentTypes.toArray(new String[0]));
+		contentType.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
+
+		label = createLabel(parent, "Relational Key:");
+		label.setLayoutData(gdLabel);
+
+		relationalKey = createText(parent);
+		relationalKey.setMessage("schema://some-uri");
+		relationalKey.setLayoutData(gdText);
+
+		label = createLabel(parent, "Converter Type:");
+		label.setLayoutData(gdLabel);
+
+		converterType = createText(parent);
+		converterType.setMessage("com.company.project.MyConverter");
+		converterType.setLayoutData(gdText);
+	}
+
+	private Label createLabel(Composite parent, String text) {
+		Label label = new Label(parent, SWT.NONE);
+		label.setText(text);
+		return label;
+	}
+
+	private Text createText(Composite parent) {
+		Text text = new Text(parent, SWT.BORDER);
+		text.setEnabled(true);
+		return text;
+	}
+
+	private Text createTextMulti(Composite parent) {
+		Text text = new Text(parent, SWT.BORDER | SWT.MULTI | SWT.V_SCROLL);
+		text.setEnabled(true);
+		return text;
+	}
+
+	private void popuateStoredValues() {
+		converterType.setText(field.getConverter());
+		description.setText(field.getDescription());
+		relationalKey.setText(field.getRelationKey());
+		name.setText(field.getName());
+		expression.setText(field.getExpression());
+		contentType.setText(field.getContentType().toString());
+	}
+
+	private void bindListeners() {
+		converterType.addModifyListener(new ModifyListener() {
+
+			@Override
+			public void modifyText(ModifyEvent e) {
+				field.setConverter(converterType.getText());
+			}
+		});
+
+		description.addModifyListener(new ModifyListener() {
+
+			@Override
+			public void modifyText(ModifyEvent e) {
+				field.setDescription(description.getText());
+			}
+		});
+
+		relationalKey.addModifyListener(new ModifyListener() {
+
+			@Override
+			public void modifyText(ModifyEvent e) {
+				field.setRelationKey(relationalKey.getText());
+			}
+		});
+
+		name.addModifyListener(new ModifyListener() {
+
+			@Override
+			public void modifyText(ModifyEvent e) {
+				field.setName(name.getText());
+
+			}
+		});
+
+		expression.addModifyListener(new ModifyListener() {
+
+			@Override
+			public void modifyText(ModifyEvent e) {
+				field.setExpression(expression.getText());
+			}
+		});
+
+		contentType.addModifyListener(new ModifyListener() {
+
+			@Override
+			public void modifyText(ModifyEvent e) {
+				if (contentType.getSelectionIndex() >= 0) {
+					field.setContentType(ICapturedValue.ContentType.valueOf(contentType.getText()));
+				}
+			}
+		});
+
 	}
 }

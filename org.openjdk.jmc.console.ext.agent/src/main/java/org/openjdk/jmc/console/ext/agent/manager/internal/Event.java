@@ -42,7 +42,11 @@ import org.openjdk.jmc.console.ext.agent.manager.model.IMethodParameter;
 import org.openjdk.jmc.console.ext.agent.manager.model.IMethodReturnValue;
 
 public class Event implements IEvent {
+	private static final String DEFAULT_STRING_FIELD = "";
+	private static final boolean DEFAULT_BOOLEAN_FIELD = false;
+	private static final Location DEFAULT_LOCATION = Location.WRAP;
 
+	private String id;
 	private String name;
 	private String clazz;
 	private String description;
@@ -55,6 +59,29 @@ public class Event implements IEvent {
 	private List<IMethodParameter> parameters = new ArrayList<>();
 	private IMethodReturnValue returnValue;
 	private List<IField> fields = new ArrayList<>();
+
+	public Event() {
+		id = DEFAULT_STRING_FIELD;
+		name = DEFAULT_STRING_FIELD;
+		clazz = DEFAULT_STRING_FIELD;
+		description = DEFAULT_STRING_FIELD;
+		path = DEFAULT_STRING_FIELD;
+		recordStackTrace = DEFAULT_BOOLEAN_FIELD;
+		useRethrow = DEFAULT_BOOLEAN_FIELD;
+		methodName = DEFAULT_STRING_FIELD;
+		methodDescriptor = DEFAULT_STRING_FIELD;
+		location = DEFAULT_LOCATION;
+	}
+
+	@Override
+	public String getId() {
+		return id;
+	}
+
+	@Override
+	public void setId(String id) {
+		this.id = id;
+	}
 
 	@Override
 	public String getName() {

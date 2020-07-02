@@ -33,20 +33,32 @@
  */
 package org.openjdk.jmc.console.ext.agent.manager.wizards;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
-import org.eclipse.swt.layout.FillLayout;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Label;
+import org.openjdk.jmc.console.ext.agent.manager.internal.MethodParameter;
+import org.openjdk.jmc.console.ext.agent.manager.model.ICapturedValue;
 import org.openjdk.jmc.console.ext.agent.manager.model.IEvent;
+import org.openjdk.jmc.console.ext.agent.manager.model.IMethodParameter;
+import org.openjdk.jmc.console.ext.agent.manager.model.IMethodReturnValue;
+import org.openjdk.jmc.ui.wizards.OnePageWizardDialog;
 
 public class EventEditingWizardParameterPage extends WizardPage {
 	private static final String PAGE_NAME = "Agent Event Editing";
-	private static final String MESSAGE_EVENT_EDITING_WIZARD_CONFIG_PAGE_TITLE = "Editing Event Parameters";
-	private static final String MESSAGE_EVENT_EDITING_WIZARD_CONFIG_PAGE_DESCRIPTION = "Function parameters and return values can be recorded when committing an event.";
-
+	private static final String MESSAGE_EVENT_EDITING_WIZARD_PARAMETER_PAGE_TITLE = "Edit Event Parameters";
+	private static final String MESSAGE_EVENT_EDITING_WIZARD_PARAMETER_PAGE_DESCRIPTION = "Function parameters and return values can be recorded when committing an event.";
 	private final IEvent event;
+	private ParameterTableInspector tableInspector;
+	private TableButtonControls tableButtons;
 
 	protected EventEditingWizardParameterPage(IEvent event) {
 		super(PAGE_NAME);
@@ -58,20 +70,81 @@ public class EventEditingWizardParameterPage extends WizardPage {
 	public void createControl(Composite parent) {
 		initializeDialogUnits(parent);
 
-		setTitle(MESSAGE_EVENT_EDITING_WIZARD_CONFIG_PAGE_TITLE);
-		setDescription(MESSAGE_EVENT_EDITING_WIZARD_CONFIG_PAGE_DESCRIPTION);
+		setTitle(MESSAGE_EVENT_EDITING_WIZARD_PARAMETER_PAGE_TITLE);
+		setDescription(MESSAGE_EVENT_EDITING_WIZARD_PARAMETER_PAGE_DESCRIPTION);
 
 		ScrolledComposite sc = new ScrolledComposite(parent, SWT.H_SCROLL | SWT.V_SCROLL);
 		Composite container = new Composite(sc, SWT.NONE);
 		sc.setContent(container);
 
-		// TODO: create parameter page control here
-		container.setLayout(new FillLayout());
-		new Label(container, SWT.NONE).setText("TODO: create parameter page control here");
+		container.setLayout(new GridLayout(2, false));
+		container.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+
+		tableInspector = new ParameterTableInspector(container);
+		tableInspector.setInput(populateTable());
+
+		tableButtons = new TableButtonControls(container, tableInspector.getViewer());
+		tableButtons.setAddButtonListener(() -> onAddBtnPressed());
+		tableButtons.setEditButtonListener(() -> onEditBtnPressed());
+		tableButtons.setRemoveButtonListener(() -> onRemoveBtnPressed());
 
 		sc.setExpandHorizontal(true);
 		sc.setExpandVertical(true);
 		sc.setMinSize(container.computeSize(SWT.DEFAULT, SWT.DEFAULT));
 		setControl(sc);
 	}
+
+	private void onAddBtnPressed() {
+		EventMethodParameterEditingPage page = new EventMethodParameterEditingPage();
+		OnePageWizardDialog.open(page, 600, 600);
+		ICapturedValue capturedValue = page.getCapturedValue();
+		if (capturedValue instanceof MethodParameter) {
+			event.addMethodParameter((IMethodParameter) capturedValue);
+		} else {
+			event.setMethodReturnValue((IMethodReturnValue) capturedValue);
+		}
+		tableInspector.setInput(populateTable());
+	}
+
+	private void onEditBtnPressed() {
+		ICapturedValue itemInfo = getSingleSelectedTemplate();
+		if (itemInfo == null) {
+			return;
+		}
+		OnePageWizardDialog.open(new EventMethodParameterEditingPage(itemInfo), 600, 600);
+
+		tableInspector.setInput(populateTable());
+	}
+
+	private void onRemoveBtnPressed() {
+		ICapturedValue itemInfo = getSingleSelectedTemplate();
+		if (itemInfo == null) {
+			return;
+		}
+		if (itemInfo instanceof IMethodReturnValue) {
+			event.setMethodReturnValue(null);
+		} else {
+			event.removeMethodParameter((IMethodParameter) itemInfo);
+		}
+		tableInspector.setInput(populateTable());
+	}
+
+	private ICapturedValue getSingleSelectedTemplate() {
+		ISelection selection = tableInspector.getViewer().getSelection();
+		if (selection instanceof IStructuredSelection) {
+			return (ICapturedValue) ((IStructuredSelection) selection).getFirstElement();
+		}
+		return null;
+	}
+
+	private ICapturedValue[] populateTable() {
+		List<ICapturedValue> capturedValues = new ArrayList<>();
+
+		capturedValues.addAll(Arrays.asList(event.getMethodParameters()));
+		if (event.getMethodReturnValue() != null) {
+			capturedValues.add(event.getMethodReturnValue());
+		}
+		return capturedValues.toArray(new ICapturedValue[0]);
+	}
+
 }
