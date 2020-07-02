@@ -144,7 +144,7 @@ public class PresetEditingWizardConfigPage extends WizardPage {
 			} catch (IllegalArgumentException e) {
 				fileNameError = e;
 			}
-			
+
 			setErrorMessageIfAny();
 		});
 

@@ -34,14 +34,11 @@
 package org.openjdk.jmc.console.ext.agent.manager.wizards;
 
 import com.sun.tools.javac.util.List;
-import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
 import org.eclipse.jface.viewers.ColumnViewerToolTipSupport;
 import org.eclipse.jface.viewers.IContentProvider;
-import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
-import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
@@ -155,7 +152,7 @@ public class PresetEditingWizardEventPage extends WizardPage {
 				return event.getName();
 			}
 		});
-		
+
 		tableViewer.getTable().setSortColumn(idColumn.getColumn());
 		tableViewer.getTable().setSortDirection(SWT.DOWN);
 		tableViewer.getTable().setLinesVisible(true);
@@ -228,8 +225,8 @@ public class PresetEditingWizardEventPage extends WizardPage {
 		});
 		removeButton.setEnabled(false);
 
-		tableViewer.addSelectionChangedListener(
-				selectionChangedEvent -> List.of(editButton, duplicateButton, removeButton)
+		tableViewer
+				.addSelectionChangedListener(selectionChangedEvent -> List.of(editButton, duplicateButton, removeButton)
 						.forEach(button -> button.setEnabled(!tableViewer.getStructuredSelection().isEmpty())));
 	}
 

@@ -61,12 +61,12 @@ public class Event implements IEvent {
 	public String getId() {
 		return id;
 	}
-	
+
 	@Override
 	public void setId(String id) {
 		this.id = id;
 	}
-	
+
 	@Override
 	public String getName() {
 		return name;
