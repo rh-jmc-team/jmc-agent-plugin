@@ -37,11 +37,25 @@ import org.openjdk.jmc.console.ext.agent.manager.model.IMethodParameter;
 
 public class MethodParameter implements IMethodParameter {
 
+	private static final String DEFAULT_STRING_FIELD = "";
+	private static final ContentType DEFAULT_CONTENT_TYPE = ContentType.NONE;
+	private static final int DEFAULT_INDEX = 0;
+
 	private String name;
 	private String description;
 	private ContentType contentType;
 	private String relationKey;
 	private String converter;
+	private int index;
+
+	public MethodParameter() {
+		name = DEFAULT_STRING_FIELD;
+		description = DEFAULT_STRING_FIELD;
+		contentType = DEFAULT_CONTENT_TYPE;
+		relationKey = DEFAULT_STRING_FIELD;
+		converter = DEFAULT_STRING_FIELD;
+		index = DEFAULT_INDEX;
+	}
 
 	@Override
 	public String getName() {
@@ -92,6 +106,16 @@ public class MethodParameter implements IMethodParameter {
 	@Override
 	public void setConverter(String converter) {
 		this.converter = converter;
+	}
+
+	@Override
+	public int getIndex() {
+		return index;
+	}
+
+	@Override
+	public void setIndex(int index) {
+		this.index = index;
 	}
 
 }

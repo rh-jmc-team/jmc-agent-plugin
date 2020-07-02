@@ -33,22 +33,27 @@
  */
 package org.openjdk.jmc.console.ext.agent.manager.wizards;
 
+import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
-import org.eclipse.swt.layout.FillLayout;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Label;
+import org.openjdk.jmc.console.ext.agent.manager.internal.Field;
 import org.openjdk.jmc.console.ext.agent.manager.model.IEvent;
 import org.openjdk.jmc.console.ext.agent.manager.model.IField;
-import org.openjdk.jmc.ui.misc.DialogToolkit;
+import org.openjdk.jmc.ui.wizards.OnePageWizardDialog;
 
 public class EventEditingWizardFieldPage extends WizardPage {
 	private static final String PAGE_NAME = "Agent Event Editing";
-	private static final String MESSAGE_EVENT_EDITING_WIZARD_CONFIG_PAGE_TITLE = "Editing Event Fields";
-	private static final String MESSAGE_EVENT_EDITING_WIZARD_CONFIG_PAGE_DESCRIPTION = "Fields are a subset of Java primary expressions which can be evaluated and recorded when committing an event.";
+	private static final String MESSAGE_EVENT_EDITING_WIZARD_FIELD_PAGE_TITLE = "Editing Event Fields";
+	private static final String MESSAGE_EVENT_EDITING_WIZARD_FIELD_PAGE_DESCRIPTION = "Fields are a subset of Java primary expressions which can be evaluated and recorded when committing an event.";
 
 	private final IEvent event;
+	private TableButtonControls tableButtons;
+	private FieldTableInspector tableInspector;
 
 	protected EventEditingWizardFieldPage(IEvent event) {
 		super(PAGE_NAME);
@@ -60,16 +65,23 @@ public class EventEditingWizardFieldPage extends WizardPage {
 	public void createControl(Composite parent) {
 		initializeDialogUnits(parent);
 
-		setTitle(MESSAGE_EVENT_EDITING_WIZARD_CONFIG_PAGE_TITLE);
-		setDescription(MESSAGE_EVENT_EDITING_WIZARD_CONFIG_PAGE_DESCRIPTION);
+		setTitle(MESSAGE_EVENT_EDITING_WIZARD_FIELD_PAGE_TITLE);
+		setDescription(MESSAGE_EVENT_EDITING_WIZARD_FIELD_PAGE_DESCRIPTION);
 
 		ScrolledComposite sc = new ScrolledComposite(parent, SWT.H_SCROLL | SWT.V_SCROLL);
 		Composite container = new Composite(sc, SWT.NONE);
 		sc.setContent(container);
 
-		// TODO: create field page control here
-		container.setLayout(new FillLayout());
-		new Label(container, SWT.NONE).setText("TODO: create field page control here");
+		container.setLayout(new GridLayout(2, false));
+		container.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+
+		tableInspector = new FieldTableInspector(container);
+		tableInspector.setInput(event.getFields());
+
+		tableButtons = new TableButtonControls(container, tableInspector.getViewer());
+		tableButtons.setAddButtonListener(() -> onAddBtnPressed());
+		tableButtons.setEditButtonListener(() -> onEditBtnPressed());
+		tableButtons.setRemoveButtonListener(() -> onRemoveBtnPressed());
 
 		sc.setExpandHorizontal(true);
 		sc.setExpandVertical(true);
@@ -77,10 +89,38 @@ public class EventEditingWizardFieldPage extends WizardPage {
 		setControl(sc);
 	}
 
-	// TODO: call this function when "New" or "Edit" button clicked
-	private void openEventEditingWizardFor(IField field) {
-		if (DialogToolkit.openWizardWithHelp(new EventEditingWizard(event))) {
-			// TODO: save the modified event to the preset
-		}
+	private void onAddBtnPressed() {
+		IField field = new Field();
+		EventFieldEditingPage page = new EventFieldEditingPage(field);
+		OnePageWizardDialog.open(page, 600, 600);
+		event.addField(field);
+		tableInspector.setInput(event.getFields());
 	}
+
+	private void onEditBtnPressed() {
+		IField itemInfo = getSingleSelectedTemplate();
+		if (itemInfo == null) {
+			return;
+		}
+		OnePageWizardDialog.open(new EventFieldEditingPage(itemInfo), 600, 600);
+		tableInspector.setInput(event.getFields());
+	}
+
+	private void onRemoveBtnPressed() {
+		IField itemInfo = getSingleSelectedTemplate();
+		if (itemInfo == null) {
+			return;
+		}
+		event.removeField(itemInfo);
+		tableInspector.setInput(event.getFields());
+	}
+
+	private IField getSingleSelectedTemplate() {
+		ISelection selection = tableInspector.getViewer().getSelection();
+		if (selection instanceof IStructuredSelection) {
+			return (IField) ((IStructuredSelection) selection).getFirstElement();
+		}
+		return null;
+	}
+
 }

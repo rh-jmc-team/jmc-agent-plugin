@@ -37,12 +37,24 @@ import org.openjdk.jmc.console.ext.agent.manager.model.IField;
 
 public class Field implements IField {
 
+	private static final String DEFAULT_STRING_FIELD = "";
+	private static final ContentType DEFAULT_CONTENT_TYPE = ContentType.NONE;
+
 	private String name;
 	private String description;
 	private ContentType contentType;
 	private String relationKey;
 	private String converter;
 	private String expression;
+
+	public Field() {
+		name = DEFAULT_STRING_FIELD;
+		expression = DEFAULT_STRING_FIELD;
+		description = DEFAULT_STRING_FIELD;
+		contentType = DEFAULT_CONTENT_TYPE;
+		relationKey = DEFAULT_STRING_FIELD;
+		converter = DEFAULT_STRING_FIELD;
+	}
 
 	@Override
 	public String getName() {

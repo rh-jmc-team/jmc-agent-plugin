@@ -33,19 +33,45 @@
  */
 package org.openjdk.jmc.console.ext.agent.manager.wizards;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
-import org.eclipse.swt.layout.FillLayout;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.Text;
 import org.openjdk.jmc.console.ext.agent.manager.model.IEvent;
-import org.openjdk.jmc.console.ext.agent.manager.model.IPreset;
+import org.openjdk.jmc.console.ext.agent.manager.model.IEvent.Location;
 
 public class EventEditingWizardConfigPage extends WizardPage {
 	private static final String PAGE_NAME = "Agent Event Editing";
 	private static final String MESSAGE_EVENT_EDITING_WIZARD_CONFIG_PAGE_TITLE = "Editing Event Configurations";
 	private static final String MESSAGE_EVENT_EDITING_WIZARD_CONFIG_PAGE_DESCRIPTION = "Edit basic information of an event on how it should be instrumented and injected.";
+
+	private static final int NUM_COLUMNS = 3;
+
+	private Text idText;
+	private Text nameText;
+	private Text descriptionText;
+	private Text clazzText;
+	private Text methodNameText;
+	private Text methodDescriptorText;
+	private Text pathText;
+	private Combo locationCombo;
+	private Button useRethrowBtn;
+	private Button recordStackTraceBtn;
 
 	private final IEvent event;
 
@@ -53,6 +79,11 @@ public class EventEditingWizardConfigPage extends WizardPage {
 		super(PAGE_NAME);
 
 		this.event = event;
+	}
+
+	@Override
+	public IWizardPage getNextPage() {
+		return super.getNextPage();
 	}
 
 	@Override
@@ -66,13 +97,271 @@ public class EventEditingWizardConfigPage extends WizardPage {
 		Composite container = new Composite(sc, SWT.NONE);
 		sc.setContent(container);
 
-		// TODO: create config page control here
-		container.setLayout(new FillLayout());
-		new Label(container, SWT.NONE).setText("TODO: create config page control here");
+		container.setLayout(new GridLayout());
+		container.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+
+		Composite gridSection = new Composite(container, SWT.NONE);
+		GridLayout gLayout = new GridLayout(NUM_COLUMNS, false);
+		gridSection.setLayout(gLayout);
+
+		createGlobalConfigSection(gridSection);
+		createMethodSection(gridSection);
+		createOtherInfoSection(gridSection);
+		gridSection.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
+
+		createCheckBoxSection(container);
+
+		bindListeners();
+		populateStoredValues();
 
 		sc.setExpandHorizontal(true);
 		sc.setExpandVertical(true);
 		sc.setMinSize(container.computeSize(SWT.DEFAULT, SWT.DEFAULT));
 		setControl(sc);
 	}
+
+	private void createGlobalConfigSection(Composite parent) {
+		GridData gdLabel = new GridData(SWT.BEGINNING, SWT.CENTER, false, false);
+		GridData gdText = new GridData(SWT.FILL, SWT.CENTER, true, true);
+		gdText.minimumWidth = 0;
+		gdText.widthHint = 300;
+		gdText.horizontalSpan = NUM_COLUMNS - 1;
+
+		Label label = createLabel(parent, "ID:");
+		label.setLayoutData(gdLabel);
+
+		idText = createText(parent);
+		idText.setMessage("Event ID");
+		idText.setLayoutData(gdText);
+
+		label = createLabel(parent, "Name:");
+		label.setLayoutData(gdLabel);
+
+		nameText = createText(parent);
+		nameText.setMessage("Name of the Event");
+		nameText.setLayoutData(gdText);
+
+		label = createLabel(parent, "Description:");
+		label.setLayoutData(gdLabel);
+
+		gdText = new GridData(SWT.FILL, SWT.CENTER, true, true);
+		gdText.minimumWidth = 0;
+		gdText.widthHint = 300;
+		gdText.heightHint = 100;
+		gdText.horizontalSpan = NUM_COLUMNS;
+
+		descriptionText = createTextMulti(parent);
+		descriptionText.setMessage("Description of this event");
+		descriptionText.setLayoutData(gdText);
+
+		Control separator = createSeparator(parent);
+		GridData gdSeperator = new GridData(SWT.FILL, SWT.FILL, true, false);
+		gdSeperator.horizontalSpan = NUM_COLUMNS;
+		gdSeperator.heightHint = 20;
+		separator.setLayoutData(gdSeperator);
+
+	}
+
+	private void createMethodSection(Composite parent) {
+
+		GridData gdLabel = new GridData(SWT.BEGINNING, SWT.CENTER, false, false);
+		GridData gdText = new GridData(SWT.FILL, SWT.CENTER, true, true);
+		gdText.minimumWidth = 0;
+		gdText.widthHint = 300;
+		gdText.horizontalSpan = NUM_COLUMNS - 1;
+
+		Label label = createLabel(parent, "Class:");
+		label.setLayoutData(gdLabel);
+
+		clazzText = createText(parent);
+		clazzText.setMessage("com.company.project.MyClass");
+		clazzText.setLayoutData(gdText);
+
+		label = createLabel(parent, "Method:");
+		label.setLayoutData(gdLabel);
+
+		gdText = new GridData(SWT.FILL, SWT.CENTER, true, true);
+		gdText.minimumWidth = 0;
+		gdText.widthHint = 300;
+		gdText.horizontalSpan = NUM_COLUMNS - 2;
+
+		methodNameText = createText(parent);
+		methodNameText.setMessage("Method Name");
+		methodNameText.setLayoutData(gdText);
+
+		methodDescriptorText = createText(parent);
+		methodDescriptorText.setMessage("Descriptor");
+		methodDescriptorText.setLayoutData(gdText);
+
+		Control separator = createSeparator(parent);
+		GridData gdSeperator = new GridData(SWT.FILL, SWT.FILL, true, false);
+		gdSeperator.horizontalSpan = NUM_COLUMNS;
+		gdSeperator.heightHint = 20;
+		separator.setLayoutData(gdSeperator);
+	}
+
+	private void createOtherInfoSection(Composite parent) {
+		GridData gdLabel = new GridData(SWT.BEGINNING, SWT.CENTER, false, false);
+		GridData gdText = new GridData(SWT.FILL, SWT.CENTER, true, true);
+		gdText.minimumWidth = 0;
+		gdText.widthHint = 300;
+		gdText.horizontalSpan = NUM_COLUMNS - 1;
+
+		Label label = createLabel(parent, "Path:");
+		label.setLayoutData(gdLabel);
+
+		pathText = createText(parent);
+		pathText.setMessage("path/to/event");
+		pathText.setLayoutData(gdText);
+
+		label = createLabel(parent, "Location:");
+		label.setLayoutData(gdLabel);
+
+		locationCombo = new Combo(parent, SWT.DROP_DOWN | SWT.READ_ONLY);
+		List<String> locations = new ArrayList<>();
+		for (Location l : Location.values()) {
+			locations.add(l.name());
+		}
+		locationCombo.setItems(locations.toArray(new String[0]));
+		locationCombo.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
+	}
+
+	private void createCheckBoxSection(Composite parent) {
+		Composite checkBoxTextContainer = new Composite(parent, SWT.NONE);
+		checkBoxTextContainer.setLayout(new GridLayout(2, false));
+
+		useRethrowBtn = new Button(checkBoxTextContainer, SWT.CHECK);
+		useRethrowBtn.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false));
+
+		GridData gdLabel = new GridData(SWT.FILL, SWT.CENTER, true, true);
+
+		Label label = createLabel(checkBoxTextContainer, "Catch any expression and rethrow");
+		label.setLayoutData(gdLabel);
+
+		recordStackTraceBtn = new Button(checkBoxTextContainer, SWT.CHECK);
+		recordStackTraceBtn.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false));
+
+		label = createLabel(checkBoxTextContainer, "Record Stack Trace");
+		label.setLayoutData(gdLabel);
+
+		checkBoxTextContainer.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
+	}
+
+	private Label createLabel(Composite parent, String text) {
+		Label label = new Label(parent, SWT.NONE);
+		label.setText(text);
+		return label;
+	}
+
+	private Text createText(Composite parent) {
+		Text text = new Text(parent, SWT.BORDER);
+		text.setEnabled(true);
+		return text;
+	}
+
+	private Text createTextMulti(Composite parent) {
+		Text text = new Text(parent, SWT.BORDER | SWT.MULTI | SWT.V_SCROLL);
+		text.setEnabled(true);
+		return text;
+	}
+
+	private Label createSeparator(Composite parent) {
+		return new Label(parent, SWT.SEPARATOR | SWT.HORIZONTAL);
+	}
+
+	private void bindListeners() {
+		idText.addModifyListener(new ModifyListener() {
+
+			@Override
+			public void modifyText(ModifyEvent e) {
+				event.setId(idText.getText());
+			}
+		});
+
+		nameText.addModifyListener(new ModifyListener() {
+
+			@Override
+			public void modifyText(ModifyEvent e) {
+				event.setName(nameText.getText());
+			}
+		});
+
+		descriptionText.addModifyListener(new ModifyListener() {
+
+			@Override
+			public void modifyText(ModifyEvent e) {
+				event.setDescription(descriptionText.getText());
+			}
+		});
+
+		methodNameText.addModifyListener(new ModifyListener() {
+
+			@Override
+			public void modifyText(ModifyEvent e) {
+				event.setMethodName(methodNameText.getText());
+			}
+		});
+
+		methodDescriptorText.addModifyListener(new ModifyListener() {
+
+			@Override
+			public void modifyText(ModifyEvent e) {
+				event.setMethodDescriptor(methodDescriptorText.getText());
+			}
+		});
+
+		pathText.addModifyListener(new ModifyListener() {
+
+			@Override
+			public void modifyText(ModifyEvent e) {
+				event.setMethodName(pathText.getText());
+			}
+		});
+
+		clazzText.addModifyListener(new ModifyListener() {
+
+			@Override
+			public void modifyText(ModifyEvent e) {
+				event.setClazz(clazzText.getText());
+			}
+		});
+
+		useRethrowBtn.addListener(SWT.Selection, new Listener() {
+			@Override
+			public void handleEvent(Event e) {
+				event.setRethrow(useRethrowBtn.getSelection());
+			}
+		});
+
+		recordStackTraceBtn.addListener(SWT.Selection, new Listener() {
+			@Override
+			public void handleEvent(Event e) {
+				event.setStackTrace(recordStackTraceBtn.getSelection());
+			}
+		});
+
+		locationCombo.addModifyListener(new ModifyListener() {
+
+			@Override
+			public void modifyText(ModifyEvent e) {
+				if (locationCombo.getSelectionIndex() >= 0) {
+					event.setLocation(Location.valueOf(locationCombo.getText()));
+				}
+			}
+		});
+	}
+
+	private void populateStoredValues() {
+		idText.setText(event.getId());
+		nameText.setText(event.getName());
+		descriptionText.setText(event.getDescription());
+		clazzText.setText(event.getClazz());
+		methodNameText.setText(event.getMethodName());
+		methodDescriptorText.setText(event.getMethodDescriptor());
+		pathText.setText(event.getPath());
+		locationCombo.setText(event.getLocation().toString());
+		useRethrowBtn.setSelection(event.getRethrow());
+		recordStackTraceBtn.setSelection(event.getStackTrace());
+	}
+
 }

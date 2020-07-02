@@ -37,10 +37,22 @@ import org.openjdk.jmc.console.ext.agent.manager.model.IMethodReturnValue;
 
 public class MethodReturnValue implements IMethodReturnValue {
 
+	private static final String DEFAULT_STRING_FIELD = "";
+	private static final ContentType DEFAULT_CONTENT_TYPE = ContentType.NONE;
+
+	private String name;
 	private String description;
 	private ContentType contentType;
 	private String relationKey;
 	private String converter;
+
+	public MethodReturnValue() {
+		name = DEFAULT_STRING_FIELD;
+		description = DEFAULT_STRING_FIELD;
+		contentType = DEFAULT_CONTENT_TYPE;
+		relationKey = DEFAULT_STRING_FIELD;
+		converter = DEFAULT_STRING_FIELD;
+	}
 
 	@Override
 	public String getDescription() {
@@ -80,6 +92,16 @@ public class MethodReturnValue implements IMethodReturnValue {
 	@Override
 	public void setConverter(String converter) {
 		this.converter = converter;
+	}
+
+	@Override
+	public String getName() {
+		return name;
+	}
+
+	@Override
+	public void setName(String name) {
+		this.name = name;
 	}
 
 }
