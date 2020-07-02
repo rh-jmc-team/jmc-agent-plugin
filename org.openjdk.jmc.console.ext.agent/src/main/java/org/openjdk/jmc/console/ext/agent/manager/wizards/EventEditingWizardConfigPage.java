@@ -59,6 +59,22 @@ public class EventEditingWizardConfigPage extends WizardPage {
 	private static final String PAGE_NAME = "Agent Event Editing";
 	private static final String MESSAGE_EVENT_EDITING_WIZARD_CONFIG_PAGE_TITLE = "Editing Event Configurations";
 	private static final String MESSAGE_EVENT_EDITING_WIZARD_CONFIG_PAGE_DESCRIPTION = "Edit basic information of an event on how it should be instrumented and injected.";
+	private static final String EVENT_ID_LABEL = "ID: ";
+	private static final String EVENT_ID_DESCRIPTION = "Event ID";
+	private static final String EVENT_NAME_LABEL = "Name: ";
+	private static final String EVENT_NAME_DESCRIPTION = "Name of the Event";
+	private static final String EVENT_DESCRIPTION_LABEL = "Description: ";
+	private static final String EVENT_DESCRIPTION_DESCRIPTION = "Description of this event";
+	private static final String EVENT_CLAZZ_LABEL = "Class: ";
+	private static final String EVENT_CLAZZ_DESCRIPTION = "com.company.project.MyClass";
+	private static final String EVENT_METHOD_LABEL = "Method: ";
+	private static final String EVENT_METHOD_NAME_DESCRIPTION = "Method Name";
+	private static final String EVENT_DESCRIPTOR_DESCRIPTION = "Descriptor";
+	private static final String EVENT_PATH_LABEL = "Path: ";
+	private static final String EVENT_PATH_DESCRIPTION = "path/to/event";
+	private static final String EVENT_LOCATION_LABEL = "Location: ";
+	private static final String EVENT_RETHROW_LABEL = "Catch any expression and rethrow";
+	private static final String EVENT_STACKTRACE_LABEL = "Record Stack Trace";
 
 	private static final int NUM_COLUMNS = 3;
 
@@ -127,21 +143,21 @@ public class EventEditingWizardConfigPage extends WizardPage {
 		gdText.widthHint = 300;
 		gdText.horizontalSpan = NUM_COLUMNS - 1;
 
-		Label label = createLabel(parent, "ID:");
+		Label label = createLabel(parent, EVENT_ID_LABEL);
 		label.setLayoutData(gdLabel);
 
 		idText = createText(parent);
-		idText.setMessage("Event ID");
+		idText.setMessage(EVENT_ID_DESCRIPTION);
 		idText.setLayoutData(gdText);
 
-		label = createLabel(parent, "Name:");
+		label = createLabel(parent, EVENT_NAME_LABEL);
 		label.setLayoutData(gdLabel);
 
 		nameText = createText(parent);
-		nameText.setMessage("Name of the Event");
+		nameText.setMessage(EVENT_NAME_DESCRIPTION);
 		nameText.setLayoutData(gdText);
 
-		label = createLabel(parent, "Description:");
+		label = createLabel(parent, EVENT_DESCRIPTION_LABEL);
 		label.setLayoutData(gdLabel);
 
 		gdText = new GridData(SWT.FILL, SWT.CENTER, true, true);
@@ -151,7 +167,7 @@ public class EventEditingWizardConfigPage extends WizardPage {
 		gdText.horizontalSpan = NUM_COLUMNS;
 
 		descriptionText = createTextMulti(parent);
-		descriptionText.setMessage("Description of this event");
+		descriptionText.setMessage(EVENT_DESCRIPTION_DESCRIPTION);
 		descriptionText.setLayoutData(gdText);
 
 		Control separator = createSeparator(parent);
@@ -170,14 +186,14 @@ public class EventEditingWizardConfigPage extends WizardPage {
 		gdText.widthHint = 300;
 		gdText.horizontalSpan = NUM_COLUMNS - 1;
 
-		Label label = createLabel(parent, "Class:");
+		Label label = createLabel(parent, EVENT_CLAZZ_LABEL);
 		label.setLayoutData(gdLabel);
 
 		clazzText = createText(parent);
-		clazzText.setMessage("com.company.project.MyClass");
+		clazzText.setMessage(EVENT_CLAZZ_DESCRIPTION);
 		clazzText.setLayoutData(gdText);
 
-		label = createLabel(parent, "Method:");
+		label = createLabel(parent, EVENT_METHOD_LABEL);
 		label.setLayoutData(gdLabel);
 
 		gdText = new GridData(SWT.FILL, SWT.CENTER, true, true);
@@ -186,11 +202,11 @@ public class EventEditingWizardConfigPage extends WizardPage {
 		gdText.horizontalSpan = NUM_COLUMNS - 2;
 
 		methodNameText = createText(parent);
-		methodNameText.setMessage("Method Name");
+		methodNameText.setMessage(EVENT_METHOD_NAME_DESCRIPTION);
 		methodNameText.setLayoutData(gdText);
 
 		methodDescriptorText = createText(parent);
-		methodDescriptorText.setMessage("Descriptor");
+		methodDescriptorText.setMessage(EVENT_DESCRIPTOR_DESCRIPTION);
 		methodDescriptorText.setLayoutData(gdText);
 
 		Control separator = createSeparator(parent);
@@ -207,14 +223,14 @@ public class EventEditingWizardConfigPage extends WizardPage {
 		gdText.widthHint = 300;
 		gdText.horizontalSpan = NUM_COLUMNS - 1;
 
-		Label label = createLabel(parent, "Path:");
+		Label label = createLabel(parent, EVENT_PATH_LABEL);
 		label.setLayoutData(gdLabel);
 
 		pathText = createText(parent);
-		pathText.setMessage("path/to/event");
+		pathText.setMessage(EVENT_PATH_DESCRIPTION);
 		pathText.setLayoutData(gdText);
 
-		label = createLabel(parent, "Location:");
+		label = createLabel(parent, EVENT_LOCATION_LABEL);
 		label.setLayoutData(gdLabel);
 
 		locationCombo = new Combo(parent, SWT.DROP_DOWN | SWT.READ_ONLY);
@@ -235,13 +251,13 @@ public class EventEditingWizardConfigPage extends WizardPage {
 
 		GridData gdLabel = new GridData(SWT.FILL, SWT.CENTER, true, true);
 
-		Label label = createLabel(checkBoxTextContainer, "Catch any expression and rethrow");
+		Label label = createLabel(checkBoxTextContainer, EVENT_RETHROW_LABEL);
 		label.setLayoutData(gdLabel);
 
 		recordStackTraceBtn = new Button(checkBoxTextContainer, SWT.CHECK);
 		recordStackTraceBtn.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false));
 
-		label = createLabel(checkBoxTextContainer, "Record Stack Trace");
+		label = createLabel(checkBoxTextContainer, EVENT_STACKTRACE_LABEL);
 		label.setLayoutData(gdLabel);
 
 		checkBoxTextContainer.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));

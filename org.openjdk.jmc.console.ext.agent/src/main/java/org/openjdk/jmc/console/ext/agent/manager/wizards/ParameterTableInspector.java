@@ -56,7 +56,12 @@ import org.openjdk.jmc.ui.misc.TreeStructureContentProvider;
 public class ParameterTableInspector {
 
 	public static final String PARAMETER_TREE_NAME = "EventEditingWizardParameterPage.ParamtersTree"; //$NON-NLS-1$
-
+	private static final String INDEX_COLUNM_ID = "index";
+	private static final String INDEX_COLUNM_NAME = "Index";
+	private static final String NAME_COLUNM_ID = "name";
+	private static final String NAME_COLUNM_NAME = "Name";
+	private static final String DESCRIPTION_COLUNM_ID = "description";
+	private static final String DESCRIPTION_COLUNM_NAME = "Description";
 	private final TreeViewer viewer;
 
 	private final ColumnLabelProvider nameLabelProvider = new ColumnLabelProvider() {
@@ -101,12 +106,13 @@ public class ParameterTableInspector {
 
 		tree.setData("name", PARAMETER_TREE_NAME); //$NON-NLS-1$
 		List<IColumn> columns = new ArrayList<>();
-		columns.add(new ColumnBuilder("Index", "index", indexLabelProvider).comparator( //$NON-NLS-1$
+		columns.add(new ColumnBuilder(INDEX_COLUNM_NAME, INDEX_COLUNM_ID, indexLabelProvider).comparator( //$NON-NLS-1$
 				new OptimisticComparator(indexLabelProvider)).build());
-		columns.add(new ColumnBuilder("Name", "name", nameLabelProvider).comparator( //$NON-NLS-1$
+		columns.add(new ColumnBuilder(NAME_COLUNM_NAME, NAME_COLUNM_ID, nameLabelProvider).comparator( //$NON-NLS-1$
 				new OptimisticComparator(nameLabelProvider)).build());
-		columns.add(new ColumnBuilder("Description", "description", descriptionLabelProvider).comparator(//$NON-NLS-1$
-				new OptimisticComparator(descriptionLabelProvider)).build());
+		columns.add(
+				new ColumnBuilder(DESCRIPTION_COLUNM_NAME, DESCRIPTION_COLUNM_ID, descriptionLabelProvider).comparator(//$NON-NLS-1$
+						new OptimisticComparator(descriptionLabelProvider)).build());
 		ColumnManager.build(viewer, columns, null);
 	}
 
