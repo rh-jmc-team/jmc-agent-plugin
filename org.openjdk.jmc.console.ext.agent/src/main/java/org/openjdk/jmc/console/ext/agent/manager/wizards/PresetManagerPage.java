@@ -33,9 +33,11 @@
  */
 package org.openjdk.jmc.console.ext.agent.manager.wizards;
 
+import org.eclipse.jface.viewers.DelegatingStyledCellLabelProvider;
 import org.eclipse.jface.viewers.IContentProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.LabelProvider;
+import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
@@ -64,6 +66,7 @@ public class PresetManagerPage extends WizardPage {
 	private static final String MESSAGE_REMOVE_BUTTON = "Remove";
 	private static final String MESSAGE_IMPORT_FILES_BUTTON = "Import Files...";
 	private static final String MESSAGE_EXPORT_FILE_BUTTON = "Export File...";
+	private static final String MESSAGE_EVENTS = "event(s)";
 
 	private final PresetRepository repository;
 	private TableViewer tableViewer;
@@ -105,7 +108,7 @@ public class PresetManagerPage extends WizardPage {
 		tableViewer = new TableViewer(parent, SWT.V_SCROLL | SWT.BORDER | SWT.MULTI);
 		tableViewer.getControl().setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 		tableViewer.setContentProvider(new PresetTableContentProvider());
-		tableViewer.setLabelProvider(new PresetTableLabelProvider());
+		tableViewer.setLabelProvider(new DelegatingStyledCellLabelProvider(new PresetTableLabelProvider()));
 		tableViewer.setInput(repository);
 	}
 
@@ -238,15 +241,23 @@ public class PresetManagerPage extends WizardPage {
 		}
 	}
 
-	private static class PresetTableLabelProvider extends LabelProvider {
+	private static class PresetTableLabelProvider extends LabelProvider
+			implements DelegatingStyledCellLabelProvider.IStyledLabelProvider {
 		@Override
 		public String getText(Object element) {
+			return getStyledText(element).getString();
+		}
+
+		@Override
+		public StyledString getStyledText(Object element) {
 			if (!(element instanceof IPreset)) {
 				throw new IllegalArgumentException("element must be an IPreset");
 			}
 
 			IPreset preset = (IPreset) element;
-			return preset.getFileName();
+			StyledString text = new StyledString(preset.getFileName());
+			text.append(" - " + preset.getEvents().length + " " + MESSAGE_EVENTS, StyledString.DECORATIONS_STYLER);
+			return text;
 		}
 
 		@Override

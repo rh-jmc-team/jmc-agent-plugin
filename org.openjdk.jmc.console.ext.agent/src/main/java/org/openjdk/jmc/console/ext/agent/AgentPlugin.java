@@ -33,6 +33,7 @@
  */
 package org.openjdk.jmc.console.ext.agent;
 
+import org.eclipse.jface.resource.ImageRegistry;
 import org.openjdk.jmc.ui.MCAbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
@@ -61,5 +62,10 @@ public class AgentPlugin extends MCAbstractUIPlugin {
 
 	public static AgentPlugin getDefault() {
 		return m_plugin;
+	}
+
+	@Override
+	protected void initializeImageRegistry(ImageRegistry registry) {
+		registerImage(registry, ICON_AGENT, ICON_AGENT);
 	}
 }
