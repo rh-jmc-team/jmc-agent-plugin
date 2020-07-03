@@ -13,9 +13,9 @@ import org.eclipse.swt.widgets.Listener;
 
 public class TableButtonControls extends Composite {
 
-	Button addBtn;
-	Button editBtn;
-	Button removeBtn;
+	private Button addBtn;
+	private Button editBtn;
+	private Button removeBtn;
 	private Runnable addBtnLister;
 	private Runnable removeBtnLister;
 	private Runnable editBtnLister;

@@ -60,6 +60,18 @@ public class EventMethodParameterEditingPage extends WizardPage implements IPerf
 	private static final String PAGE_NAME = "Agent Parameter Editing";
 	private static final String MESSAGE_PRESET_MANAGER_PAGE_TITLE = "Edit a Parameter or Return Value Capturing";
 	private static final String MESSAGE_PRESET_MANAGER_PAGE_DESCRIPTION = "Define the capturing of a parameter or return value by its index.";
+	private static final String PARAM_NAME_LABEL = "Name: ";
+	private static final String PARAM_NAME_DESCRIPTION = "Parameter or Return Value Name";
+	private static final String PARAM_INDEX_LABEL = "Index: ";
+	private static final String RETURN_VALUE_LABEL = "This is a return value";
+	private static final String PARAM_DESCRIPTION_LABEL = "Description: ";
+	private static final String PARAM_DESCRIPTION_DESCRIPTION = "Description of this parameter or return value";
+	private static final String PARAM_CONTENT_TYPE_LABEL = "Content Type: ";
+	private static final String PARAM_RELATIONAL_KEY_LABEL = "Relational Key: ";
+	private static final String PARAM_RELATIONAL_KEY_DESCRIPTION = "schema://some-uri";
+	private static final String PARAM_CONVERTER_TYPE_LABEL = "Converter Type: ";
+	private static final String PARAM_CONVERTER_TYPE_DESCRIPTION = "com.company.project.MyConverter";
+
 	private ICapturedValue capturedValue;
 	private Text name;
 	private Spinner index;
@@ -118,14 +130,14 @@ public class EventMethodParameterEditingPage extends WizardPage implements IPerf
 		gdText.minimumWidth = 0;
 		gdText.widthHint = 300;
 
-		Label label = createLabel(parent, "Name:");
+		Label label = createLabel(parent, PARAM_NAME_LABEL);
 		label.setLayoutData(gdLabel);
 
 		name = createText(parent);
-		name.setMessage("Parameter or Return Value Name");
+		name.setMessage(PARAM_NAME_DESCRIPTION);
 		name.setLayoutData(gdText);
 
-		label = createLabel(parent, "Index:");
+		label = createLabel(parent, PARAM_INDEX_LABEL);
 		label.setLayoutData(gdLabel);
 
 		Composite indexContainer = new Composite(parent, SWT.NONE);
@@ -135,7 +147,7 @@ public class EventMethodParameterEditingPage extends WizardPage implements IPerf
 		index = new Spinner(indexContainer, SWT.NONE);
 		index.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
 
-		label = createLabel(indexContainer, "This is a return value");
+		label = createLabel(indexContainer, RETURN_VALUE_LABEL);
 		label.setLayoutData(new GridData(SWT.CENTER, SWT.CENTER, true, true));
 
 		returnValueBtn = new Button(indexContainer, SWT.CHECK);
@@ -145,7 +157,6 @@ public class EventMethodParameterEditingPage extends WizardPage implements IPerf
 			@Override
 			public void handleEvent(Event event) {
 				if (returnValueBtn.getSelection()) {
-					//index.deselectAll();
 					index.setEnabled(false);
 				} else {
 					index.setEnabled(true);
@@ -155,7 +166,7 @@ public class EventMethodParameterEditingPage extends WizardPage implements IPerf
 
 		});
 
-		label = createLabel(parent, "Description:");
+		label = createLabel(parent, PARAM_DESCRIPTION_LABEL);
 		label.setLayoutData(gdLabel);
 
 		GridData largeText = new GridData(SWT.FILL, SWT.CENTER, true, true);
@@ -165,10 +176,10 @@ public class EventMethodParameterEditingPage extends WizardPage implements IPerf
 		largeText.horizontalSpan = 2;
 
 		description = createTextMulti(parent);
-		description.setMessage("Description of this parameter or return value");
+		description.setMessage(PARAM_DESCRIPTION_DESCRIPTION);
 		description.setLayoutData(largeText);
 
-		label = createLabel(parent, "Content Type:");
+		label = createLabel(parent, PARAM_CONTENT_TYPE_LABEL);
 		label.setLayoutData(gdLabel);
 
 		contentType = new Combo(parent, SWT.DROP_DOWN | SWT.READ_ONLY);
@@ -179,18 +190,18 @@ public class EventMethodParameterEditingPage extends WizardPage implements IPerf
 		contentType.setItems(contentTypes.toArray(new String[0]));
 		contentType.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
 
-		label = createLabel(parent, "Relational Key:");
+		label = createLabel(parent, PARAM_RELATIONAL_KEY_LABEL);
 		label.setLayoutData(gdLabel);
 
 		relationalKey = createText(parent);
-		relationalKey.setMessage("schema://some-uri");
+		relationalKey.setMessage(PARAM_RELATIONAL_KEY_DESCRIPTION);
 		relationalKey.setLayoutData(gdText);
 
-		label = createLabel(parent, "Converter Type:");
+		label = createLabel(parent, PARAM_CONVERTER_TYPE_LABEL);
 		label.setLayoutData(gdLabel);
 
 		converterType = createText(parent);
-		converterType.setMessage("com.company.project.MyConverter");
+		converterType.setMessage(PARAM_CONVERTER_TYPE_DESCRIPTION);
 		converterType.setLayoutData(gdText);
 	}
 

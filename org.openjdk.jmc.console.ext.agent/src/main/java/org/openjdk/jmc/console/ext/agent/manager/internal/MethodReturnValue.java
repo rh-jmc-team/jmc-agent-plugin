@@ -94,12 +94,10 @@ public class MethodReturnValue implements IMethodReturnValue {
 		this.converter = converter;
 	}
 
-	@Override
 	public String getName() {
 		return name;
 	}
 
-	@Override
 	public void setName(String name) {
 		this.name = name;
 	}

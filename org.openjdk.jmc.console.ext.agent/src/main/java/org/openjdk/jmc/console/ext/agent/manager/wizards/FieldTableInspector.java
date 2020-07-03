@@ -53,6 +53,12 @@ import org.openjdk.jmc.ui.misc.TreeStructureContentProvider;
 public class FieldTableInspector {
 
 	public static final String FIELD_TREE_NAME = "EventEditingWizardFieldPage.FieldsTree"; //$NON-NLS-1$
+	private static final String NAME_COLUNM_ID = "name";
+	private static final String NAME_COLUNM_NAME = "Name";
+	private static final String EXPRESSION_COLUNM_ID = "expression";
+	private static final String EXPRESSION_COLUNM_NAME = "Expression";
+	private static final String DESCRIPTION_COLUNM_ID = "description";
+	private static final String DESCRIPTION_COLUNM_NAME = "Description";
 
 	private final TreeViewer viewer;
 
@@ -96,12 +102,13 @@ public class FieldTableInspector {
 
 		tree.setData("name", FIELD_TREE_NAME); //$NON-NLS-1$
 		List<IColumn> columns = new ArrayList<>();
-		columns.add(new ColumnBuilder("Name", "name", nameLabelProvider).comparator( //$NON-NLS-1$
+		columns.add(new ColumnBuilder(NAME_COLUNM_NAME, NAME_COLUNM_ID, nameLabelProvider).comparator( //$NON-NLS-1$
 				new OptimisticComparator(nameLabelProvider)).build());
-		columns.add(new ColumnBuilder("Expression", "expression", expressionLabelProvider).comparator( //$NON-NLS-1$
+		columns.add(new ColumnBuilder(EXPRESSION_COLUNM_NAME, EXPRESSION_COLUNM_ID, expressionLabelProvider).comparator( //$NON-NLS-1$
 				new OptimisticComparator(expressionLabelProvider)).build());
-		columns.add(new ColumnBuilder("Description", "description", descriptionLabelProvider).comparator(//$NON-NLS-1$
-				new OptimisticComparator(descriptionLabelProvider)).build());
+		columns.add(
+				new ColumnBuilder(DESCRIPTION_COLUNM_NAME, DESCRIPTION_COLUNM_ID, descriptionLabelProvider).comparator(//$NON-NLS-1$
+						new OptimisticComparator(descriptionLabelProvider)).build());
 		ColumnManager.build(viewer, columns, null);
 	}
 
