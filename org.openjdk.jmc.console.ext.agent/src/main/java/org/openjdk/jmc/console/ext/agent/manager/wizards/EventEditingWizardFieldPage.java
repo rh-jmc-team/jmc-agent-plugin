@@ -41,6 +41,7 @@ import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.openjdk.jmc.console.ext.agent.manager.internal.Field;
 import org.openjdk.jmc.console.ext.agent.manager.model.IEvent;
 import org.openjdk.jmc.console.ext.agent.manager.model.IField;
@@ -79,9 +80,9 @@ public class EventEditingWizardFieldPage extends WizardPage {
 		tableInspector.setInput(event.getFields());
 
 		tableButtons = new TableButtonControls(container, tableInspector.getViewer());
-		tableButtons.setAddButtonListener(() -> onAddBtnPressed());
-		tableButtons.setEditButtonListener(() -> onEditBtnPressed());
-		tableButtons.setRemoveButtonListener(() -> onRemoveBtnPressed());
+		tableButtons.setAddButtonListener(this::onAddBtnPressed);
+		tableButtons.setEditButtonListener(this::onEditBtnPressed);
+		tableButtons.setRemoveButtonListener(this::onRemoveBtnPressed);
 
 		sc.setExpandHorizontal(true);
 		sc.setExpandVertical(true);
@@ -92,7 +93,7 @@ public class EventEditingWizardFieldPage extends WizardPage {
 	private void onAddBtnPressed() {
 		IField field = new Field();
 		EventFieldEditingPage page = new EventFieldEditingPage(field);
-		OnePageWizardDialog.open(page, 600, 600);
+		new OnePageWizardDialog(Display.getCurrent().getActiveShell(), page).open();
 		event.addField(field);
 		tableInspector.setInput(event.getFields());
 	}
@@ -102,7 +103,7 @@ public class EventEditingWizardFieldPage extends WizardPage {
 		if (itemInfo == null) {
 			return;
 		}
-		OnePageWizardDialog.open(new EventFieldEditingPage(itemInfo), 600, 600);
+		new OnePageWizardDialog(Display.getCurrent().getActiveShell(), new EventFieldEditingPage(itemInfo)).open();
 		tableInspector.setInput(event.getFields());
 	}
 

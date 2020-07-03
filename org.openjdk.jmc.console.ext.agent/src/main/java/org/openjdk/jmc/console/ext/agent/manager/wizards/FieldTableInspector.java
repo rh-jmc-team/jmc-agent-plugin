@@ -37,12 +37,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.jface.viewers.ColumnLabelProvider;
-import org.eclipse.jface.viewers.ColumnViewerToolTipSupport;
-import org.eclipse.jface.viewers.TreeViewer;
+import org.eclipse.jface.viewers.TableViewer;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Tree;
 import org.openjdk.jmc.console.ext.agent.manager.model.IField;
 import org.openjdk.jmc.ui.column.ColumnBuilder;
 import org.openjdk.jmc.ui.column.ColumnManager;
@@ -60,7 +59,7 @@ public class FieldTableInspector {
 	private static final String DESCRIPTION_COLUNM_ID = "description";
 	private static final String DESCRIPTION_COLUNM_NAME = "Description";
 
-	private final TreeViewer viewer;
+	private final TableViewer viewer;
 
 	private final ColumnLabelProvider nameLabelProvider = new ColumnLabelProvider() {
 		@Override
@@ -93,14 +92,11 @@ public class FieldTableInspector {
 	};
 
 	public FieldTableInspector(Composite parent) {
-		Tree tree = new Tree(parent,
-				SWT.BORDER | SWT.FULL_SELECTION | SWT.MULTI | SWT.VIRTUAL | SWT.H_SCROLL | SWT.V_SCROLL);
-		tree.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-		viewer = new TreeViewer(tree);
+		viewer = new TableViewer(parent, SWT.V_SCROLL | SWT.BORDER | SWT.FULL_SELECTION);
+		viewer.getControl().setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 		viewer.setContentProvider(new TreeStructureContentProvider());
-		ColumnViewerToolTipSupport.enableFor(viewer);
+		viewer.getTable().setHeaderVisible(true);
 
-		tree.setData("name", FIELD_TREE_NAME); //$NON-NLS-1$
 		List<IColumn> columns = new ArrayList<>();
 		columns.add(new ColumnBuilder(NAME_COLUNM_NAME, NAME_COLUNM_ID, nameLabelProvider).comparator( //$NON-NLS-1$
 				new OptimisticComparator(nameLabelProvider)).build());
@@ -116,7 +112,7 @@ public class FieldTableInspector {
 		viewer.setInput(input);
 	}
 
-	public TreeViewer getViewer() {
+	public TableViewer getViewer() {
 		return viewer;
 	}
 

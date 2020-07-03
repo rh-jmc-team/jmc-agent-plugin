@@ -63,9 +63,9 @@ public class EventFieldEditingPage extends WizardPage {
 	private static final String FIELD_DESCRIPTION_DESCRIPTION = "Description of field";
 	private static final String FIELD_CONTENT_TYPE_LABEL = "Content Type: ";
 	private static final String FIELD_RELATIONAL_KEY_LABEL = "Relational Key: ";
-	private static final String FIELD_RELATIONAL_KEY_DESCRIPTION = "schema://some-uri";
+	private static final String FIELD_RELATIONAL_KEY_DESCRIPTION = "schema://some-uri"; // $NON-NLS-1$
 	private static final String FIELD_CONVERTER_TYPE_LABEL = "Converter Type: ";
-	private static final String FIELD_CONVERTER_TYPE_DESCRIPTION = "com.company.project.MyConverter";
+	private static final String FIELD_CONVERTER_TYPE_DESCRIPTION = "com.company.project.MyConverter"; // $NON-NLS-1$
 
 	private Text name;
 	private Text expression;
@@ -199,7 +199,6 @@ public class EventFieldEditingPage extends WizardPage {
 
 	private void bindListeners() {
 		converterType.addModifyListener(new ModifyListener() {
-
 			@Override
 			public void modifyText(ModifyEvent e) {
 				field.setConverter(converterType.getText());
@@ -207,7 +206,6 @@ public class EventFieldEditingPage extends WizardPage {
 		});
 
 		description.addModifyListener(new ModifyListener() {
-
 			@Override
 			public void modifyText(ModifyEvent e) {
 				field.setDescription(description.getText());
@@ -215,7 +213,6 @@ public class EventFieldEditingPage extends WizardPage {
 		});
 
 		relationalKey.addModifyListener(new ModifyListener() {
-
 			@Override
 			public void modifyText(ModifyEvent e) {
 				field.setRelationKey(relationalKey.getText());
@@ -223,7 +220,6 @@ public class EventFieldEditingPage extends WizardPage {
 		});
 
 		name.addModifyListener(new ModifyListener() {
-
 			@Override
 			public void modifyText(ModifyEvent e) {
 				field.setName(name.getText());
@@ -240,7 +236,6 @@ public class EventFieldEditingPage extends WizardPage {
 		});
 
 		contentType.addModifyListener(new ModifyListener() {
-
 			@Override
 			public void modifyText(ModifyEvent e) {
 				if (contentType.getSelectionIndex() >= 0) {

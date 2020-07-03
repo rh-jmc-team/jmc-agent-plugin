@@ -68,9 +68,9 @@ public class EventMethodParameterEditingPage extends WizardPage implements IPerf
 	private static final String PARAM_DESCRIPTION_DESCRIPTION = "Description of this parameter or return value";
 	private static final String PARAM_CONTENT_TYPE_LABEL = "Content Type: ";
 	private static final String PARAM_RELATIONAL_KEY_LABEL = "Relational Key: ";
-	private static final String PARAM_RELATIONAL_KEY_DESCRIPTION = "schema://some-uri";
+	private static final String PARAM_RELATIONAL_KEY_DESCRIPTION = "schema://some-uri"; // $NON-NLS-1$
 	private static final String PARAM_CONVERTER_TYPE_LABEL = "Converter Type: ";
-	private static final String PARAM_CONVERTER_TYPE_DESCRIPTION = "com.company.project.MyConverter";
+	private static final String PARAM_CONVERTER_TYPE_DESCRIPTION = "com.company.project.MyConverter"; // $NON-NLS-1$
 
 	private ICapturedValue capturedValue;
 	private Text name;
@@ -161,9 +161,7 @@ public class EventMethodParameterEditingPage extends WizardPage implements IPerf
 				} else {
 					index.setEnabled(true);
 				}
-
 			}
-
 		});
 
 		label = createLabel(parent, PARAM_DESCRIPTION_LABEL);

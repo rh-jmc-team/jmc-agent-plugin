@@ -66,12 +66,12 @@ public class EventEditingWizardConfigPage extends WizardPage {
 	private static final String EVENT_DESCRIPTION_LABEL = "Description: ";
 	private static final String EVENT_DESCRIPTION_DESCRIPTION = "Description of this event";
 	private static final String EVENT_CLAZZ_LABEL = "Class: ";
-	private static final String EVENT_CLAZZ_DESCRIPTION = "com.company.project.MyClass";
+	private static final String EVENT_CLAZZ_DESCRIPTION = "com.company.project.MyClass"; // $NON-NLS-1$
 	private static final String EVENT_METHOD_LABEL = "Method: ";
 	private static final String EVENT_METHOD_NAME_DESCRIPTION = "Method Name";
 	private static final String EVENT_DESCRIPTOR_DESCRIPTION = "Descriptor";
 	private static final String EVENT_PATH_LABEL = "Path: ";
-	private static final String EVENT_PATH_DESCRIPTION = "path/to/event";
+	private static final String EVENT_PATH_DESCRIPTION = "path/to/event"; // $NON-NLS-1$
 	private static final String EVENT_LOCATION_LABEL = "Location: ";
 	private static final String EVENT_RETHROW_LABEL = "Catch any expression and rethrow";
 	private static final String EVENT_STACKTRACE_LABEL = "Record Stack Trace";
@@ -179,7 +179,6 @@ public class EventEditingWizardConfigPage extends WizardPage {
 	}
 
 	private void createMethodSection(Composite parent) {
-
 		GridData gdLabel = new GridData(SWT.BEGINNING, SWT.CENTER, false, false);
 		GridData gdText = new GridData(SWT.FILL, SWT.CENTER, true, true);
 		gdText.minimumWidth = 0;
@@ -287,7 +286,6 @@ public class EventEditingWizardConfigPage extends WizardPage {
 
 	private void bindListeners() {
 		idText.addModifyListener(new ModifyListener() {
-
 			@Override
 			public void modifyText(ModifyEvent e) {
 				event.setId(idText.getText());
@@ -295,7 +293,6 @@ public class EventEditingWizardConfigPage extends WizardPage {
 		});
 
 		nameText.addModifyListener(new ModifyListener() {
-
 			@Override
 			public void modifyText(ModifyEvent e) {
 				event.setName(nameText.getText());
@@ -303,7 +300,6 @@ public class EventEditingWizardConfigPage extends WizardPage {
 		});
 
 		descriptionText.addModifyListener(new ModifyListener() {
-
 			@Override
 			public void modifyText(ModifyEvent e) {
 				event.setDescription(descriptionText.getText());
@@ -311,7 +307,6 @@ public class EventEditingWizardConfigPage extends WizardPage {
 		});
 
 		methodNameText.addModifyListener(new ModifyListener() {
-
 			@Override
 			public void modifyText(ModifyEvent e) {
 				event.setMethodName(methodNameText.getText());
@@ -319,7 +314,6 @@ public class EventEditingWizardConfigPage extends WizardPage {
 		});
 
 		methodDescriptorText.addModifyListener(new ModifyListener() {
-
 			@Override
 			public void modifyText(ModifyEvent e) {
 				event.setMethodDescriptor(methodDescriptorText.getText());
@@ -327,7 +321,6 @@ public class EventEditingWizardConfigPage extends WizardPage {
 		});
 
 		pathText.addModifyListener(new ModifyListener() {
-
 			@Override
 			public void modifyText(ModifyEvent e) {
 				event.setMethodName(pathText.getText());
@@ -335,7 +328,6 @@ public class EventEditingWizardConfigPage extends WizardPage {
 		});
 
 		clazzText.addModifyListener(new ModifyListener() {
-
 			@Override
 			public void modifyText(ModifyEvent e) {
 				event.setClazz(clazzText.getText());
@@ -357,7 +349,6 @@ public class EventEditingWizardConfigPage extends WizardPage {
 		});
 
 		locationCombo.addModifyListener(new ModifyListener() {
-
 			@Override
 			public void modifyText(ModifyEvent e) {
 				if (locationCombo.getSelectionIndex() >= 0) {
