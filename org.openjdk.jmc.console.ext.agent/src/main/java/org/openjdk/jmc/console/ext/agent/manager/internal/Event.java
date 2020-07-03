@@ -84,16 +84,6 @@ public class Event implements IEvent {
 	}
 
 	@Override
-	public String getId() {
-		return id;
-	}
-
-	@Override
-	public void setId(String id) {
-		this.id = id;
-	}
-
-	@Override
 	public String getName() {
 		return name;
 	}
