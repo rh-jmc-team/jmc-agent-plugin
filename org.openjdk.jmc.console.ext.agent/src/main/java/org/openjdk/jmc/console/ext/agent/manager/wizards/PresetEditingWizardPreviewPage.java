@@ -98,5 +98,7 @@ public class PresetEditingWizardPreviewPage extends WizardPage {
 		partitioner.connect(document);
 		document.setDocumentPartitioner(partitioner);
 		editor.setDocument(document);
+
+		editor.setEditable(false);
 	}
 }

@@ -237,8 +237,7 @@ public class PresetEditingWizardEventPage extends WizardPage {
 				// TODO: save the modified event to the preset
 				preset.addEvent(event);
 			} catch (IllegalArgumentException e) {
-				if (DialogToolkit
-						.openConfirmOnUiThread(MESSAGE_UNABLE_TO_SAVE_THE_PRESET, e.getMessage())) {
+				if (DialogToolkit.openConfirmOnUiThread(MESSAGE_UNABLE_TO_SAVE_THE_PRESET, e.getMessage())) {
 					continue;
 				}
 			}

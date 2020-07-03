@@ -142,8 +142,8 @@ public class PresetManagerPage extends WizardPage {
 				// TODO: properly save to repository
 				repository.add(preset);
 			} catch (IllegalArgumentException e) {
-				if (DialogToolkit
-						.openConfirmOnUiThread(MESSAGE_PRESET_MANAGER_UNABLE_TO_SAVE_THE_PRESET, e.getMessage())) {
+				if (DialogToolkit.openConfirmOnUiThread(MESSAGE_PRESET_MANAGER_UNABLE_TO_SAVE_THE_PRESET,
+						e.getMessage())) {
 					continue;
 				}
 			}
