@@ -59,6 +59,7 @@ public class PresetEditingWizardEventPage extends WizardPage {
 	private static final String PAGE_NAME = "Agent Preset Editing";
 	private static final String MESSAGE_PRESET_EDITING_WIZARD_EVENT_PAGE_TITLE = "Editing Preset Events";
 	private static final String MESSAGE_PRESET_EDITING_WIZARD_EVENT_PAGE_DESCRIPTION = "Add new events to the preset, or remove/edit existing events.";
+	private static final String MESSAGE_UNABLE_TO_SAVE_THE_PRESET = "Unable to add the event";
 
 	private static final String LABEL_EVENTS = "Events: ";
 	private static final String LABEL_ADD_BUTTON = "Add...";
@@ -208,7 +209,7 @@ public class PresetEditingWizardEventPage extends WizardPage {
 				// TODO: create a copy properly
 				IEvent original = (IEvent) tableViewer.getStructuredSelection().getFirstElement();
 				IEvent duplicate = new Event();
-				// duplicate.setId(original.getId() + ".copy");
+				duplicate.setId(original.getId() + ".copy");
 				duplicate.setName("Copy of " + original.getName());
 				preset.addEvent(duplicate);
 				tableViewer.refresh();
@@ -231,12 +232,18 @@ public class PresetEditingWizardEventPage extends WizardPage {
 	}
 
 	private void openEventEditingWizardFor(IEvent event) {
-		if (!(DialogToolkit.openWizardWithHelp(new EventEditingWizard(event)))) {
-			return;
-		}
+		while (DialogToolkit.openWizardWithHelp(new EventEditingWizard(event))) {
+			try {
+				// TODO: save the modified event to the preset
+				preset.addEvent(event);
+			} catch (IllegalArgumentException e) {
+				if (DialogToolkit.openConfirmOnUiThread(MESSAGE_UNABLE_TO_SAVE_THE_PRESET, e.getMessage())) {
+					continue;
+				}
+			}
 
-		// TODO: save the modified event to the preset
-		preset.addEvent(event);
+			break;
+		}
 	}
 
 	private static class EventTableContentProvider extends AbstractStructuredContentProvider
@@ -245,7 +252,7 @@ public class PresetEditingWizardEventPage extends WizardPage {
 		@Override
 		public Object[] getElements(Object inputElement) {
 			if (!(inputElement instanceof IPreset)) {
-				throw new IllegalArgumentException("input element must be a IPreset");
+				throw new IllegalArgumentException("input element must be a IPreset"); // $NON-NLS-1$
 			}
 
 			IPreset preset = (IPreset) inputElement;
@@ -257,7 +264,7 @@ public class PresetEditingWizardEventPage extends WizardPage {
 		@Override
 		public String getText(Object element) {
 			if (!(element instanceof IEvent)) {
-				throw new IllegalArgumentException("element must be an IEvent");
+				throw new IllegalArgumentException("element must be an IEvent"); // $NON-NLS-1$
 			}
 
 			return doGetText((IEvent) element);

@@ -217,7 +217,7 @@ public class PresetEditingWizardConfigPage extends WizardPage {
 		allowToString.setLayoutData(gd2);
 
 		allowToString.addSelectionListener(SelectionListener
-				.widgetSelectedAdapter(selectionEvent -> preset.setAllowToString(allowConverter.getSelection())));
+				.widgetSelectedAdapter(selectionEvent -> preset.setAllowToString(allowToString.getSelection())));
 	}
 
 	private void createAllowConverterCheckbox(Composite parent, int cols) {
@@ -256,5 +256,10 @@ public class PresetEditingWizardConfigPage extends WizardPage {
 		text = text == null ? "" : text;
 		receiver.setText(text);
 		receiver.setToolTipText(text);
+	}
+
+	@Override
+	public boolean canFlipToNextPage() {
+		return classPrefixError == null && fileNameError == null;
 	}
 }

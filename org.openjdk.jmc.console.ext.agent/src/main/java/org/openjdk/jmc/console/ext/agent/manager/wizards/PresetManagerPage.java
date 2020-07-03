@@ -33,9 +33,11 @@
  */
 package org.openjdk.jmc.console.ext.agent.manager.wizards;
 
+import org.eclipse.jface.viewers.DelegatingStyledCellLabelProvider;
 import org.eclipse.jface.viewers.IContentProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.LabelProvider;
+import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
@@ -58,12 +60,14 @@ public class PresetManagerPage extends WizardPage {
 	private static final String PAGE_NAME = "Agent Preset Manager";
 	private static final String MESSAGE_PRESET_MANAGER_PAGE_TITLE = "JMC Agent Configuration Preset Manager";
 	private static final String MESSAGE_PRESET_MANAGER_PAGE_DESCRIPTION = "Presets for JMC agent are useful to repeatedly apply configurations to a running JMC agent.";
+	private static final String MESSAGE_PRESET_MANAGER_UNABLE_TO_SAVE_THE_PRESET = "Unable to save the preset";
 	private static final String MESSAGE_NEW_BUTTON = "New";
 	private static final String MESSAGE_EDIT_BUTTON = "Edit";
 	private static final String MESSAGE_DUPLICATE_BUTTON = "Duplicate";
 	private static final String MESSAGE_REMOVE_BUTTON = "Remove";
 	private static final String MESSAGE_IMPORT_FILES_BUTTON = "Import Files...";
 	private static final String MESSAGE_EXPORT_FILE_BUTTON = "Export File...";
+	private static final String MESSAGE_EVENTS = "event(s)";
 
 	private final PresetRepository repository;
 	private TableViewer tableViewer;
@@ -105,7 +109,7 @@ public class PresetManagerPage extends WizardPage {
 		tableViewer = new TableViewer(parent, SWT.V_SCROLL | SWT.BORDER | SWT.MULTI);
 		tableViewer.getControl().setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 		tableViewer.setContentProvider(new PresetTableContentProvider());
-		tableViewer.setLabelProvider(new PresetTableLabelProvider());
+		tableViewer.setLabelProvider(new DelegatingStyledCellLabelProvider(new PresetTableLabelProvider()));
 		tableViewer.setInput(repository);
 	}
 
@@ -133,12 +137,19 @@ public class PresetManagerPage extends WizardPage {
 	}
 
 	private void openPresetEditingWizardFor(IPreset preset) {
-		if (!DialogToolkit.openWizardWithHelp(new PresetEditingWizard(preset))) {
-			return;
-		}
+		while (DialogToolkit.openWizardWithHelp(new PresetEditingWizard(preset))) {
+			try {
+				// TODO: properly save to repository
+				repository.add(preset);
+			} catch (IllegalArgumentException e) {
+				if (DialogToolkit.openConfirmOnUiThread(MESSAGE_PRESET_MANAGER_UNABLE_TO_SAVE_THE_PRESET,
+						e.getMessage())) {
+					continue;
+				}
+			}
 
-		// TODO: save the modified preset to the repository 
-		repository.add(preset);
+			break;
+		}
 	}
 
 	private void bindListeners() {
@@ -230,7 +241,7 @@ public class PresetManagerPage extends WizardPage {
 		@Override
 		public Object[] getElements(Object inputElement) {
 			if (!(inputElement instanceof PresetRepository)) {
-				throw new IllegalArgumentException("input element must be a PresetRepository");
+				throw new IllegalArgumentException("input element must be a PresetRepository"); // $NON-NLS-1$
 			}
 
 			PresetRepository repository = (PresetRepository) inputElement;
@@ -238,15 +249,23 @@ public class PresetManagerPage extends WizardPage {
 		}
 	}
 
-	private static class PresetTableLabelProvider extends LabelProvider {
+	private static class PresetTableLabelProvider extends LabelProvider
+			implements DelegatingStyledCellLabelProvider.IStyledLabelProvider {
 		@Override
 		public String getText(Object element) {
+			return getStyledText(element).getString();
+		}
+
+		@Override
+		public StyledString getStyledText(Object element) {
 			if (!(element instanceof IPreset)) {
-				throw new IllegalArgumentException("element must be an IPreset");
+				throw new IllegalArgumentException("element must be an IPreset"); // $NON-NLS-1$
 			}
 
 			IPreset preset = (IPreset) element;
-			return preset.getFileName();
+			StyledString text = new StyledString(preset.getFileName());
+			text.append(" - " + preset.getEvents().length + " " + MESSAGE_EVENTS, StyledString.DECORATIONS_STYLER);
+			return text;
 		}
 
 		@Override
