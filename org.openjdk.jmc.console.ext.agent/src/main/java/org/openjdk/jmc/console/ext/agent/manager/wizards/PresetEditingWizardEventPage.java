@@ -35,7 +35,6 @@ package org.openjdk.jmc.console.ext.agent.manager.wizards;
 
 import com.sun.tools.javac.util.List;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
-import org.eclipse.jface.viewers.ColumnViewerToolTipSupport;
 import org.eclipse.jface.viewers.IContentProvider;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
@@ -106,6 +105,7 @@ public class PresetEditingWizardEventPage extends WizardPage {
 		sc.setMinSize(container.computeSize(SWT.DEFAULT, SWT.DEFAULT));
 		setControl(sc);
 
+		populateUi();
 		bindListeners();
 	}
 
@@ -158,9 +158,6 @@ public class PresetEditingWizardEventPage extends WizardPage {
 		tableViewer.getTable().setSortDirection(SWT.DOWN);
 		tableViewer.getTable().setLinesVisible(true);
 		tableViewer.getTable().setHeaderVisible(true);
-		ColumnViewerToolTipSupport.enableFor(tableViewer); // TODO:???
-
-		tableViewer.setInput(preset);
 	}
 
 	private Composite createEventButtons(Composite parent) {
@@ -175,6 +172,12 @@ public class PresetEditingWizardEventPage extends WizardPage {
 		editButton = createButton(container, LABEL_EDIT_BUTTON);
 		duplicateButton = createButton(container, LABEL_DUPLICATE_BUTTON);
 		removeButton = createButton(container, LABEL_REMOVE_BUTTON);
+
+		// set button initial states when no item is selected
+		editButton.setEnabled(false);
+		duplicateButton.setEnabled(false);
+		removeButton.setEnabled(false);
+
 		return container;
 	}
 
@@ -201,7 +204,6 @@ public class PresetEditingWizardEventPage extends WizardPage {
 				tableViewer.refresh();
 			}
 		});
-		editButton.setEnabled(false);
 
 		duplicateButton.addSelectionListener(new SelectionAdapter() {
 			@Override
@@ -215,7 +217,6 @@ public class PresetEditingWizardEventPage extends WizardPage {
 				tableViewer.refresh();
 			}
 		});
-		duplicateButton.setEnabled(false);
 
 		removeButton.addSelectionListener(new SelectionAdapter() {
 			@Override
@@ -224,11 +225,14 @@ public class PresetEditingWizardEventPage extends WizardPage {
 				tableViewer.refresh();
 			}
 		});
-		removeButton.setEnabled(false);
 
 		tableViewer
 				.addSelectionChangedListener(selectionChangedEvent -> List.of(editButton, duplicateButton, removeButton)
 						.forEach(button -> button.setEnabled(!tableViewer.getStructuredSelection().isEmpty())));
+	}
+
+	private void populateUi() {
+		tableViewer.setInput(preset);
 	}
 
 	private void openEventEditingWizardFor(IEvent event) {

@@ -57,8 +57,6 @@ public class PresetEditingWizardConfigPage extends WizardPage {
 	private static final String BUTTON_ALLOW_TO_STRING = "Allow toString";
 	private static final String BUTTON_ALLOW_CONVERTER = "Allow Converter";
 
-	private static final String DEFAULT_CLASS_PREFIX = "__JFR_Event";
-
 	private final IPreset preset;
 
 	private Text fileNameText;
@@ -107,6 +105,9 @@ public class PresetEditingWizardConfigPage extends WizardPage {
 			globalConfigContainer.setLayoutData(gd);
 		}
 
+		populateUi();
+		bindListeners();
+
 		sc.setExpandHorizontal(true);
 		sc.setExpandVertical(true);
 		sc.setMinSize(container.computeSize(SWT.DEFAULT, SWT.DEFAULT));
@@ -126,31 +127,15 @@ public class PresetEditingWizardConfigPage extends WizardPage {
 	}
 
 	private void createFileNameInput(Composite parent, int cols) {
-		GridData gd1 = new GridData(SWT.BEGINNING, SWT.CENTER, false, false);
 		Label label = createLabel(parent, LABEL_FILE_NAME);
-		label.setLayoutData(gd1);
+		label.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false, false));
 
-		GridData gd2 = new GridData(SWT.FILL, SWT.CENTER, true, true);
-		gd2.horizontalSpan = cols - 2;
 		fileNameText = createText(parent);
-		gd2.minimumWidth = 0;
-		gd2.widthHint = 400;
-		fileNameText.setLayoutData(gd2);
-
-		fileNameText.addModifyListener(modifyEvent -> {
-			try {
-				preset.setFileName(fileNameText.getText());
-				fileNameError = null;
-			} catch (IllegalArgumentException e) {
-				fileNameError = e;
-			}
-
-			setErrorMessageIfAny();
-		});
-
-		// TODO: come up with a proper naming scheme, to avoid collision in names
-		// TODO: defaults should be set in model, not view
-		setTextText(fileNameText, "new_preset.xml");
+		GridData gd = new GridData(SWT.FILL, SWT.CENTER, true, true);
+		gd.horizontalSpan = cols - 2;
+		gd.minimumWidth = 0;
+		gd.widthHint = 400;
+		fileNameText.setLayoutData(gd);
 	}
 
 	private void setErrorMessageIfAny() {
@@ -190,43 +175,22 @@ public class PresetEditingWizardConfigPage extends WizardPage {
 		Label label = createLabel(parent, LABEL_CLASS_PREFIX);
 		label.setLayoutData(gd1);
 
+		classPrefixText = createText(parent);
 		GridData gd2 = new GridData(SWT.FILL, SWT.CENTER, true, true);
 		gd2.horizontalSpan = cols - 2;
-		classPrefixText = createText(parent);
 		gd2.minimumWidth = 0;
 		gd2.widthHint = 400;
 		classPrefixText.setLayoutData(gd2);
-
-		classPrefixText.addModifyListener(modifyEvent -> {
-			try {
-				preset.setClassPrefix(classPrefixText.getText());
-				classPrefixError = null;
-			} catch (IllegalArgumentException e) {
-				classPrefixError = e;
-			}
-
-			setErrorMessageIfAny();
-		});
-
-		setTextText(classPrefixText, DEFAULT_CLASS_PREFIX);
 	}
 
 	private void createAllowToStringCheckbox(Composite parent, int cols) {
-		GridData gd2 = new GridData(SWT.FILL, SWT.FILL, false, true, cols, 1);
 		allowToString = createCheckbox(parent, BUTTON_ALLOW_TO_STRING);
-		allowToString.setLayoutData(gd2);
-
-		allowToString.addSelectionListener(SelectionListener
-				.widgetSelectedAdapter(selectionEvent -> preset.setAllowToString(allowToString.getSelection())));
+		allowToString.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, true, cols, 1));
 	}
 
 	private void createAllowConverterCheckbox(Composite parent, int cols) {
-		GridData gd2 = new GridData(SWT.FILL, SWT.FILL, false, true, cols, 1);
 		allowConverter = createCheckbox(parent, BUTTON_ALLOW_CONVERTER);
-		allowConverter.setLayoutData(gd2);
-
-		allowConverter.addSelectionListener(SelectionListener
-				.widgetSelectedAdapter(selectionEvent -> preset.setAllowConverter(allowConverter.getSelection())));
+		allowConverter.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, true, cols, 1));
 	}
 
 	protected Label createLabel(Composite parent, String text) {
@@ -261,5 +225,42 @@ public class PresetEditingWizardConfigPage extends WizardPage {
 	@Override
 	public boolean canFlipToNextPage() {
 		return classPrefixError == null && fileNameError == null;
+	}
+
+	private void bindListeners() {
+		fileNameText.addModifyListener(modifyEvent -> {
+			try {
+				preset.setFileName(fileNameText.getText());
+				fileNameError = null;
+			} catch (IllegalArgumentException e) {
+				fileNameError = e;
+			}
+
+			setErrorMessageIfAny();
+		});
+
+		classPrefixText.addModifyListener(modifyEvent -> {
+			try {
+				preset.setClassPrefix(classPrefixText.getText());
+				classPrefixError = null;
+			} catch (IllegalArgumentException e) {
+				classPrefixError = e;
+			}
+
+			setErrorMessageIfAny();
+		});
+
+		allowToString.addSelectionListener(SelectionListener
+				.widgetSelectedAdapter(selectionEvent -> preset.setAllowToString(allowToString.getSelection())));
+
+		allowConverter.addSelectionListener(SelectionListener
+				.widgetSelectedAdapter(selectionEvent -> preset.setAllowConverter(allowConverter.getSelection())));
+	}
+
+	private void populateUi() {
+		setTextText(fileNameText, preset.getFileName());
+		setTextText(classPrefixText, preset.getFileName());
+		allowToString.setSelection(preset.getAllowToString());
+		allowConverter.setSelection(preset.getAllowConverter());
 	}
 }

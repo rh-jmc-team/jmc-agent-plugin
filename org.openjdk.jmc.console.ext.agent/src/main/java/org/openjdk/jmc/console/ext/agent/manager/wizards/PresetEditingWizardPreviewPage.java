@@ -56,6 +56,8 @@ public class PresetEditingWizardPreviewPage extends WizardPage {
 
 	private final IPreset preset;
 
+	private IDocument document;
+
 	protected PresetEditingWizardPreviewPage(IPreset preset) {
 		super(PAGE_NAME);
 
@@ -77,6 +79,8 @@ public class PresetEditingWizardPreviewPage extends WizardPage {
 
 		createPreviewViewer(container);
 
+		populateUi();
+
 		sc.setExpandHorizontal(true);
 		sc.setExpandVertical(true);
 		sc.setMinSize(container.computeSize(SWT.DEFAULT, SWT.DEFAULT));
@@ -91,8 +95,7 @@ public class PresetEditingWizardPreviewPage extends WizardPage {
 		SourceViewer editor = new SourceViewer(parent, ruler, SWT.NONE);
 		editor.configure(new XmlConfiguration(new ColorManager()));
 
-		IDocument document = new Document();
-		document.set("<jfragent>\n</jfragent>"); // TODO: generate real output preview
+		document = new Document();
 		IDocumentPartitioner partitioner = new FastPartitioner(new XmlPartitionScanner(),
 				new String[] {XmlPartitionScanner.XML_TAG, XmlPartitionScanner.XML_COMMENT});
 		partitioner.connect(document);
@@ -100,5 +103,9 @@ public class PresetEditingWizardPreviewPage extends WizardPage {
 		editor.setDocument(document);
 
 		editor.setEditable(false);
+	}
+
+	private void populateUi() {
+		document.set("<jfragent>\n</jfragent>"); // TODO: generate real output preview from this.preset
 	}
 }
