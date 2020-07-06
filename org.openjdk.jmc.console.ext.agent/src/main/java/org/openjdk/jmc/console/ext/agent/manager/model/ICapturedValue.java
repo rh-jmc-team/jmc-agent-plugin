@@ -38,6 +38,10 @@ public interface ICapturedValue {
 		NONE, BYTES, TIMESTAMP, MILLIS, NANOS, TICKS, ADDRESS, OS_THREAD, JAVA_THREAD, STACK_TRACE, CLASS, PERCENTAGE
 	}
 
+	String getName();
+
+	void setName(String name);
+
 	String getDescription();
 
 	void setDescription(String description);

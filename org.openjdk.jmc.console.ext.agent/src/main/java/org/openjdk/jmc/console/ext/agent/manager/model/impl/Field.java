@@ -31,12 +31,22 @@
  * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.openjdk.jmc.console.ext.agent.manager.internal;
+package org.openjdk.jmc.console.ext.agent.manager.model.impl;
+
+import java.net.URI;
+import java.net.URISyntaxException;
 
 import org.openjdk.jmc.console.ext.agent.manager.model.IField;
 
 public class Field implements IField {
 
+	private static final String DEFAULT_STRING_FIELD = "";
+	private static final ContentType DEFAULT_CONTENT_TYPE = ContentType.NONE;
+	private static final String DEFAULT_FIELD_NAME = "'myField'";
+	private static final String DEFAULT_FIELD_EXPRESSION = "myField";
+	private static final String EXPRESSION_REGEX = "([a-zA-Z_$][a-zA-Z0-9_$]*\\.)*([a-zA-Z_$][a-zA-Z0-9_$]*)(\\.[a-zA-Z_$][a-zA-Z_$]*)*";
+	private static final String ERROR_CANNOT_BE_EMPTY = "Field cannot be empty";
+	private static final String ERROR_INCORRECT_SYNTAX = "Field has incorrect syntax";
 	private String name;
 	private String description;
 	private ContentType contentType;
@@ -44,22 +54,30 @@ public class Field implements IField {
 	private String converter;
 	private String expression;
 
-	@Override
+	public Field() {
+		name = DEFAULT_FIELD_NAME;
+		expression = DEFAULT_FIELD_EXPRESSION;
+		description = DEFAULT_STRING_FIELD;
+		contentType = DEFAULT_CONTENT_TYPE;
+		relationKey = DEFAULT_STRING_FIELD;
+		converter = DEFAULT_STRING_FIELD;
+	}
+
 	public String getName() {
 		return name;
 	}
 
-	@Override
 	public void setName(String name) {
+		if (name.isEmpty()) {
+			throw new IllegalArgumentException(ERROR_CANNOT_BE_EMPTY);
+		}
 		this.name = name;
 	}
 
-	@Override
 	public String getDescription() {
 		return description;
 	}
 
-	@Override
 	public void setDescription(String description) {
 		this.description = description;
 	}
@@ -69,27 +87,27 @@ public class Field implements IField {
 		return contentType;
 	}
 
-	@Override
 	public void setContentType(ContentType contentType) {
 		this.contentType = contentType;
 	}
 
-	@Override
 	public String getRelationKey() {
 		return relationKey;
 	}
 
-	@Override
 	public void setRelationKey(String relationKey) {
+		try {
+			new URI(relationKey);
+		} catch (URISyntaxException e) {
+			throw new IllegalArgumentException(ERROR_INCORRECT_SYNTAX);
+		}
 		this.relationKey = relationKey;
 	}
 
-	@Override
 	public String getConverter() {
 		return converter;
 	}
 
-	@Override
 	public void setConverter(String converter) {
 		this.converter = converter;
 	}
@@ -101,7 +119,16 @@ public class Field implements IField {
 
 	@Override
 	public void setExpression(String expression) {
+		expression = removeWhiteSpaces(expression);
+		if (expression.isEmpty()) {
+			throw new IllegalArgumentException(ERROR_CANNOT_BE_EMPTY);
+		} else if (!expression.matches(EXPRESSION_REGEX)) {
+			throw new IllegalArgumentException(ERROR_INCORRECT_SYNTAX);
+		}
 		this.expression = expression;
 	}
 
+	private String removeWhiteSpaces(String stringWithSpaces) {
+		return stringWithSpaces.replaceAll("\\s+", "");
+	}
 }

@@ -31,7 +31,7 @@
  * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.openjdk.jmc.console.ext.agent.manager.internal;
+package org.openjdk.jmc.console.ext.agent.manager.model.impl;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -43,6 +43,24 @@ import org.openjdk.jmc.console.ext.agent.manager.model.IMethodReturnValue;
 
 public class Event implements IEvent {
 
+	private static final String DEFAULT_STRING_FIELD = "";
+	private static final boolean DEFAULT_BOOLEAN_FIELD = false;
+	private static final Location DEFAULT_LOCATION = Location.WRAP;
+	private static final String DEFAULT_EVENT_ID = "my.id";
+	private static final String DEFAULT_EVENT_NAME = "MyCustomEvent";
+	private static final String DEFAULT_EVENT_CLAZZ = "com.company.project.MyClass";
+	private static final String DEFAULT_EVENT_PATH = "path/to/event";
+	private static final String DEFAULT_METHOD_NAME = "myMethod";
+	private static final String DEFAULT_METHOD_DESCRIPTOR = "()V";
+	private static final String CLAZZ_REGEX = "([a-zA-Z_$][a-zA-Z0-9_$]*\\.)*([a-zA-Z_$][a-zA-Z0-9_$]*)";
+	private static final String PATH_REGEX = "([^/]+/)*([^/]*)";
+	private static final String METHOD_NAME_REGEX = "[a-zA-Z_$][a-zA-Z0-9_$]*";
+	private static final String METHOD_DESCRIPTOR_REGEX = "\\((\\[*([BCDFIJSZ]|L([a-zA-Z_$][a-zA-Z0-9_$]*/)*[a-zA-Z_$][a-zA-Z0-9_$]*;))*\\)(V|\\[*([BCDFIJSZ]|L([a-zA-Z_$][a-zA-Z0-9_$]*/)*[a-zA-Z_$][a-zA-Z0-9_$]*;))";
+	private static final String ERROR_CANNOT_BE_EMPTY = "Field cannot be empty";
+	private static final String ERROR_INCORRECT_SYNTAX = "Field has incorrect syntax";
+	private static final String ERROR_INDEX_MUST_BE_UNIQUE = "MethodParameter index must be unique";
+
+	private String id;
 	private String name;
 	private String clazz;
 	private String description;
@@ -56,6 +74,32 @@ public class Event implements IEvent {
 	private IMethodReturnValue returnValue;
 	private List<IField> fields = new ArrayList<>();
 
+	public Event() {
+		id = DEFAULT_EVENT_ID;
+		name = DEFAULT_EVENT_NAME;
+		clazz = DEFAULT_EVENT_CLAZZ;
+		description = DEFAULT_STRING_FIELD;
+		path = DEFAULT_EVENT_PATH;
+		recordStackTrace = DEFAULT_BOOLEAN_FIELD;
+		useRethrow = DEFAULT_BOOLEAN_FIELD;
+		methodName = DEFAULT_METHOD_NAME;
+		methodDescriptor = DEFAULT_METHOD_DESCRIPTOR;
+		location = DEFAULT_LOCATION;
+	}
+
+	@Override
+	public String getId() {
+		return id;
+	}
+
+	@Override
+	public void setId(String id) {
+		if (id.isEmpty()) {
+			throw new IllegalArgumentException(ERROR_CANNOT_BE_EMPTY);
+		}
+		this.id = id;
+	}
+
 	@Override
 	public String getName() {
 		return name;
@@ -63,6 +107,9 @@ public class Event implements IEvent {
 
 	@Override
 	public void setName(String name) {
+		if (name.isEmpty()) {
+			throw new IllegalArgumentException(ERROR_CANNOT_BE_EMPTY);
+		}
 		this.name = name;
 	}
 
@@ -73,6 +120,12 @@ public class Event implements IEvent {
 
 	@Override
 	public void setClazz(String clazz) {
+		clazz = removeWhiteSpaces(clazz);
+		if (clazz.isEmpty()) {
+			throw new IllegalArgumentException(ERROR_CANNOT_BE_EMPTY);
+		} else if (!clazz.matches(CLAZZ_REGEX)) {
+			throw new IllegalArgumentException(ERROR_INCORRECT_SYNTAX);
+		}
 		this.clazz = clazz;
 	}
 
@@ -93,6 +146,12 @@ public class Event implements IEvent {
 
 	@Override
 	public void setPath(String path) {
+		path = removeWhiteSpaces(path);
+		if (path.isEmpty()) {
+			throw new IllegalArgumentException(ERROR_CANNOT_BE_EMPTY);
+		} else if (!path.matches(PATH_REGEX)) {
+			throw new IllegalArgumentException(ERROR_INCORRECT_SYNTAX);
+		}
 		this.path = path;
 	}
 
@@ -134,6 +193,12 @@ public class Event implements IEvent {
 
 	@Override
 	public void setMethodName(String methodName) {
+		methodName = removeWhiteSpaces(methodName);
+		if (methodName.isEmpty()) {
+			throw new IllegalArgumentException(ERROR_CANNOT_BE_EMPTY);
+		} else if (!methodName.matches(METHOD_NAME_REGEX)) {
+			throw new IllegalArgumentException(ERROR_INCORRECT_SYNTAX);
+		}
 		this.methodName = methodName;
 	}
 
@@ -144,6 +209,12 @@ public class Event implements IEvent {
 
 	@Override
 	public void setMethodDescriptor(String methodDescriptor) {
+		methodDescriptor = removeWhiteSpaces(methodDescriptor);
+		if (methodDescriptor.isEmpty()) {
+			throw new IllegalArgumentException(ERROR_CANNOT_BE_EMPTY);
+		} else if (!methodDescriptor.matches(METHOD_DESCRIPTOR_REGEX)) {
+			throw new IllegalArgumentException(ERROR_INCORRECT_SYNTAX);
+		}
 		this.methodDescriptor = methodDescriptor;
 
 	}
@@ -155,6 +226,9 @@ public class Event implements IEvent {
 
 	@Override
 	public void addMethodParameter(IMethodParameter methodParameter) {
+		if (!hasUniqueParamIndex(methodParameter.getIndex())) {
+			throw new IllegalArgumentException(ERROR_INDEX_MUST_BE_UNIQUE);
+		}
 		parameters.add(methodParameter);
 
 	}
@@ -199,6 +273,19 @@ public class Event implements IEvent {
 	@Override
 	public boolean containField(IField field) {
 		return fields.contains(field);
+	}
+
+	private String removeWhiteSpaces(String stringWithSpaces) {
+		return stringWithSpaces.replaceAll("\\s+", "");
+	}
+
+	private boolean hasUniqueParamIndex(int index) {
+		for (IMethodParameter param : parameters) {
+			if (param.getIndex() == index) {
+				return false;
+			}
+		}
+		return true;
 	}
 
 }

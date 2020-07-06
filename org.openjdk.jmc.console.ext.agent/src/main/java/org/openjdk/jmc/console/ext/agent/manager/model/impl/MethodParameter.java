@@ -31,55 +31,97 @@
  * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.openjdk.jmc.console.ext.agent.manager.internal;
+package org.openjdk.jmc.console.ext.agent.manager.model.impl;
 
-import org.openjdk.jmc.console.ext.agent.manager.model.IMethodReturnValue;
+import java.net.URI;
+import java.net.URISyntaxException;
 
-public class MethodReturnValue implements IMethodReturnValue {
+import org.openjdk.jmc.console.ext.agent.manager.model.IMethodParameter;
 
+public class MethodParameter implements IMethodParameter {
+	private static final String DEFAULT_STRING_FIELD = "";
+	private static final String DEFAULT_PARAMETER_NAME = "myParameterName";
+	private static final ContentType DEFAULT_CONTENT_TYPE = ContentType.NONE;
+	private static final int DEFAULT_INDEX = 0;
+	private static final String ERROR_CANNOT_BE_EMPTY = "Field cannot be empty";
+	private static final String ERROR_INCORRECT_SYNTAX = "Field has incorrect syntax";
+	private static final String ERROR_LESS_THAN_ZERO = "Index cannot be less than zero";
+
+	private String name;
 	private String description;
 	private ContentType contentType;
 	private String relationKey;
 	private String converter;
+	private int index;
 
-	@Override
+	public MethodParameter() {
+		name = DEFAULT_PARAMETER_NAME;
+		description = DEFAULT_STRING_FIELD;
+		contentType = DEFAULT_CONTENT_TYPE;
+		relationKey = DEFAULT_STRING_FIELD;
+		converter = DEFAULT_STRING_FIELD;
+		index = DEFAULT_INDEX;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		if (name.isEmpty()) {
+			throw new IllegalArgumentException(ERROR_CANNOT_BE_EMPTY);
+		}
+		this.name = name;
+	}
+
 	public String getDescription() {
 		return description;
 	}
 
-	@Override
 	public void setDescription(String description) {
 		this.description = description;
 	}
 
-	@Override
 	public ContentType getContentType() {
 		return contentType;
 	}
 
-	@Override
 	public void setContentType(ContentType contentType) {
 		this.contentType = contentType;
 	}
 
-	@Override
 	public String getRelationKey() {
 		return relationKey;
 	}
 
-	@Override
 	public void setRelationKey(String relationKey) {
+		try {
+			new URI(relationKey);
+		} catch (URISyntaxException e) {
+			throw new IllegalArgumentException(ERROR_INCORRECT_SYNTAX);
+		}
 		this.relationKey = relationKey;
 	}
 
-	@Override
 	public String getConverter() {
 		return converter;
 	}
 
-	@Override
 	public void setConverter(String converter) {
 		this.converter = converter;
+	}
+
+	@Override
+	public int getIndex() {
+		return index;
+	}
+
+	@Override
+	public void setIndex(int index) {
+		if (index < 0) {
+			throw new IllegalArgumentException(ERROR_LESS_THAN_ZERO);
+		}
+		this.index = index;
 	}
 
 }

@@ -31,11 +31,17 @@
  * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.openjdk.jmc.console.ext.agent.manager.internal;
+package org.openjdk.jmc.console.ext.agent.manager.model.impl;
 
-import org.openjdk.jmc.console.ext.agent.manager.model.IMethodParameter;
+import java.net.URI;
+import java.net.URISyntaxException;
 
-public class MethodParameter implements IMethodParameter {
+import org.openjdk.jmc.console.ext.agent.manager.model.IMethodReturnValue;
+
+public class MethodReturnValue implements IMethodReturnValue {
+
+	private static final String DEFAULT_STRING_FIELD = "";
+	private static final ContentType DEFAULT_CONTENT_TYPE = ContentType.NONE;
 
 	private String name;
 	private String description;
@@ -43,55 +49,57 @@ public class MethodParameter implements IMethodParameter {
 	private String relationKey;
 	private String converter;
 
-	@Override
-	public String getName() {
-		return name;
+	public MethodReturnValue() {
+		name = DEFAULT_STRING_FIELD;
+		description = DEFAULT_STRING_FIELD;
+		contentType = DEFAULT_CONTENT_TYPE;
+		relationKey = DEFAULT_STRING_FIELD;
+		converter = DEFAULT_STRING_FIELD;
 	}
 
-	@Override
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	@Override
 	public String getDescription() {
 		return description;
 	}
 
-	@Override
 	public void setDescription(String description) {
 		this.description = description;
-
 	}
 
-	@Override
 	public ContentType getContentType() {
 		return contentType;
 	}
 
-	@Override
 	public void setContentType(ContentType contentType) {
 		this.contentType = contentType;
 	}
 
-	@Override
 	public String getRelationKey() {
 		return relationKey;
 	}
 
-	@Override
 	public void setRelationKey(String relationKey) {
+		try {
+			new URI(relationKey);
+		} catch (URISyntaxException e) {
+			throw new IllegalArgumentException();
+		}
 		this.relationKey = relationKey;
 	}
 
-	@Override
 	public String getConverter() {
 		return converter;
 	}
 
-	@Override
 	public void setConverter(String converter) {
 		this.converter = converter;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
 	}
 
 }

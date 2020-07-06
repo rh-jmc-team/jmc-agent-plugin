@@ -33,5 +33,8 @@
  */
 package org.openjdk.jmc.console.ext.agent.manager.model;
 
-public interface IMethodParameter extends INamedCapturedValue {
+public interface IMethodParameter extends ICapturedValue {
+	int getIndex();
+
+	void setIndex(int index);
 }
