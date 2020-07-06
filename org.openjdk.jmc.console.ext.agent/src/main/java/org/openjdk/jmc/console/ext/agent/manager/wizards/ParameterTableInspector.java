@@ -52,8 +52,6 @@ import org.openjdk.jmc.ui.misc.OptimisticComparator;
 import org.openjdk.jmc.ui.misc.TreeStructureContentProvider;
 
 public class ParameterTableInspector {
-
-	public static final String PARAMETER_TREE_NAME = "EventEditingWizardParameterPage.ParamtersTree"; //$NON-NLS-1$
 	private static final String INDEX_COLUNM_ID = "index";
 	private static final String INDEX_COLUNM_NAME = "Index";
 	private static final String NAME_COLUNM_ID = "name";

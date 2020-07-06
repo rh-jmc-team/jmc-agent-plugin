@@ -50,8 +50,6 @@ import org.openjdk.jmc.ui.misc.OptimisticComparator;
 import org.openjdk.jmc.ui.misc.TreeStructureContentProvider;
 
 public class FieldTableInspector {
-
-	public static final String FIELD_TREE_NAME = "EventEditingWizardFieldPage.FieldsTree"; //$NON-NLS-1$
 	private static final String NAME_COLUNM_ID = "name";
 	private static final String NAME_COLUNM_NAME = "Name";
 	private static final String EXPRESSION_COLUNM_ID = "expression";
