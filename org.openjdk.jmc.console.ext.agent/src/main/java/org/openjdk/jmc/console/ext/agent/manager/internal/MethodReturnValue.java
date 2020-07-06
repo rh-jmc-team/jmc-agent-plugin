@@ -54,42 +54,34 @@ public class MethodReturnValue implements IMethodReturnValue {
 		converter = DEFAULT_STRING_FIELD;
 	}
 
-	@Override
 	public String getDescription() {
 		return description;
 	}
 
-	@Override
 	public void setDescription(String description) {
 		this.description = description;
 	}
 
-	@Override
 	public ContentType getContentType() {
 		return contentType;
 	}
 
-	@Override
 	public void setContentType(ContentType contentType) {
 		this.contentType = contentType;
 	}
 
-	@Override
 	public String getRelationKey() {
 		return relationKey;
 	}
 
-	@Override
 	public void setRelationKey(String relationKey) {
 		this.relationKey = relationKey;
 	}
 
-	@Override
 	public String getConverter() {
 		return converter;
 	}
 
-	@Override
 	public void setConverter(String converter) {
 		this.converter = converter;
 	}

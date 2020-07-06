@@ -1,17 +1,16 @@
 package org.openjdk.jmc.console.ext.agent.manager.wizards;
 
-import org.eclipse.jface.viewers.ISelectionChangedListener;
-import org.eclipse.jface.viewers.SelectionChangedEvent;
-import org.eclipse.jface.viewers.TreeViewer;
+import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Event;
-import org.eclipse.swt.widgets.Listener;
 
 public class TableButtonControls extends Composite {
+	private static final String ADD_BTN_LABEL = "Add";
+	private static final String EDIT_BTN_LABEL = "Edit";
+	private static final String REMOVE_BTN_LABEL = "Remove";
 
 	private Button addBtn;
 	private Button editBtn;
@@ -19,9 +18,9 @@ public class TableButtonControls extends Composite {
 	private Runnable addBtnLister;
 	private Runnable removeBtnLister;
 	private Runnable editBtnLister;
-	private final TreeViewer viewer;
+	private final TableViewer viewer;
 
-	TableButtonControls(Composite parent, TreeViewer viewer) {
+	TableButtonControls(Composite parent, TableViewer viewer) {
 		super(parent, SWT.NONE);
 		this.viewer = viewer;
 
@@ -32,15 +31,15 @@ public class TableButtonControls extends Composite {
 
 		addBtn = new Button(this, SWT.PUSH);
 		addBtn.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-		addBtn.setText("Add");
+		addBtn.setText(ADD_BTN_LABEL);
 
 		removeBtn = new Button(this, SWT.PUSH);
 		removeBtn.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-		removeBtn.setText("Remove");
+		removeBtn.setText(REMOVE_BTN_LABEL);
 
 		editBtn = new Button(this, SWT.PUSH);
 		editBtn.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-		editBtn.setText("Edit");
+		editBtn.setText(EDIT_BTN_LABEL);
 
 		bindListeners();
 		updateButtonsAccordingTo(false);
@@ -65,44 +64,10 @@ public class TableButtonControls extends Composite {
 	}
 
 	private void bindListeners() {
-		addBtn.addListener(SWT.Selection, new Listener() {
-
-			@Override
-			public void handleEvent(Event e) {
-				if (addBtnLister != null) {
-					addBtnLister.run();
-				}
-			}
-
-		});
-
-		removeBtn.addListener(SWT.Selection, new Listener() {
-
-			@Override
-			public void handleEvent(Event e) {
-				if (removeBtnLister != null) {
-					removeBtnLister.run();
-				}
-			}
-		});
-
-		editBtn.addListener(SWT.Selection, new Listener() {
-
-			@Override
-			public void handleEvent(Event e) {
-				if (editBtnLister != null) {
-					editBtnLister.run();
-				}
-			}
-
-		});
-
-		viewer.addSelectionChangedListener(new ISelectionChangedListener() {
-			@Override
-			public void selectionChanged(SelectionChangedEvent event) {
-				updateButtonsAccordingTo(!event.getSelection().isEmpty());
-			}
-		});
+		addBtn.addListener(SWT.Selection, e -> addBtnLister.run());
+		removeBtn.addListener(SWT.Selection, e -> removeBtnLister.run());
+		editBtn.addListener(SWT.Selection, e -> editBtnLister.run());
+		viewer.addSelectionChangedListener(e -> updateButtonsAccordingTo(!e.getSelection().isEmpty()));
 	}
 
 }

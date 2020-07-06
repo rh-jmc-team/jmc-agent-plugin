@@ -45,6 +45,7 @@ import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.openjdk.jmc.console.ext.agent.manager.internal.MethodParameter;
 import org.openjdk.jmc.console.ext.agent.manager.model.ICapturedValue;
 import org.openjdk.jmc.console.ext.agent.manager.model.IEvent;
@@ -84,9 +85,9 @@ public class EventEditingWizardParameterPage extends WizardPage {
 		tableInspector.setInput(populateTable());
 
 		tableButtons = new TableButtonControls(container, tableInspector.getViewer());
-		tableButtons.setAddButtonListener(() -> onAddBtnPressed());
-		tableButtons.setEditButtonListener(() -> onEditBtnPressed());
-		tableButtons.setRemoveButtonListener(() -> onRemoveBtnPressed());
+		tableButtons.setAddButtonListener(this::onAddBtnPressed);
+		tableButtons.setEditButtonListener(this::onEditBtnPressed);
+		tableButtons.setRemoveButtonListener(this::onRemoveBtnPressed);
 
 		sc.setExpandHorizontal(true);
 		sc.setExpandVertical(true);
@@ -96,7 +97,7 @@ public class EventEditingWizardParameterPage extends WizardPage {
 
 	private void onAddBtnPressed() {
 		EventMethodParameterEditingPage page = new EventMethodParameterEditingPage();
-		OnePageWizardDialog.open(page, 600, 600);
+		new OnePageWizardDialog(Display.getCurrent().getActiveShell(), page).open();
 		ICapturedValue capturedValue = page.getCapturedValue();
 		if (capturedValue instanceof MethodParameter) {
 			event.addMethodParameter((IMethodParameter) capturedValue);
@@ -111,7 +112,8 @@ public class EventEditingWizardParameterPage extends WizardPage {
 		if (itemInfo == null) {
 			return;
 		}
-		OnePageWizardDialog.open(new EventMethodParameterEditingPage(itemInfo), 600, 600);
+		new OnePageWizardDialog(Display.getCurrent().getActiveShell(), new EventMethodParameterEditingPage(itemInfo))
+				.open();
 
 		tableInspector.setInput(populateTable());
 	}

@@ -172,7 +172,6 @@ public class Event implements IEvent {
 	@Override
 	public void setMethodDescriptor(String methodDescriptor) {
 		this.methodDescriptor = methodDescriptor;
-
 	}
 
 	@Override
@@ -183,13 +182,11 @@ public class Event implements IEvent {
 	@Override
 	public void addMethodParameter(IMethodParameter methodParameter) {
 		parameters.add(methodParameter);
-
 	}
 
 	@Override
 	public void removeMethodParameter(IMethodParameter methodParameter) {
 		parameters.remove(methodParameter);
-
 	}
 
 	@Override
@@ -215,7 +212,6 @@ public class Event implements IEvent {
 	@Override
 	public void addField(IField field) {
 		fields.add(field);
-
 	}
 
 	@Override

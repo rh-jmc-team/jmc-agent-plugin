@@ -37,12 +37,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.jface.viewers.ColumnLabelProvider;
-import org.eclipse.jface.viewers.ColumnViewerToolTipSupport;
-import org.eclipse.jface.viewers.TreeViewer;
+import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Tree;
 import org.openjdk.jmc.console.ext.agent.manager.model.ICapturedValue;
 import org.openjdk.jmc.console.ext.agent.manager.model.IMethodParameter;
 import org.openjdk.jmc.console.ext.agent.manager.model.IMethodReturnValue;
@@ -54,21 +52,20 @@ import org.openjdk.jmc.ui.misc.OptimisticComparator;
 import org.openjdk.jmc.ui.misc.TreeStructureContentProvider;
 
 public class ParameterTableInspector {
-
-	public static final String PARAMETER_TREE_NAME = "EventEditingWizardParameterPage.ParamtersTree"; //$NON-NLS-1$
-	private static final String INDEX_COLUNM_ID = "index";
-	private static final String INDEX_COLUNM_NAME = "Index";
-	private static final String NAME_COLUNM_ID = "name";
-	private static final String NAME_COLUNM_NAME = "Name";
-	private static final String DESCRIPTION_COLUNM_ID = "description";
-	private static final String DESCRIPTION_COLUNM_NAME = "Description";
-	private final TreeViewer viewer;
+	private static final String RETURN_VALUE_INDEX_PLACEHOLDER = "ReturnValue";
+	private static final String INDEX_COLUMN_ID = "index";
+	private static final String INDEX_COLUMN_NAME = "Index";
+	private static final String NAME_COLUMN_ID = "name";
+	private static final String NAME_COLUMN_NAME = "Name";
+	private static final String DESCRIPTION_COLUMN_ID = "description";
+	private static final String DESCRIPTION_COLUMN_NAME = "Description";
+	private final TableViewer viewer;
 
 	private final ColumnLabelProvider nameLabelProvider = new ColumnLabelProvider() {
 		@Override
 		public String getText(Object element) {
 			if (element instanceof ICapturedValue) {
-				return ((INamedCapturedValue) ((ICapturedValue) element)).getName();
+				return ((INamedCapturedValue) element).getName();
 			}
 			return element.toString();
 		}
@@ -78,9 +75,9 @@ public class ParameterTableInspector {
 		@Override
 		public String getText(Object element) {
 			if (element instanceof IMethodParameter) {
-				return (String.valueOf(((IMethodParameter) element).getIndex()));
+				return String.valueOf(((IMethodParameter) element).getIndex());
 			} else if (element instanceof IMethodReturnValue) {
-				return ("ReturnValue");
+				return RETURN_VALUE_INDEX_PLACEHOLDER;
 			}
 			return element.toString();
 		}
@@ -97,21 +94,18 @@ public class ParameterTableInspector {
 	};
 
 	public ParameterTableInspector(Composite parent) {
-		Tree tree = new Tree(parent,
-				SWT.BORDER | SWT.FULL_SELECTION | SWT.MULTI | SWT.VIRTUAL | SWT.H_SCROLL | SWT.V_SCROLL);
-		tree.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-		viewer = new TreeViewer(tree);
+		viewer = new TableViewer(parent, SWT.V_SCROLL | SWT.BORDER | SWT.FULL_SELECTION);
+		viewer.getControl().setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 		viewer.setContentProvider(new TreeStructureContentProvider());
-		ColumnViewerToolTipSupport.enableFor(viewer);
+		viewer.getTable().setHeaderVisible(true);
 
-		tree.setData("name", PARAMETER_TREE_NAME); //$NON-NLS-1$
 		List<IColumn> columns = new ArrayList<>();
-		columns.add(new ColumnBuilder(INDEX_COLUNM_NAME, INDEX_COLUNM_ID, indexLabelProvider).comparator( //$NON-NLS-1$
+		columns.add(new ColumnBuilder(INDEX_COLUMN_NAME, INDEX_COLUMN_ID, indexLabelProvider).comparator( //$NON-NLS-1$
 				new OptimisticComparator(indexLabelProvider)).build());
-		columns.add(new ColumnBuilder(NAME_COLUNM_NAME, NAME_COLUNM_ID, nameLabelProvider).comparator( //$NON-NLS-1$
+		columns.add(new ColumnBuilder(NAME_COLUMN_NAME, NAME_COLUMN_ID, nameLabelProvider).comparator( //$NON-NLS-1$
 				new OptimisticComparator(nameLabelProvider)).build());
 		columns.add(
-				new ColumnBuilder(DESCRIPTION_COLUNM_NAME, DESCRIPTION_COLUNM_ID, descriptionLabelProvider).comparator(//$NON-NLS-1$
+				new ColumnBuilder(DESCRIPTION_COLUMN_NAME, DESCRIPTION_COLUMN_ID, descriptionLabelProvider).comparator(//$NON-NLS-1$
 						new OptimisticComparator(descriptionLabelProvider)).build());
 		ColumnManager.build(viewer, columns, null);
 	}
@@ -120,7 +114,7 @@ public class ParameterTableInspector {
 		viewer.setInput(input);
 	}
 
-	public TreeViewer getViewer() {
+	public TableViewer getViewer() {
 		return viewer;
 	}
 
