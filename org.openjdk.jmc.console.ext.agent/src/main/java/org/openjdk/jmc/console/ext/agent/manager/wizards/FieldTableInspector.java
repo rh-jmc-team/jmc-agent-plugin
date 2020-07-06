@@ -50,12 +50,12 @@ import org.openjdk.jmc.ui.misc.OptimisticComparator;
 import org.openjdk.jmc.ui.misc.TreeStructureContentProvider;
 
 public class FieldTableInspector {
-	private static final String NAME_COLUNM_ID = "name";
-	private static final String NAME_COLUNM_NAME = "Name";
-	private static final String EXPRESSION_COLUNM_ID = "expression";
-	private static final String EXPRESSION_COLUNM_NAME = "Expression";
-	private static final String DESCRIPTION_COLUNM_ID = "description";
-	private static final String DESCRIPTION_COLUNM_NAME = "Description";
+	private static final String NAME_COLUMN_ID = "name";
+	private static final String NAME_COLUMN_NAME = "Name";
+	private static final String EXPRESSION_COLUMN_ID = "expression";
+	private static final String EXPRESSION_COLUMN_NAME = "Expression";
+	private static final String DESCRIPTION_COLUMN_ID = "description";
+	private static final String DESCRIPTION_COLUMN_NAME = "Description";
 
 	private final TableViewer viewer;
 
@@ -96,12 +96,12 @@ public class FieldTableInspector {
 		viewer.getTable().setHeaderVisible(true);
 
 		List<IColumn> columns = new ArrayList<>();
-		columns.add(new ColumnBuilder(NAME_COLUNM_NAME, NAME_COLUNM_ID, nameLabelProvider).comparator( //$NON-NLS-1$
+		columns.add(new ColumnBuilder(NAME_COLUMN_NAME, NAME_COLUMN_ID, nameLabelProvider).comparator( //$NON-NLS-1$
 				new OptimisticComparator(nameLabelProvider)).build());
-		columns.add(new ColumnBuilder(EXPRESSION_COLUNM_NAME, EXPRESSION_COLUNM_ID, expressionLabelProvider).comparator( //$NON-NLS-1$
+		columns.add(new ColumnBuilder(EXPRESSION_COLUMN_NAME, EXPRESSION_COLUMN_ID, expressionLabelProvider).comparator( //$NON-NLS-1$
 				new OptimisticComparator(expressionLabelProvider)).build());
 		columns.add(
-				new ColumnBuilder(DESCRIPTION_COLUNM_NAME, DESCRIPTION_COLUNM_ID, descriptionLabelProvider).comparator(//$NON-NLS-1$
+				new ColumnBuilder(DESCRIPTION_COLUMN_NAME, DESCRIPTION_COLUMN_ID, descriptionLabelProvider).comparator(//$NON-NLS-1$
 						new OptimisticComparator(descriptionLabelProvider)).build());
 		ColumnManager.build(viewer, columns, null);
 	}

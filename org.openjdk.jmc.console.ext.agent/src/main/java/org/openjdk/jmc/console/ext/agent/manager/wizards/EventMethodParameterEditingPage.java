@@ -44,9 +44,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Text;
 import org.openjdk.jmc.console.ext.agent.manager.internal.MethodParameter;
@@ -141,28 +139,18 @@ public class EventMethodParameterEditingPage extends WizardPage implements IPerf
 		label.setLayoutData(gdLabel);
 
 		Composite indexContainer = new Composite(parent, SWT.NONE);
-		indexContainer.setLayout(new GridLayout(3, false));
+		GridLayout gl = new GridLayout(2, false);
+		gl.marginWidth = 0;
+		indexContainer.setLayout(gl);
 		indexContainer.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
 		index = new Spinner(indexContainer, SWT.NONE);
 		index.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
 
-		label = createLabel(indexContainer, RETURN_VALUE_LABEL);
-		label.setLayoutData(new GridData(SWT.CENTER, SWT.CENTER, true, true));
-
 		returnValueBtn = new Button(indexContainer, SWT.CHECK);
-		returnValueBtn.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
-		returnValueBtn.addListener(SWT.Selection, new Listener() {
-
-			@Override
-			public void handleEvent(Event event) {
-				if (returnValueBtn.getSelection()) {
-					index.setEnabled(false);
-				} else {
-					index.setEnabled(true);
-				}
-			}
-		});
+		returnValueBtn.setText(RETURN_VALUE_LABEL);
+		returnValueBtn.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
+		returnValueBtn.addListener(SWT.Selection, e -> index.setEnabled(!returnValueBtn.getSelection()));
 
 		label = createLabel(parent, PARAM_DESCRIPTION_LABEL);
 		label.setLayoutData(gdLabel);
@@ -235,7 +223,7 @@ public class EventMethodParameterEditingPage extends WizardPage implements IPerf
 			returnValueBtn.setEnabled(false);
 		} else {
 			index.setEnabled(false);
-			returnValueBtn.setSelection(true);
+			returnValueBtn.setSelection(false);
 		}
 	}
 

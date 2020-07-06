@@ -39,8 +39,6 @@ import java.util.List;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
-import org.eclipse.swt.events.ModifyEvent;
-import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Combo;
@@ -102,7 +100,7 @@ public class EventFieldEditingPage extends WizardPage {
 		createPageContent(gridSection);
 		gridSection.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
 
-		popuateStoredValues();
+		populateStoredValues();
 		bindListeners();
 
 		sc.setExpandHorizontal(true);
@@ -188,7 +186,7 @@ public class EventFieldEditingPage extends WizardPage {
 		return text;
 	}
 
-	private void popuateStoredValues() {
+	private void populateStoredValues() {
 		converterType.setText(field.getConverter());
 		description.setText(field.getDescription());
 		relationalKey.setText(field.getRelationKey());
@@ -198,51 +196,12 @@ public class EventFieldEditingPage extends WizardPage {
 	}
 
 	private void bindListeners() {
-		converterType.addModifyListener(new ModifyListener() {
-			@Override
-			public void modifyText(ModifyEvent e) {
-				field.setConverter(converterType.getText());
-			}
-		});
-
-		description.addModifyListener(new ModifyListener() {
-			@Override
-			public void modifyText(ModifyEvent e) {
-				field.setDescription(description.getText());
-			}
-		});
-
-		relationalKey.addModifyListener(new ModifyListener() {
-			@Override
-			public void modifyText(ModifyEvent e) {
-				field.setRelationKey(relationalKey.getText());
-			}
-		});
-
-		name.addModifyListener(new ModifyListener() {
-			@Override
-			public void modifyText(ModifyEvent e) {
-				field.setName(name.getText());
-
-			}
-		});
-
-		expression.addModifyListener(new ModifyListener() {
-
-			@Override
-			public void modifyText(ModifyEvent e) {
-				field.setExpression(expression.getText());
-			}
-		});
-
-		contentType.addModifyListener(new ModifyListener() {
-			@Override
-			public void modifyText(ModifyEvent e) {
-				if (contentType.getSelectionIndex() >= 0) {
-					field.setContentType(ICapturedValue.ContentType.valueOf(contentType.getText()));
-				}
-			}
-		});
-
+		converterType.addModifyListener(e -> field.setConverter(converterType.getText()));
+		description.addModifyListener(e -> field.setDescription(description.getText()));
+		relationalKey.addModifyListener(e -> field.setRelationKey(relationalKey.getText()));
+		name.addModifyListener(e -> field.setName(name.getText()));
+		expression.addModifyListener(e -> field.setExpression(expression.getText()));
+		contentType.addModifyListener(
+				e -> field.setContentType(ICapturedValue.ContentType.valueOf(contentType.getText())));
 	}
 }

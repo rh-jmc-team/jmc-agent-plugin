@@ -52,19 +52,20 @@ import org.openjdk.jmc.ui.misc.OptimisticComparator;
 import org.openjdk.jmc.ui.misc.TreeStructureContentProvider;
 
 public class ParameterTableInspector {
-	private static final String INDEX_COLUNM_ID = "index";
-	private static final String INDEX_COLUNM_NAME = "Index";
-	private static final String NAME_COLUNM_ID = "name";
-	private static final String NAME_COLUNM_NAME = "Name";
-	private static final String DESCRIPTION_COLUNM_ID = "description";
-	private static final String DESCRIPTION_COLUNM_NAME = "Description";
+	private static final String RETURN_VALUE_INDEX_PLACEHOLDER = "ReturnValue";
+	private static final String INDEX_COLUMN_ID = "index";
+	private static final String INDEX_COLUMN_NAME = "Index";
+	private static final String NAME_COLUMN_ID = "name";
+	private static final String NAME_COLUMN_NAME = "Name";
+	private static final String DESCRIPTION_COLUMN_ID = "description";
+	private static final String DESCRIPTION_COLUMN_NAME = "Description";
 	private final TableViewer viewer;
 
 	private final ColumnLabelProvider nameLabelProvider = new ColumnLabelProvider() {
 		@Override
 		public String getText(Object element) {
 			if (element instanceof ICapturedValue) {
-				return ((INamedCapturedValue) ((ICapturedValue) element)).getName();
+				return ((INamedCapturedValue) element).getName();
 			}
 			return element.toString();
 		}
@@ -74,9 +75,9 @@ public class ParameterTableInspector {
 		@Override
 		public String getText(Object element) {
 			if (element instanceof IMethodParameter) {
-				return (String.valueOf(((IMethodParameter) element).getIndex()));
+				return String.valueOf(((IMethodParameter) element).getIndex());
 			} else if (element instanceof IMethodReturnValue) {
-				return ("ReturnValue");
+				return RETURN_VALUE_INDEX_PLACEHOLDER;
 			}
 			return element.toString();
 		}
@@ -99,12 +100,12 @@ public class ParameterTableInspector {
 		viewer.getTable().setHeaderVisible(true);
 
 		List<IColumn> columns = new ArrayList<>();
-		columns.add(new ColumnBuilder(INDEX_COLUNM_NAME, INDEX_COLUNM_ID, indexLabelProvider).comparator( //$NON-NLS-1$
+		columns.add(new ColumnBuilder(INDEX_COLUMN_NAME, INDEX_COLUMN_ID, indexLabelProvider).comparator( //$NON-NLS-1$
 				new OptimisticComparator(indexLabelProvider)).build());
-		columns.add(new ColumnBuilder(NAME_COLUNM_NAME, NAME_COLUNM_ID, nameLabelProvider).comparator( //$NON-NLS-1$
+		columns.add(new ColumnBuilder(NAME_COLUMN_NAME, NAME_COLUMN_ID, nameLabelProvider).comparator( //$NON-NLS-1$
 				new OptimisticComparator(nameLabelProvider)).build());
 		columns.add(
-				new ColumnBuilder(DESCRIPTION_COLUNM_NAME, DESCRIPTION_COLUNM_ID, descriptionLabelProvider).comparator(//$NON-NLS-1$
+				new ColumnBuilder(DESCRIPTION_COLUMN_NAME, DESCRIPTION_COLUMN_ID, descriptionLabelProvider).comparator(//$NON-NLS-1$
 						new OptimisticComparator(descriptionLabelProvider)).build());
 		ColumnManager.build(viewer, columns, null);
 	}
