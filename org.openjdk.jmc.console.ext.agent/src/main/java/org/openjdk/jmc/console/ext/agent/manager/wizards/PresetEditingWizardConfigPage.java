@@ -113,7 +113,7 @@ public class PresetEditingWizardConfigPage extends BaseWizardPage {
 
 		return container;
 	}
-	
+
 	private Composite createGlobalConfigContainer(Composite parent) {
 		Composite container = new Composite(parent, SWT.NONE);
 		int cols = 5;
@@ -121,7 +121,8 @@ public class PresetEditingWizardConfigPage extends BaseWizardPage {
 		layout.horizontalSpacing = 8;
 		container.setLayout(layout);
 
-		classPrefixText = createTextInput(container, cols, LABEL_CLASS_PREFIX, MESSAGE_PREFIX_ADDED_TO_GENERATED_EVENT_CLASSES);
+		classPrefixText = createTextInput(container, cols, LABEL_CLASS_PREFIX,
+				MESSAGE_PREFIX_ADDED_TO_GENERATED_EVENT_CLASSES);
 		allowToStringButton = createCheckboxInput(parent, cols, LABEL_ALLOW_TO_STRING);
 		allowConverterButton = createCheckboxInput(parent, cols, LABEL_ALLOW_CONVERTER);
 
@@ -170,8 +171,10 @@ public class PresetEditingWizardConfigPage extends BaseWizardPage {
 			setErrorMessageIfAny();
 		});
 
-		allowToStringButton.addListener(SWT.Selection, e -> preset.setAllowToString(allowToStringButton.getSelection()));
-		allowConverterButton.addListener(SWT.Selection, e -> preset.setAllowConverter(allowConverterButton.getSelection()));
+		allowToStringButton.addListener(SWT.Selection,
+				e -> preset.setAllowToString(allowToStringButton.getSelection()));
+		allowConverterButton.addListener(SWT.Selection,
+				e -> preset.setAllowConverter(allowConverterButton.getSelection()));
 	}
 
 	private void populateUi() {

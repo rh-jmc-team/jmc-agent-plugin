@@ -24,7 +24,7 @@ public abstract class BaseWizardPage extends WizardPage {
 	protected Composite createComposite(Composite parent) {
 		return new Composite(parent, SWT.NONE);
 	}
-	
+
 	protected Label createLabel(Composite parent, String text) {
 		Label label = new Label(parent, SWT.NONE);
 		label.setText(text);
@@ -113,7 +113,7 @@ public abstract class BaseWizardPage extends WizardPage {
 		for (int i = 0; i < hints.length; i++) {
 			t[i] = createText(container, hints[i]);
 		}
-		
+
 		return t;
 	}
 
@@ -130,7 +130,7 @@ public abstract class BaseWizardPage extends WizardPage {
 	protected Button createCheckboxInput(Composite parent, int cols, String text) {
 		Button b = createCheckbox(parent, text);
 		b.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, true, cols, 0));
-		
+
 		return b;
 	}
 }
