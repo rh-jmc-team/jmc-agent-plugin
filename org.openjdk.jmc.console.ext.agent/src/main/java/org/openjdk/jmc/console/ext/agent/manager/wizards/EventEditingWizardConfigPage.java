@@ -34,9 +34,11 @@
 package org.openjdk.jmc.console.ext.agent.manager.wizards;
 
 import org.eclipse.jface.wizard.IWizardPage;
-import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -49,7 +51,9 @@ import org.openjdk.jmc.console.ext.agent.manager.model.IEvent.Location;
 
 import java.util.stream.Stream;
 
-public class EventEditingWizardConfigPage extends WizardPage {
+import javax.swing.plaf.basic.BasicInternalFrameTitlePane.SystemMenuBar;
+
+public class EventEditingWizardConfigPage extends BaseWizardPage {
 	private static final String PAGE_NAME = "Agent Event Editing";
 	private static final String MESSAGE_EVENT_EDITING_WIZARD_CONFIG_PAGE_TITLE = "Editing Event Configurations";
 	private static final String MESSAGE_EVENT_EDITING_WIZARD_CONFIG_PAGE_DESCRIPTION = "Edit basic information of an event on how it should be instrumented and injected.";
@@ -61,6 +65,7 @@ public class EventEditingWizardConfigPage extends WizardPage {
 	private static final String LABEL_METHOD = "Method: ";
 	private static final String LABEL_PATH = "Path: ";
 	private static final String LABEL_LOCATION = "Location: ";
+	private static final String LABEL_CLEAR = "Clear";
 	private static final String LABEL_RECORD_EXCEPTIONS = "Record exceptions";
 	private static final String LABEL_RECORD_STACK_TRACE = "Record stack trace";
 
@@ -82,6 +87,7 @@ public class EventEditingWizardConfigPage extends WizardPage {
 	private Text methodDescriptorText;
 	private Text pathText;
 	private Combo locationCombo;
+	private Button locationClearBtn;
 	private Button recordExceptionsBtn;
 	private Button recordStackTraceBtn;
 
@@ -132,80 +138,12 @@ public class EventEditingWizardConfigPage extends WizardPage {
 		layout.horizontalSpacing = 8;
 		container.setLayout(layout);
 
-		createIdInput(container, cols);
-		createNameInput(container, cols);
-		createDescriptionInput(container, cols);
+		idText = createTextInput(container, cols, LABEL_ID, MESSAGE_EVENT_ID);
+		nameText = createTextInput(container, cols, LABEL_NAME, MESSAGE_NAME_OF_THE_EVENT);
+		descriptionText = createMultiTextInput(container, cols, LABEL_DESCRIPTION,
+				MESSAGE_OPTIONAL_DESCRIPTION_OF_THIS_EVENT);
 
 		return container;
-	}
-
-	private void createIdInput(Composite parent, int cols) {
-		{
-			Label label = createLabel(parent, LABEL_ID);
-
-			GridData gd = new GridData(SWT.BEGINNING, SWT.CENTER, false, false);
-			gd.horizontalSpan = 2;
-			gd.minimumHeight = 0;
-			label.setLayoutData(gd);
-		}
-
-		{
-			idText = createText(parent);
-			idText.setMessage(MESSAGE_EVENT_ID);
-
-			GridData gd = new GridData(SWT.FILL, SWT.CENTER, true, true);
-			gd.horizontalSpan = cols - 2;
-			gd.minimumWidth = 0;
-			gd.widthHint = 400;
-			idText.setLayoutData(gd);
-		}
-	}
-
-	private void createNameInput(Composite parent, int cols) {
-		{
-			Label label = createLabel(parent, LABEL_NAME);
-
-			GridData gd = new GridData(SWT.BEGINNING, SWT.CENTER, false, false);
-			gd.horizontalSpan = 2;
-			gd.minimumHeight = 0;
-			label.setLayoutData(gd);
-		}
-
-		{
-			nameText = createText(parent);
-			nameText.setMessage(MESSAGE_NAME_OF_THE_EVENT);
-
-			GridData gd = new GridData(SWT.FILL, SWT.CENTER, true, true);
-			gd.horizontalSpan = cols - 2;
-			gd.minimumWidth = 0;
-			gd.widthHint = 400;
-			nameText.setLayoutData(gd);
-		}
-	}
-
-	private void createDescriptionInput(Composite parent, int cols) {
-		{
-			Label label = createLabel(parent, LABEL_DESCRIPTION);
-
-			GridData gd = new GridData(SWT.BEGINNING, SWT.CENTER, true, true);
-			gd.horizontalSpan = cols;
-			gd.minimumHeight = 0;
-			label.setLayoutData(gd);
-		}
-
-		{
-			descriptionText = createMultiText(parent);
-			// FIXME: Multi line Text field (SWT.MULTI) does not support Text.setMessage
-			// https://bugs.eclipse.org/bugs/show_bug.cgi?id=328832
-			descriptionText.setMessage(MESSAGE_OPTIONAL_DESCRIPTION_OF_THIS_EVENT);
-
-			GridData gd = new GridData(SWT.FILL, SWT.CENTER, true, true);
-			gd.horizontalSpan = cols;
-			gd.minimumWidth = 0;
-			gd.widthHint = 300;
-			gd.heightHint = 100;
-			descriptionText.setLayoutData(gd);
-		}
 	}
 
 	private Composite createInstrumentationTargetContainer(Composite parent) {
@@ -215,68 +153,14 @@ public class EventEditingWizardConfigPage extends WizardPage {
 		layout.horizontalSpacing = 8;
 		container.setLayout(layout);
 
-		createClassInput(container, cols);
-		createMethodInput(container, cols);
+		classText = createTextInput(container, cols, LABEL_CLASS, MESSAGE_FULLY_QUALIFIED_CLASS_NAME);
+		Text[] receivers = createMultiInputTextInput(container, cols, LABEL_METHOD,
+				new String[] {MESSAGE_METHOD_NAME, MESSAGE_METHOD_DESCRIPTOR});
+
+		methodNameText = receivers[0];
+		methodDescriptorText = receivers[1];
 
 		return container;
-	}
-
-	private void createClassInput(Composite parent, int cols) {
-		{
-			Label label = createLabel(parent, LABEL_CLASS);
-
-			GridData gd = new GridData(SWT.BEGINNING, SWT.CENTER, false, false);
-			gd.horizontalSpan = 2;
-			gd.minimumHeight = 0;
-			label.setLayoutData(gd);
-		}
-
-		{
-			classText = createText(parent);
-			classText.setMessage(MESSAGE_FULLY_QUALIFIED_CLASS_NAME);
-
-			GridData gd = new GridData(SWT.FILL, SWT.CENTER, true, true);
-			gd.horizontalSpan = cols - 2;
-			gd.minimumWidth = 0;
-			gd.widthHint = 400;
-			classText.setLayoutData(gd);
-		}
-	}
-
-	private void createMethodInput(Composite parent, int cols) {
-		{
-			Label label = createLabel(parent, LABEL_METHOD);
-
-			GridData gd = new GridData(SWT.BEGINNING, SWT.CENTER, true, true);
-			gd.horizontalSpan = 2;
-			gd.minimumHeight = 0;
-
-			label.setLayoutData(gd);
-		}
-
-		{
-			methodNameText = createText(parent);
-			methodNameText.setMessage(MESSAGE_METHOD_NAME);
-
-			GridData gd = new GridData(SWT.FILL, SWT.CENTER, false, true);
-			gd.horizontalSpan = (cols - 2) / 2;
-			gd.minimumWidth = 0;
-			gd.widthHint = 300;
-
-			methodNameText.setLayoutData(gd);
-		}
-
-		{
-			methodDescriptorText = createText(parent);
-			methodDescriptorText.setMessage(MESSAGE_METHOD_DESCRIPTOR);
-
-			GridData gd = new GridData(SWT.FILL, SWT.CENTER, true, true);
-			gd.horizontalSpan = (cols - 2) / 2;
-			gd.minimumWidth = 0;
-			gd.widthHint = 300;
-
-			methodDescriptorText.setLayoutData(gd);
-		}
 	}
 
 	private Composite createMetaInfoContainer(Composite parent) {
@@ -286,112 +170,16 @@ public class EventEditingWizardConfigPage extends WizardPage {
 		layout.horizontalSpacing = 8;
 		container.setLayout(layout);
 
-		createPathInput(container, cols);
-		createLocationInput(container, cols);
-		createRecordExceptionInput(container, cols);
-		createRecordStackTraceInput(container, cols);
+		pathText = createTextInput(container, cols, LABEL_PATH, MESSAGE_PATH_TO_EVENT);
+		locationCombo = createComboInput(container, cols - 2, LABEL_LOCATION,
+				Stream.of(Location.values()).map(Location::toString).toArray(String[]::new));
+		locationClearBtn = createButton(container, LABEL_CLEAR);
+		locationClearBtn.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 2, 0));
+
+		recordExceptionsBtn = createCheckboxInput(container, cols, LABEL_RECORD_EXCEPTIONS);
+		recordStackTraceBtn = createCheckboxInput(container, cols, LABEL_RECORD_STACK_TRACE);
 
 		return container;
-	}
-
-	private void createPathInput(Composite parent, int cols) {
-		{
-			Label label = createLabel(parent, LABEL_LOCATION);
-
-			GridData gd = new GridData(SWT.BEGINNING, SWT.CENTER, false, false);
-			gd.horizontalSpan = 2;
-			gd.minimumHeight = 0;
-			label.setLayoutData(gd);
-		}
-
-		{
-			pathText = createText(parent);
-			pathText.setMessage(MESSAGE_PATH_TO_EVENT);
-
-			GridData gd = new GridData(SWT.FILL, SWT.CENTER, true, true);
-			gd.horizontalSpan = cols - 2;
-			gd.minimumWidth = 0;
-			gd.widthHint = 400;
-			pathText.setLayoutData(gd);
-		}
-	}
-
-	private void createLocationInput(Composite parent, int cols) {
-		{
-			Label label = createLabel(parent, LABEL_LOCATION);
-
-			GridData gd = new GridData(SWT.BEGINNING, SWT.CENTER, false, false);
-			gd.horizontalSpan = 2;
-			gd.minimumHeight = 0;
-			label.setLayoutData(gd);
-		}
-
-		{
-			locationCombo = createCombo(parent,
-					Stream.of(Location.values()).map(Location::toString).toArray(String[]::new));
-
-			GridData gd = new GridData(SWT.FILL, SWT.CENTER, true, true);
-			gd.horizontalSpan = cols - 2;
-			gd.minimumWidth = 0;
-			gd.widthHint = 400;
-			locationCombo.setLayoutData(gd);
-		}
-	}
-
-	private void createRecordExceptionInput(Composite parent, int cols) {
-		recordExceptionsBtn = createCheckbox(parent, LABEL_RECORD_EXCEPTIONS);
-		recordExceptionsBtn.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, true, cols, 1));
-	}
-
-	private void createRecordStackTraceInput(Composite parent, int cols) {
-		recordStackTraceBtn = createCheckbox(parent, LABEL_RECORD_STACK_TRACE);
-		recordStackTraceBtn.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, true, cols, 1));
-	}
-
-	private Label createLabel(Composite parent, String text) {
-		Label label = new Label(parent, SWT.NONE);
-		label.setText(text);
-		return label;
-	}
-
-	private Text createText(Composite parent) {
-		Text text = new Text(parent, SWT.BORDER);
-		text.setEnabled(true);
-		return text;
-	}
-
-	private Text createMultiText(Composite parent) {
-		Text text = new Text(parent, SWT.BORDER | SWT.MULTI | SWT.V_SCROLL);
-		text.setEnabled(true);
-		return text;
-	}
-
-	private Label createSeparator(Composite parent) {
-		return new Label(parent, SWT.SEPARATOR | SWT.HORIZONTAL);
-	}
-
-	private Combo createCombo(Composite parent, String[] items) {
-		Combo combo = new Combo(parent, SWT.DROP_DOWN | SWT.READ_ONLY);
-		combo.setItems(items);
-		return combo;
-	}
-
-	private Button createCheckbox(Composite parent, String text) {
-		Button checkbox = new Button(parent, SWT.CHECK);
-		checkbox.setText(text);
-		return checkbox;
-	}
-
-	private void setTextText(Text receiver, String text) {
-		text = text == null ? "" : text;
-		receiver.setText(text);
-		receiver.setToolTipText(text);
-	}
-
-	private void setComboText(Combo receiver, String text) {
-		text = text == null ? "" : text;
-		receiver.setText(text);
-		receiver.setToolTipText(text);
 	}
 
 	private void bindListeners() {
@@ -402,20 +190,22 @@ public class EventEditingWizardConfigPage extends WizardPage {
 		methodDescriptorText.addModifyListener(e -> event.setMethodDescriptor(methodDescriptorText.getText()));
 		pathText.addModifyListener(e -> event.setMethodName(pathText.getText()));
 		classText.addModifyListener(e -> event.setClazz(classText.getText()));
+		locationCombo.addModifyListener(e -> event.setLocation(
+				locationCombo.getSelectionIndex() == -1 ? null : Location.valueOf(locationCombo.getText())));
+		locationClearBtn.addListener(SWT.Selection, e -> locationCombo.deselectAll());
 		recordExceptionsBtn.addListener(SWT.Selection, e -> event.setRethrow(recordExceptionsBtn.getSelection()));
 		recordStackTraceBtn.addListener(SWT.Selection, e -> event.setStackTrace(recordStackTraceBtn.getSelection()));
-		locationCombo.addModifyListener(e -> event.setLocation(Location.valueOf(locationCombo.getText())));
 	}
 
 	private void populateUi() {
-		setTextText(idText, event.getId());
-		setTextText(nameText, event.getName());
-		setTextText(descriptionText, event.getDescription());
-		setTextText(classText, event.getClazz());
-		setTextText(methodNameText, event.getMethodName());
-		setTextText(methodDescriptorText, event.getMethodDescriptor());
-		setTextText(pathText, event.getPath());
-		setComboText(locationCombo, event.getLocation().toString());
+		setText(idText, event.getId());
+		setText(nameText, event.getName());
+		setText(descriptionText, event.getDescription());
+		setText(classText, event.getClazz());
+		setText(methodNameText, event.getMethodName());
+		setText(methodDescriptorText, event.getMethodDescriptor());
+		setText(pathText, event.getPath());
+		setText(locationCombo, event.getLocation().toString());
 		recordExceptionsBtn.setSelection(event.getRethrow());
 		recordStackTraceBtn.setSelection(event.getStackTrace());
 	}
