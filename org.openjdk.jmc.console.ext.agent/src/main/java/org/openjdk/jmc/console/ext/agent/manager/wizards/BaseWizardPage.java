@@ -1,24 +1,12 @@
 package org.openjdk.jmc.console.ext.agent.manager.wizards;
 
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
-import org.eclipse.jface.viewers.ColumnViewer;
-import org.eclipse.jface.viewers.IColorProvider;
 import org.eclipse.jface.viewers.IContentProvider;
-import org.eclipse.jface.viewers.IFontProvider;
-import org.eclipse.jface.viewers.ILabelProvider;
-import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.IToolTipProvider;
 import org.eclipse.jface.viewers.TableViewer;
-import org.eclipse.jface.viewers.ViewerCell;
-import org.eclipse.jface.viewers.ViewerColumn;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.graphics.Color;
-import org.eclipse.swt.graphics.Font;
-import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -153,7 +141,7 @@ public abstract class BaseWizardPage extends WizardPage {
 
 	protected static Button createCheckboxInput(Composite parent, int cols, String text) {
 		Button b = createCheckbox(parent, text);
-		b.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false, cols, 0));
+		b.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, true, cols, 0));
 
 		return b;
 	}
@@ -216,81 +204,6 @@ public abstract class BaseWizardPage extends WizardPage {
 		protected final void addColumn(String name, String id, ColumnLabelProvider labelProvider) {
 			columns.add(new ColumnBuilder(name, id, labelProvider).comparator(new OptimisticComparator(labelProvider))
 					.build());
-		}
-
-		protected final void addColumn(String name, String id, TextAwareCellLabelProvider labelProvider) {
-			ColumnLabelProvider delegate = new ColumnLabelProvider() {
-				@Override
-				public String getText(Object element) {
-					return labelProvider.getText(element);
-				}
-
-				@Override
-				public void update(ViewerCell cell) {
-					if (labelProvider instanceof CellLabelProvider) {
-						((CellLabelProvider) labelProvider).update(cell);
-					}
-				}
-
-				@Override
-				public Color getForeground(Object element) {
-					return labelProvider instanceof IColorProvider ?
-							((IColorProvider) labelProvider).getForeground(element) : null;
-				}
-
-				@Override
-				public Color getBackground(Object element) {
-					return labelProvider instanceof IColorProvider ?
-							((IColorProvider) labelProvider).getBackground(element) : null;
-				}
-
-				@Override
-				public Font getFont(Object element) {
-					return labelProvider instanceof IFontProvider ? ((IFontProvider) labelProvider).getFont(element) :
-							null;
-				}
-
-				@Override
-				public String getToolTipText(Object element) {
-					return labelProvider instanceof IToolTipProvider ?
-							((IToolTipProvider) labelProvider).getToolTipText(element) : super.getToolTipText(element);
-				}
-
-				@Override
-				public Image getImage(Object element) {
-					return labelProvider.getImage(element);
-				}
-
-				@Override
-				public void addListener(ILabelProviderListener listener) {
-					super.addListener(listener);
-					labelProvider.addListener(listener);
-				}
-
-				@Override
-				public void removeListener(ILabelProviderListener listener) {
-					super.removeListener(listener);
-					labelProvider.removeListener(listener);
-				}
-
-				@Override
-				public boolean isLabelProperty(Object element, String property) {
-					return labelProvider.isLabelProperty(element, property);
-				}
-
-				@Override
-				protected void initialize(ColumnViewer viewer, ViewerColumn column) {
-					labelProvider.doInitialize(viewer, column);
-				}
-
-				@Override
-				public void dispose() {
-					super.dispose();
-					labelProvider.dispose();
-				}
-			};
-
-			columns.add(new ColumnBuilder(name, id, delegate).comparator(new OptimisticComparator(delegate)).build());
 		}
 
 		protected abstract void addColumns();
@@ -414,14 +327,6 @@ public abstract class BaseWizardPage extends WizardPage {
 		}
 
 		protected void onAddButtonSelected(IStructuredSelection selection) {
-		}
-
-		protected interface TextAwareCellLabelProvider extends ILabelProvider {
-			String getText(Object element);
-
-			Image getImage(Object element);
-
-			void doInitialize(ColumnViewer viewer, ViewerColumn column);
 		}
 	}
 }
