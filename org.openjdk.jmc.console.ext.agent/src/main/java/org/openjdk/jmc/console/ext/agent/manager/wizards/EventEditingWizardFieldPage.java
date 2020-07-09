@@ -33,28 +33,38 @@
  */
 package org.openjdk.jmc.console.ext.agent.manager.wizards;
 
-import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.ColumnLabelProvider;
+import org.eclipse.jface.viewers.IContentProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.wizard.WizardPage;
+import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
-import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.openjdk.jmc.console.ext.agent.manager.internal.Field;
 import org.openjdk.jmc.console.ext.agent.manager.model.IEvent;
 import org.openjdk.jmc.console.ext.agent.manager.model.IField;
+import org.openjdk.jmc.ui.misc.AbstractStructuredContentProvider;
 import org.openjdk.jmc.ui.wizards.OnePageWizardDialog;
 
-public class EventEditingWizardFieldPage extends WizardPage {
+public class EventEditingWizardFieldPage extends BaseWizardPage {
 	private static final String PAGE_NAME = "Agent Event Editing";
+
 	private static final String MESSAGE_EVENT_EDITING_WIZARD_FIELD_PAGE_TITLE = "Editing Event Fields";
 	private static final String MESSAGE_EVENT_EDITING_WIZARD_FIELD_PAGE_DESCRIPTION = "Fields are a subset of Java primary expressions which can be evaluated and recorded when committing an event.";
 
+	private static final String LABEL_NAME = "Name";
+	private static final String LABEL_EXPRESSION = "Expression";
+	private static final String LABEL_DESCRIPTION = "Description";
+
+	private static final String ID_NAME = "name";
+	private static final String ID_EXPRESSION = "expression";
+	private static final String ID_DESCRIPTION = "description";
+
 	private final IEvent event;
-	private TableButtonControls tableButtons;
-	private FieldTableInspector tableInspector;
+
+	private TableInspector tableInspector;
 
 	protected EventEditingWizardFieldPage(IEvent event) {
 		super(PAGE_NAME);
@@ -73,55 +83,123 @@ public class EventEditingWizardFieldPage extends WizardPage {
 		Composite container = new Composite(sc, SWT.NONE);
 		sc.setContent(container);
 
-		container.setLayout(new GridLayout(2, false));
-		container.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+		container.setLayout(new FillLayout());
 
-		tableInspector = new FieldTableInspector(container);
-		tableInspector.setInput(event.getFields());
-
-		tableButtons = new TableButtonControls(container, tableInspector.getViewer());
-		tableButtons.setAddButtonListener(this::onAddBtnPressed);
-		tableButtons.setEditButtonListener(this::onEditBtnPressed);
-		tableButtons.setRemoveButtonListener(this::onRemoveBtnPressed);
+		createFieldTableContainer(container);
 
 		sc.setExpandHorizontal(true);
 		sc.setExpandVertical(true);
 		sc.setMinSize(container.computeSize(SWT.DEFAULT, SWT.DEFAULT));
 		setControl(sc);
+
+		populateUi();
 	}
 
-	private void onAddBtnPressed() {
-		IField field = new Field();
-		EventFieldEditingPage page = new EventFieldEditingPage(field);
-		new OnePageWizardDialog(Display.getCurrent().getActiveShell(), page).open();
-		event.addField(field);
-		tableInspector.setInput(event.getFields());
+	private Composite createFieldTableContainer(Composite parent) {
+		Composite container = new Composite(parent, SWT.NONE);
+		container.setLayout(new FillLayout());
+
+		tableInspector = new TableInspector(container,
+				TableInspector.MULTI | TableInspector.ADD_BUTTON | TableInspector.EDIT_BUTTON
+						| TableInspector.DUPLICATE_BUTTON | TableInspector.REMOVE_BUTTON) {
+			@Override
+			protected void addColumns() {
+				addColumn(LABEL_NAME, ID_NAME, new FieldTableLabelProvider() {
+					@Override
+					protected String doGetText(IField field) {
+						return field.getName();
+					}
+				});
+
+				addColumn(LABEL_EXPRESSION, ID_EXPRESSION, new FieldTableLabelProvider() {
+					@Override
+					protected String doGetText(IField field) {
+						return field.getExpression();
+					}
+				});
+
+				addColumn(LABEL_DESCRIPTION, ID_DESCRIPTION, new FieldTableLabelProvider() {
+					@Override
+					protected String doGetText(IField field) {
+						return field.getDescription();
+					}
+				});
+			}
+
+			@Override
+			protected void onAddButtonSelected(IStructuredSelection selection) {
+				IField field = new Field();
+				EventFieldEditingPage page = new EventFieldEditingPage(field);
+				if (new OnePageWizardDialog(Display.getCurrent().getActiveShell(), page).open() != Window.OK) {
+					return;
+				}
+				event.addField(field);
+
+				tableInspector.getViewer().refresh();
+			}
+
+			@Override
+			protected void onEditButtonSelected(IStructuredSelection selection) {
+				IField field = (IField) selection.getFirstElement();
+				EventFieldEditingPage page = new EventFieldEditingPage(field);
+				if (new OnePageWizardDialog(Display.getCurrent().getActiveShell(), page).open() == Window.OK) {
+					// TODO: save the field
+				}
+
+				tableInspector.getViewer().refresh();
+			}
+
+			@Override
+			protected void onDuplicateButtonSelected(IStructuredSelection selection) {
+				// TODO: create a copy properly
+				IField original = (IField) selection.getFirstElement();
+				IField duplicate = new Field();
+				duplicate.setName("Copy of " + original.getName());
+				event.addField(duplicate);
+
+				tableInspector.getViewer().refresh();
+			}
+
+			@Override
+			protected void onRemoveButtonSelected(IStructuredSelection selection) {
+				event.removeField((IField) selection.getFirstElement());
+
+				tableInspector.getViewer().refresh();
+			}
+		};
+		tableInspector.setContentProvider(new FieldTableContentProvider());
+
+		return container;
 	}
 
-	private void onEditBtnPressed() {
-		IField itemInfo = getSingleSelectedTemplate();
-		if (itemInfo == null) {
-			return;
+	private void populateUi() {
+		tableInspector.setInput(event);
+	}
+
+	private static class FieldTableContentProvider extends AbstractStructuredContentProvider
+			implements IContentProvider {
+
+		@Override
+		public Object[] getElements(Object inputElement) {
+			if (!(inputElement instanceof IEvent)) {
+				throw new IllegalArgumentException("input element must be an IEvent"); // $NON-NLS-1$
+			}
+
+			IEvent event = (IEvent) inputElement;
+			return event.getFields();
 		}
-		new OnePageWizardDialog(Display.getCurrent().getActiveShell(), new EventFieldEditingPage(itemInfo)).open();
-		tableInspector.setInput(event.getFields());
 	}
 
-	private void onRemoveBtnPressed() {
-		IField itemInfo = getSingleSelectedTemplate();
-		if (itemInfo == null) {
-			return;
+	private static abstract class FieldTableLabelProvider extends ColumnLabelProvider {
+		@Override
+		public String getText(Object element) {
+			if (!(element instanceof IField)) {
+				throw new IllegalArgumentException("element must be an IField"); // $NON-NLS-1$
+			}
+
+			return doGetText((IField) element);
 		}
-		event.removeField(itemInfo);
-		tableInspector.setInput(event.getFields());
-	}
 
-	private IField getSingleSelectedTemplate() {
-		ISelection selection = tableInspector.getViewer().getSelection();
-		if (selection instanceof IStructuredSelection) {
-			return (IField) ((IStructuredSelection) selection).getFirstElement();
-		}
-		return null;
+		protected abstract String doGetText(IField field);
 	}
-
 }

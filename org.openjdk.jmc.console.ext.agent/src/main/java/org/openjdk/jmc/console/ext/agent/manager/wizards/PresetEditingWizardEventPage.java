@@ -39,8 +39,6 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.layout.FillLayout;
-import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.openjdk.jmc.console.ext.agent.manager.internal.Event;
 import org.openjdk.jmc.console.ext.agent.manager.model.IEvent;
@@ -82,9 +80,9 @@ public class PresetEditingWizardEventPage extends BaseWizardPage {
 		Composite container = new Composite(sc, SWT.NONE);
 		sc.setContent(container);
 
-		container.setLayout(new GridLayout());
+		container.setLayout(new FillLayout());
 
-		createEventTableContainer(container).setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
+		createEventTableContainer(container);
 
 		sc.setExpandHorizontal(true);
 		sc.setExpandVertical(true);
@@ -176,7 +174,7 @@ public class PresetEditingWizardEventPage extends BaseWizardPage {
 		@Override
 		public Object[] getElements(Object inputElement) {
 			if (!(inputElement instanceof IPreset)) {
-				throw new IllegalArgumentException("input element must be a IPreset"); // $NON-NLS-1$
+				throw new IllegalArgumentException("input element must be an IPreset"); // $NON-NLS-1$
 			}
 
 			IPreset preset = (IPreset) inputElement;

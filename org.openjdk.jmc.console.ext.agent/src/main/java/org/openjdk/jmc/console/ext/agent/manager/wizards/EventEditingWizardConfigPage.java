@@ -36,22 +36,16 @@ package org.openjdk.jmc.console.ext.agent.manager.wizards;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.openjdk.jmc.console.ext.agent.manager.model.IEvent;
 import org.openjdk.jmc.console.ext.agent.manager.model.IEvent.Location;
 
 import java.util.stream.Stream;
-
-import javax.swing.plaf.basic.BasicInternalFrameTitlePane.SystemMenuBar;
 
 public class EventEditingWizardConfigPage extends BaseWizardPage {
 	private static final String PAGE_NAME = "Agent Event Editing";
