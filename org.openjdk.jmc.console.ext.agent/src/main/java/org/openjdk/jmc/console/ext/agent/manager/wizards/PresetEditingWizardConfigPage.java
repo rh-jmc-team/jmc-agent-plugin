@@ -33,21 +33,18 @@
  */
 package org.openjdk.jmc.console.ext.agent.manager.wizards;
 
-import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
-import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.openjdk.jmc.console.ext.agent.manager.model.IPreset;
 
 public class PresetEditingWizardConfigPage extends BaseWizardPage {
 	private static final String PAGE_NAME = "Agent Preset Editing";
+
 	private static final String MESSAGE_PRESET_EDITING_WIZARD_CONFIG_PAGE_TITLE = "Editing Preset Global Configurations";
 	private static final String MESSAGE_PRESET_EDITING_WIZARD_CONFIG_PAGE_DESCRIPTION = "Global configurations are defaults which applies to any event missing a per-even configuration.";
 
@@ -86,8 +83,7 @@ public class PresetEditingWizardConfigPage extends BaseWizardPage {
 		Composite container = new Composite(sc, SWT.NONE);
 		sc.setContent(container);
 
-		GridLayout layout = new GridLayout();
-		container.setLayout(layout);
+		container.setLayout(new GridLayout());
 
 		createFileNameContainer(container).setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
 		createSeparator(container).setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
