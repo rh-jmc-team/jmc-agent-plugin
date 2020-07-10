@@ -43,7 +43,6 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.openjdk.jmc.console.ext.agent.AgentJmxHelper;
-import org.openjdk.jmc.console.ext.agent.AgentPlugin;
 import org.openjdk.jmc.console.ext.agent.editor.AgentEditor;
 import org.openjdk.jmc.console.ext.agent.editor.AgentEditorInput;
 import org.openjdk.jmc.ui.common.jvm.JVMDescriptor;
@@ -52,13 +51,13 @@ import org.openjdk.jmc.ui.misc.DialogToolkit;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.logging.Level;
 
 public class StartAgentWizard extends Wizard {
 	private static final String MESSAGE_FAILED_TO_START_AGENT = "Failed to start JMC Agent";
 	private static final String MESSAGE_FAILED_TO_OPEN_AGENT_EDITOR = "Failed to open the JMC Agent Editor";
-	private static final String MESSAGE_UNEXPECTED_ERROR_HAS_OCCURRED = "An unexpected error occurred.";
-	private static final String MESSAGE_ACCESS_TO_UNSAFE_REQUIRED = "Could not access jdk.internal.misc.Unsafe! Rerun your application with '--add-opens java.base/jdk.internal.misc=ALL-UNNAMED'.";
+	private static final String MESSAGE_UNEXPECTED_ERROR_HAS_OCCURRED = "An unexpected has error occurred.";
+	private static final String MESSAGE_INVALID_AGENT_CONFIG = "An invalid configuration is entered.";
+	private static final String MESSAGE_ACCESS_TO_UNSAFE_REQUIRED = "Could not access jdk.internal.misc.Unsafe! Did you run your application with '--add-opens java.base/jdk.internal.misc=ALL-UNNAMED'?";
 
 	private final AgentJmxHelper helper;
 	private final StartAgentWizardPage startAgentWizardPage;
@@ -80,6 +79,10 @@ public class StartAgentWizard extends Wizard {
 			loadAgent(vm, agentJarPath, agentXmlPath);
 			IEditorInput ei = new AgentEditorInput(helper.getServerHandle(), helper.getConnectionHandle(), helper);
 			window.getActivePage().openEditor(ei, AgentEditor.EDITOR_ID, true);
+		} catch (IllegalArgumentException e) {
+			DialogToolkit.showException(window.getShell(), MESSAGE_FAILED_TO_START_AGENT, MESSAGE_INVALID_AGENT_CONFIG,
+					e);
+			return false;
 		} catch (AttachNotSupportedException | IOException | AgentLoadException e) {
 			DialogToolkit.showException(window.getShell(), MESSAGE_FAILED_TO_START_AGENT,
 					MESSAGE_UNEXPECTED_ERROR_HAS_OCCURRED, e);
@@ -99,7 +102,7 @@ public class StartAgentWizard extends Wizard {
 
 	private void loadAgent(VirtualMachine vm, String agentJar, String xmlPath)
 			throws IOException, AgentLoadException, AgentInitializationException {
-		if (Files.notExists(Paths.get(agentJar))) {
+		if (agentJar.isEmpty() || Files.notExists(Paths.get(agentJar))) {
 			throw new IllegalArgumentException("the Agent JAR path does exists");
 		}
 
