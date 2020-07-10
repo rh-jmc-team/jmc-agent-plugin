@@ -109,7 +109,7 @@ public class EventEditingWizardParameterPage extends BaseWizardPage {
 		container.setLayout(new FillLayout());
 
 		tableInspector = new TableInspector(container, TableInspector.MULTI | TableInspector.ADD_BUTTON
-				| TableInspector.EDIT_BUTTON | TableInspector.DUPLICATE_BUTTON | TableInspector.REMOVE_BUTTON) {
+				| TableInspector.EDIT_BUTTON | TableInspector.REMOVE_BUTTON) {
 			@Override
 			protected void addColumns() {
 				addColumn(LABEL_INDEX, ID_INDEX, new ParameterTableLabelProvider() {
@@ -144,15 +144,6 @@ public class EventEditingWizardParameterPage extends BaseWizardPage {
 			}
 
 			@Override
-			protected void toggleButtonAvailabilityBy(IStructuredSelection selection) {
-				super.toggleButtonAvailabilityBy(selection);
-
-				if (selection.getFirstElement() instanceof IMethodReturnValue) {
-					tableInspector.getDuplicateButton().setEnabled(false);
-				}
-			}
-
-			@Override
 			protected void onAddButtonSelected(IStructuredSelection selection) {
 				EventMethodParameterEditingPage page = new EventMethodParameterEditingPage();
 				if (new OnePageWizardDialog(Display.getCurrent().getActiveShell(), page).open() != Window.OK) {
@@ -175,25 +166,6 @@ public class EventEditingWizardParameterPage extends BaseWizardPage {
 				if (new OnePageWizardDialog(Display.getCurrent().getActiveShell(), page).open() == Window.OK) {
 					// TODO: save the field
 				}
-
-				tableInspector.getViewer().refresh();
-			}
-
-			@Override
-			protected void onDuplicateButtonSelected(IStructuredSelection selection) {
-				// TODO: create a copy properly
-				ICapturedValue original = (ICapturedValue) selection.getFirstElement();
-				INamedCapturedValue duplicate;
-				if (original instanceof MethodParameter) {
-					duplicate = new MethodParameter();
-					event.addMethodParameter((MethodParameter) duplicate);
-				} else if (original instanceof MethodReturnValue) {
-					duplicate = new MethodReturnValue();
-					event.setMethodReturnValue((MethodReturnValue) duplicate);
-				} else {
-					throw new IllegalArgumentException("element must be a an IMethodParameter or IMethodReturnValue"); // $NON-NLS-1$
-				}
-				duplicate.setName("Copy of " + duplicate.getName());
 
 				tableInspector.getViewer().refresh();
 			}
