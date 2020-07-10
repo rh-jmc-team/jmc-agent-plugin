@@ -199,7 +199,7 @@ public class EventEditingWizardConfigPage extends BaseWizardPage {
 		setText(methodNameText, event.getMethodName());
 		setText(methodDescriptorText, event.getMethodDescriptor());
 		setText(pathText, event.getPath());
-		setText(locationCombo, event.getLocation().toString());
+		setText(locationCombo, event.getLocation() == null ? null : event.getLocation().toString());
 		recordExceptionsBtn.setSelection(event.getRethrow());
 		recordStackTraceBtn.setSelection(event.getStackTrace());
 	}

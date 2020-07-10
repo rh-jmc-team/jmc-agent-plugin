@@ -148,12 +148,13 @@ public abstract class BaseWizardPage extends WizardPage {
 
 	protected static abstract class TableInspector extends Composite {
 		public static final int MULTI = 1;
-		public static final int ADD_BUTTON = 1 << 1;
-		public static final int EDIT_BUTTON = 1 << 2;
-		public static final int DUPLICATE_BUTTON = 1 << 3;
-		public static final int REMOVE_BUTTON = 1 << 4;
-		public static final int IMPORT_FILES_BUTTON = 1 << 5;
-		public static final int EXPORT_FILE_BUTTON = 1 << 6;
+		public static final int SHOW_HEADER = 1 << 1;
+		public static final int ADD_BUTTON = 1 << 2;
+		public static final int EDIT_BUTTON = 1 << 3;
+		public static final int DUPLICATE_BUTTON = 1 << 4;
+		public static final int REMOVE_BUTTON = 1 << 5;
+		public static final int IMPORT_FILES_BUTTON = 1 << 6;
+		public static final int EXPORT_FILE_BUTTON = 1 << 7;
 
 		private static final String LABEL_ADD_BUTTON = "Add...";
 		private static final String LABEL_EDIT_BUTTON = "Edit";
@@ -186,9 +187,9 @@ public abstract class BaseWizardPage extends WizardPage {
 			}
 			tableViewer = new TableViewer(this, style);
 			tableViewer.getControl().setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-			tableViewer.getTable().setHeaderVisible(true);
 			addColumns();
 			ColumnManager.build(tableViewer, columns, null);
+			tableViewer.getTable().setHeaderVisible((options & SHOW_HEADER) != 0);
 
 			buttonContainer = new Composite(this, SWT.NONE);
 			buttonContainer.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, false, true));
@@ -203,6 +204,11 @@ public abstract class BaseWizardPage extends WizardPage {
 
 		protected final void addColumn(String name, String id, ColumnLabelProvider labelProvider) {
 			columns.add(new ColumnBuilder(name, id, labelProvider).comparator(new OptimisticComparator(labelProvider))
+					.build());
+		}
+
+		protected final void addColumn(String id, ColumnLabelProvider labelProvider) {
+			columns.add(new ColumnBuilder("", id, labelProvider).comparator(new OptimisticComparator(labelProvider))
 					.build());
 		}
 
