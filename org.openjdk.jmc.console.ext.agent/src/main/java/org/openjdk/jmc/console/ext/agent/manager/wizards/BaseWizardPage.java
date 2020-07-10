@@ -246,6 +246,30 @@ public abstract class BaseWizardPage extends WizardPage {
 			}
 		}
 
+		public Button getAddButton() {
+			return addButton;
+		}
+
+		public Button getEditButton() {
+			return editButton;
+		}
+
+		public Button getDuplicateButton() {
+			return duplicateButton;
+		}
+
+		public Button getRemoveButton() {
+			return removeButton;
+		}
+
+		public Button getImportFilesButton() {
+			return importFilesButton;
+		}
+
+		public Button getExportFileButton() {
+			return exportFileButton;
+		}
+
 		public void setContentProvider(IContentProvider contentProvider) {
 			tableViewer.setContentProvider(contentProvider);
 		}

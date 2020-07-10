@@ -144,6 +144,15 @@ public class EventEditingWizardParameterPage extends BaseWizardPage {
 			}
 
 			@Override
+			protected void toggleButtonAvailabilityBy(IStructuredSelection selection) {
+				super.toggleButtonAvailabilityBy(selection);
+
+				if (selection.getFirstElement() instanceof IMethodReturnValue) {
+					tableInspector.getDuplicateButton().setEnabled(false);
+				}
+			}
+
+			@Override
 			protected void onAddButtonSelected(IStructuredSelection selection) {
 				EventMethodParameterEditingPage page = new EventMethodParameterEditingPage();
 				if (new OnePageWizardDialog(Display.getCurrent().getActiveShell(), page).open() != Window.OK) {
