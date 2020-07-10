@@ -45,7 +45,7 @@ import org.openjdk.jmc.console.ext.agent.manager.model.IPreset;
 public class PresetEditingWizardConfigPage extends BaseWizardPage {
 	private static final String PAGE_NAME = "Agent Preset Editing";
 
-	private static final String MESSAGE_PRESET_EDITING_WIZARD_CONFIG_PAGE_TITLE = "Editing Preset Global Configurations";
+	private static final String MESSAGE_PRESET_EDITING_WIZARD_CONFIG_PAGE_TITLE = "Edit Preset Global Configurations";
 	private static final String MESSAGE_PRESET_EDITING_WIZARD_CONFIG_PAGE_DESCRIPTION = "Global configurations are defaults which applies to any event missing a per-even configuration.";
 
 	private static final String LABEL_FILE_NAME = "File Name: ";

@@ -51,7 +51,7 @@ import org.openjdk.jmc.ui.wizards.OnePageWizardDialog;
 public class EventEditingWizardFieldPage extends BaseWizardPage {
 	private static final String PAGE_NAME = "Agent Event Editing";
 
-	private static final String MESSAGE_EVENT_EDITING_WIZARD_FIELD_PAGE_TITLE = "Editing Event Fields";
+	private static final String MESSAGE_EVENT_EDITING_WIZARD_FIELD_PAGE_TITLE = "Add or Remove Event Fields";
 	private static final String MESSAGE_EVENT_EDITING_WIZARD_FIELD_PAGE_DESCRIPTION = "Fields are a subset of Java primary expressions which can be evaluated and recorded when committing an event.";
 
 	private static final String LABEL_NAME = "Name";
@@ -99,8 +99,9 @@ public class EventEditingWizardFieldPage extends BaseWizardPage {
 		Composite container = new Composite(parent, SWT.NONE);
 		container.setLayout(new FillLayout());
 
-		tableInspector = new TableInspector(container, TableInspector.MULTI | TableInspector.ADD_BUTTON
-				| TableInspector.EDIT_BUTTON | TableInspector.DUPLICATE_BUTTON | TableInspector.REMOVE_BUTTON) {
+		tableInspector = new TableInspector(container,
+				TableInspector.MULTI | TableInspector.SHOW_HEADER | TableInspector.ADD_BUTTON
+						| TableInspector.EDIT_BUTTON | TableInspector.DUPLICATE_BUTTON | TableInspector.REMOVE_BUTTON) {
 			@Override
 			protected void addColumns() {
 				addColumn(LABEL_NAME, ID_NAME, new FieldTableLabelProvider() {
@@ -128,7 +129,7 @@ public class EventEditingWizardFieldPage extends BaseWizardPage {
 			@Override
 			protected void onAddButtonSelected(IStructuredSelection selection) {
 				IField field = new Field();
-				EventFieldEditingPage page = new EventFieldEditingPage(field);
+				CapturedValueEditingPage page = new CapturedValueEditingPage(field);
 				if (new OnePageWizardDialog(Display.getCurrent().getActiveShell(), page).open() != Window.OK) {
 					return;
 				}
@@ -140,7 +141,7 @@ public class EventEditingWizardFieldPage extends BaseWizardPage {
 			@Override
 			protected void onEditButtonSelected(IStructuredSelection selection) {
 				IField field = (IField) selection.getFirstElement();
-				EventFieldEditingPage page = new EventFieldEditingPage(field);
+				CapturedValueEditingPage page = new CapturedValueEditingPage(field);
 				if (new OnePageWizardDialog(Display.getCurrent().getActiveShell(), page).open() == Window.OK) {
 					// TODO: save the field
 				}

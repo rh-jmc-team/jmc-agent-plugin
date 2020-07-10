@@ -49,7 +49,7 @@ import java.util.stream.Stream;
 
 public class EventEditingWizardConfigPage extends BaseWizardPage {
 	private static final String PAGE_NAME = "Agent Event Editing";
-	private static final String MESSAGE_EVENT_EDITING_WIZARD_CONFIG_PAGE_TITLE = "Editing Event Configurations";
+	private static final String MESSAGE_EVENT_EDITING_WIZARD_CONFIG_PAGE_TITLE = "Edit Event Configurations";
 	private static final String MESSAGE_EVENT_EDITING_WIZARD_CONFIG_PAGE_DESCRIPTION = "Edit basic information of an event on how it should be instrumented and injected.";
 
 	private static final String LABEL_ID = "ID: ";
@@ -81,9 +81,9 @@ public class EventEditingWizardConfigPage extends BaseWizardPage {
 	private Text methodDescriptorText;
 	private Text pathText;
 	private Combo locationCombo;
-	private Button locationClearBtn;
-	private Button recordExceptionsBtn;
-	private Button recordStackTraceBtn;
+	private Button locationClearButton;
+	private Button recordExceptionsButton;
+	private Button recordStackTraceButton;
 
 	protected EventEditingWizardConfigPage(IEvent event) {
 		super(PAGE_NAME);
@@ -167,11 +167,11 @@ public class EventEditingWizardConfigPage extends BaseWizardPage {
 		pathText = createTextInput(container, cols, LABEL_PATH, MESSAGE_PATH_TO_EVENT);
 		locationCombo = createComboInput(container, cols - 2, LABEL_LOCATION,
 				Stream.of(Location.values()).map(Location::toString).toArray(String[]::new));
-		locationClearBtn = createButton(container, LABEL_CLEAR);
-		locationClearBtn.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 2, 0));
+		locationClearButton = createButton(container, LABEL_CLEAR);
+		locationClearButton.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 2, 0));
 
-		recordExceptionsBtn = createCheckboxInput(container, cols, LABEL_RECORD_EXCEPTIONS);
-		recordStackTraceBtn = createCheckboxInput(container, cols, LABEL_RECORD_STACK_TRACE);
+		recordExceptionsButton = createCheckboxInput(container, cols, LABEL_RECORD_EXCEPTIONS);
+		recordStackTraceButton = createCheckboxInput(container, cols, LABEL_RECORD_STACK_TRACE);
 
 		return container;
 	}
@@ -186,9 +186,10 @@ public class EventEditingWizardConfigPage extends BaseWizardPage {
 		classText.addModifyListener(e -> event.setClazz(classText.getText()));
 		locationCombo.addModifyListener(e -> event.setLocation(
 				locationCombo.getSelectionIndex() == -1 ? null : Location.valueOf(locationCombo.getText())));
-		locationClearBtn.addListener(SWT.Selection, e -> locationCombo.deselectAll());
-		recordExceptionsBtn.addListener(SWT.Selection, e -> event.setRethrow(recordExceptionsBtn.getSelection()));
-		recordStackTraceBtn.addListener(SWT.Selection, e -> event.setStackTrace(recordStackTraceBtn.getSelection()));
+		locationClearButton.addListener(SWT.Selection, e -> locationCombo.deselectAll());
+		recordExceptionsButton.addListener(SWT.Selection, e -> event.setRethrow(recordExceptionsButton.getSelection()));
+		recordStackTraceButton.addListener(SWT.Selection,
+				e -> event.setStackTrace(recordStackTraceButton.getSelection()));
 	}
 
 	private void populateUi() {
@@ -200,7 +201,7 @@ public class EventEditingWizardConfigPage extends BaseWizardPage {
 		setText(methodDescriptorText, event.getMethodDescriptor());
 		setText(pathText, event.getPath());
 		setText(locationCombo, event.getLocation() == null ? null : event.getLocation().toString());
-		recordExceptionsBtn.setSelection(event.getRethrow());
-		recordStackTraceBtn.setSelection(event.getStackTrace());
+		recordExceptionsButton.setSelection(event.getRethrow());
+		recordStackTraceButton.setSelection(event.getStackTrace());
 	}
 }

@@ -14,6 +14,7 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Text;
 import org.openjdk.jmc.ui.column.ColumnBuilder;
 import org.openjdk.jmc.ui.column.ColumnManager;
@@ -81,6 +82,10 @@ public abstract class BaseWizardPage extends WizardPage {
 		return checkbox;
 	}
 
+	protected static Spinner createSpinner(Composite parent) {
+		return new Spinner(parent, SWT.NONE);
+	}
+
 	protected static void setText(Text receiver, String text) {
 		text = text == null ? "" : text;
 		receiver.setText(text);
@@ -141,9 +146,19 @@ public abstract class BaseWizardPage extends WizardPage {
 
 	protected static Button createCheckboxInput(Composite parent, int cols, String text) {
 		Button b = createCheckbox(parent, text);
-		b.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, true, cols, 0));
+		b.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false, cols, 0));
 
 		return b;
+	}
+
+	protected static Spinner createSpinnerInput(Composite parent, int cols, String label) {
+		Label l = createLabel(parent, label);
+		l.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false, false, 2, 0));
+
+		Spinner s = createSpinner(parent);
+		s.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true, cols - 2, 0));
+
+		return s;
 	}
 
 	protected static abstract class TableInspector extends Composite {

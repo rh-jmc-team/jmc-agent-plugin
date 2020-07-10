@@ -49,7 +49,7 @@ import org.openjdk.jmc.ui.misc.DialogToolkit;
 public class PresetEditingWizardEventPage extends BaseWizardPage {
 	private static final String PAGE_NAME = "Agent Preset Editing";
 
-	private static final String MESSAGE_PRESET_EDITING_WIZARD_EVENT_PAGE_TITLE = "Editing Preset Events";
+	private static final String MESSAGE_PRESET_EDITING_WIZARD_EVENT_PAGE_TITLE = "Add or Remove Preset Events";
 	private static final String MESSAGE_PRESET_EDITING_WIZARD_EVENT_PAGE_DESCRIPTION = "Add new events to the preset, or remove/edit existing events.";
 	private static final String MESSAGE_UNABLE_TO_SAVE_THE_PRESET = "Unable to add the event";
 
@@ -96,8 +96,9 @@ public class PresetEditingWizardEventPage extends BaseWizardPage {
 		Composite container = new Composite(parent, SWT.NONE);
 		container.setLayout(new FillLayout());
 
-		tableInspector = new TableInspector(container, TableInspector.MULTI | TableInspector.ADD_BUTTON
-				| TableInspector.EDIT_BUTTON | TableInspector.DUPLICATE_BUTTON | TableInspector.REMOVE_BUTTON) {
+		tableInspector = new TableInspector(container,
+				TableInspector.MULTI | TableInspector.SHOW_HEADER | TableInspector.ADD_BUTTON
+						| TableInspector.EDIT_BUTTON | TableInspector.DUPLICATE_BUTTON | TableInspector.REMOVE_BUTTON) {
 			@Override
 			protected void addColumns() {
 				addColumn(LABEL_ID_COLUMN, ID_ID_COLUMN, new EventTableLabelProvider() {

@@ -50,7 +50,7 @@ import org.openjdk.jmc.console.ext.agent.tabs.editor.internal.XmlPartitionScanne
 
 public class PresetEditingWizardPreviewPage extends BaseWizardPage {
 	private static final String PAGE_NAME = "Agent Preset Editing";
-	private static final String MESSAGE_PRESET_EDITING_WIZARD_PREVIEW_PAGE_TITLE = "Preview Preset";
+	private static final String MESSAGE_PRESET_EDITING_WIZARD_PREVIEW_PAGE_TITLE = "Preview Preset Output";
 	private static final String MESSAGE_PRESET_EDITING_WIZARD_PREVIEW_PAGE_DESCRIPTION = "Inspects the generated XML before it is saved. Click Back to make any modifications if needed. Click Finish to save.";
 
 	private final IPreset preset;

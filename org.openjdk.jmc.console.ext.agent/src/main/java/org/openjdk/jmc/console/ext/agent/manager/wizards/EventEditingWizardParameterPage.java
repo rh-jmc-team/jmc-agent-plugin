@@ -59,7 +59,7 @@ import java.util.List;
 public class EventEditingWizardParameterPage extends BaseWizardPage {
 	private static final String PAGE_NAME = "Agent Event Editing";
 
-	private static final String MESSAGE_EVENT_EDITING_WIZARD_PARAMETER_PAGE_TITLE = "Edit Event Parameters";
+	private static final String MESSAGE_EVENT_EDITING_WIZARD_PARAMETER_PAGE_TITLE = "Add or Remove Event Parameters";
 	private static final String MESSAGE_EVENT_EDITING_WIZARD_PARAMETER_PAGE_DESCRIPTION = "Function parameters and return values can be recorded when committing an event.";
 	private static final String MESSAGE_RETURN_VALUE = "(Return value)";
 
@@ -108,8 +108,8 @@ public class EventEditingWizardParameterPage extends BaseWizardPage {
 		Composite container = new Composite(parent, SWT.NONE);
 		container.setLayout(new FillLayout());
 
-		tableInspector = new TableInspector(container, TableInspector.MULTI | TableInspector.ADD_BUTTON
-				| TableInspector.EDIT_BUTTON | TableInspector.REMOVE_BUTTON) {
+		tableInspector = new TableInspector(container, TableInspector.MULTI | TableInspector.SHOW_HEADER
+				| TableInspector.ADD_BUTTON | TableInspector.EDIT_BUTTON | TableInspector.REMOVE_BUTTON) {
 			@Override
 			protected void addColumns() {
 				addColumn(LABEL_INDEX, ID_INDEX, new ParameterTableLabelProvider() {
@@ -145,11 +145,12 @@ public class EventEditingWizardParameterPage extends BaseWizardPage {
 
 			@Override
 			protected void onAddButtonSelected(IStructuredSelection selection) {
-				EventMethodParameterEditingPage page = new EventMethodParameterEditingPage();
+//				EventMethodParameterEditingPage page = new EventMethodParameterEditingPage();
+				CapturedValueEditingPage page = new CapturedValueEditingPage(new MethodParameter());
 				if (new OnePageWizardDialog(Display.getCurrent().getActiveShell(), page).open() != Window.OK) {
 					return;
 				}
-				ICapturedValue capturedValue = page.getCapturedValue();
+				ICapturedValue capturedValue = page.getResult();
 				if (capturedValue instanceof MethodParameter) {
 					event.addMethodParameter((IMethodParameter) capturedValue);
 				} else {
@@ -161,10 +162,22 @@ public class EventEditingWizardParameterPage extends BaseWizardPage {
 
 			@Override
 			protected void onEditButtonSelected(IStructuredSelection selection) {
-				ICapturedValue capturedValue = (ICapturedValue) selection.getFirstElement();
-				EventMethodParameterEditingPage page = new EventMethodParameterEditingPage(capturedValue);
+				INamedCapturedValue original = (INamedCapturedValue) selection.getFirstElement();
+				CapturedValueEditingPage page = new CapturedValueEditingPage(original);
 				if (new OnePageWizardDialog(Display.getCurrent().getActiveShell(), page).open() == Window.OK) {
+					INamedCapturedValue modified = page.getResult();
 					// TODO: save the field
+					if (original instanceof MethodParameter) {
+						event.removeMethodParameter((IMethodParameter) original);
+					} else {
+						event.setMethodReturnValue(null);
+					}
+
+					if (modified instanceof MethodParameter) {
+						event.addMethodParameter((IMethodParameter) modified);
+					} else {
+						event.setMethodReturnValue((IMethodReturnValue) modified);
+					}
 				}
 
 				tableInspector.getViewer().refresh();
