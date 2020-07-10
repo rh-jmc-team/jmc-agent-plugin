@@ -99,9 +99,8 @@ public class EventEditingWizardFieldPage extends BaseWizardPage {
 		Composite container = new Composite(parent, SWT.NONE);
 		container.setLayout(new FillLayout());
 
-		tableInspector = new TableInspector(container,
-				TableInspector.MULTI | TableInspector.ADD_BUTTON | TableInspector.EDIT_BUTTON
-						| TableInspector.DUPLICATE_BUTTON | TableInspector.REMOVE_BUTTON) {
+		tableInspector = new TableInspector(container, TableInspector.MULTI | TableInspector.ADD_BUTTON
+				| TableInspector.EDIT_BUTTON | TableInspector.DUPLICATE_BUTTON | TableInspector.REMOVE_BUTTON) {
 			@Override
 			protected void addColumns() {
 				addColumn(LABEL_NAME, ID_NAME, new FieldTableLabelProvider() {

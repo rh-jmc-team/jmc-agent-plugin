@@ -108,9 +108,8 @@ public class EventEditingWizardParameterPage extends BaseWizardPage {
 		Composite container = new Composite(parent, SWT.NONE);
 		container.setLayout(new FillLayout());
 
-		tableInspector = new TableInspector(container,
-				TableInspector.MULTI | TableInspector.ADD_BUTTON | TableInspector.EDIT_BUTTON
-						| TableInspector.DUPLICATE_BUTTON | TableInspector.REMOVE_BUTTON) {
+		tableInspector = new TableInspector(container, TableInspector.MULTI | TableInspector.ADD_BUTTON
+				| TableInspector.EDIT_BUTTON | TableInspector.DUPLICATE_BUTTON | TableInspector.REMOVE_BUTTON) {
 			@Override
 			protected void addColumns() {
 				addColumn(LABEL_INDEX, ID_INDEX, new ParameterTableLabelProvider() {
@@ -183,8 +182,7 @@ public class EventEditingWizardParameterPage extends BaseWizardPage {
 					duplicate = new MethodReturnValue();
 					event.setMethodReturnValue((MethodReturnValue) duplicate);
 				} else {
-					throw new IllegalArgumentException(
-							"element must be a an IMethodParameter or IMethodReturnValue"); // $NON-NLS-1$
+					throw new IllegalArgumentException("element must be a an IMethodParameter or IMethodReturnValue"); // $NON-NLS-1$
 				}
 				duplicate.setName("Copy of " + duplicate.getName());
 
@@ -199,8 +197,7 @@ public class EventEditingWizardParameterPage extends BaseWizardPage {
 				} else if (namedCapturedValue instanceof MethodReturnValue) {
 					event.setMethodReturnValue(null);
 				} else {
-					throw new IllegalArgumentException(
-							"element must be a an IMethodParameter or IMethodReturnValue"); // $NON-NLS-1$
+					throw new IllegalArgumentException("element must be a an IMethodParameter or IMethodReturnValue"); // $NON-NLS-1$
 				}
 
 				tableInspector.getViewer().refresh();
@@ -241,8 +238,7 @@ public class EventEditingWizardParameterPage extends BaseWizardPage {
 		@Override
 		public String getText(Object element) {
 			if (!(element instanceof IMethodParameter) && !(element instanceof IMethodReturnValue)) {
-				throw new IllegalArgumentException(
-						"element must be a an IMethodParameter or IMethodReturnValue"); // $NON-NLS-1$
+				throw new IllegalArgumentException("element must be a an IMethodParameter or IMethodReturnValue"); // $NON-NLS-1$
 			}
 
 			return doGetText((INamedCapturedValue) element);

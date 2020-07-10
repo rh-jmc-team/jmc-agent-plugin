@@ -114,8 +114,7 @@ public class PresetManagerPage extends BaseWizardPage {
 
 					@Override
 					public Image getImage(Object element) {
-						return AgentPlugin.getDefault()
-								.getImage(AgentPlugin.ICON_AGENT); // TODO: replace the icon in the future
+						return AgentPlugin.getDefault().getImage(AgentPlugin.ICON_AGENT); // TODO: replace the icon in the future
 					}
 				});
 			}
@@ -177,8 +176,8 @@ public class PresetManagerPage extends BaseWizardPage {
 				// TODO: properly save to repository
 				repository.add(preset);
 			} catch (IllegalArgumentException e) {
-				if (DialogToolkit
-						.openConfirmOnUiThread(MESSAGE_PRESET_MANAGER_UNABLE_TO_SAVE_THE_PRESET, e.getMessage())) {
+				if (DialogToolkit.openConfirmOnUiThread(MESSAGE_PRESET_MANAGER_UNABLE_TO_SAVE_THE_PRESET,
+						e.getMessage())) {
 					continue;
 				}
 			}
