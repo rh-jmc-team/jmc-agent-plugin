@@ -182,7 +182,7 @@ public class EventEditingWizardConfigPage extends BaseWizardPage {
 		descriptionText.addModifyListener(e -> event.setDescription(descriptionText.getText()));
 		methodNameText.addModifyListener(e -> event.setMethodName(methodNameText.getText()));
 		methodDescriptorText.addModifyListener(e -> event.setMethodDescriptor(methodDescriptorText.getText()));
-		pathText.addModifyListener(e -> event.setMethodName(pathText.getText()));
+		pathText.addModifyListener(e -> event.setPath(pathText.getText()));
 		classText.addModifyListener(e -> event.setClazz(classText.getText()));
 		locationCombo.addModifyListener(e -> event.setLocation(
 				locationCombo.getSelectionIndex() == -1 ? null : Location.valueOf(locationCombo.getText())));
