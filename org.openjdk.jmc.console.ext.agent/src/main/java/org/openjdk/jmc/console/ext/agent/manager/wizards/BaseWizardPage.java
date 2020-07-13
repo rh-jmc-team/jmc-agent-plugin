@@ -180,6 +180,7 @@ public abstract class BaseWizardPage extends WizardPage {
 
 		private final int options;
 		private final List<IColumn> columns = new ArrayList<>();
+		private final List<Button> buttons = new ArrayList<>();
 		private final TableViewer tableViewer;
 		private final Composite buttonContainer;
 
@@ -214,6 +215,11 @@ public abstract class BaseWizardPage extends WizardPage {
 			buttonContainer.setLayout(layout);
 			addButtons();
 
+			if (buttons.isEmpty()) {
+				buttonContainer.dispose();
+				setLayout(new GridLayout(1, false));
+			}
+
 			bindListeners();
 		}
 
@@ -232,6 +238,8 @@ public abstract class BaseWizardPage extends WizardPage {
 		protected final Button addButton(String text) {
 			Button b = createButton(buttonContainer, text);
 			b.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+
+			buttons.add(b);
 			return b;
 		}
 
