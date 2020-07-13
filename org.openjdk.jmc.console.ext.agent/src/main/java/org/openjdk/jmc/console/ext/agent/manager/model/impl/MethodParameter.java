@@ -31,77 +31,103 @@
  * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.openjdk.jmc.console.ext.agent.manager.internal;
+package org.openjdk.jmc.console.ext.agent.manager.model.impl;
 
-import org.openjdk.jmc.console.ext.agent.manager.model.IField;
+import java.net.URI;
+import java.net.URISyntaxException;
 
-public class Field implements IField {
+import org.openjdk.jmc.console.ext.agent.manager.model.IMethodParameter;
+
+public class MethodParameter implements IMethodParameter {
+	private static final String DEFAULT_STRING_FIELD = ""; // $NON-NLS-1$
+	private static final Object DEFAULT_OBJECT_TYPE = null;
+	private static final String DEFAULT_PARAMETER_NAME = "myParameterName"; // $NON-NLS-1$
+	private static final int DEFAULT_INDEX = 0;
+	private static final String ERROR_CANNOT_BE_EMPTY = "Field cannot be empty";
+	private static final String ERROR_INCORRECT_SYNTAX = "Field has incorrect syntax";
+	private static final String ERROR_LESS_THAN_ZERO = "Index cannot be less than zero";
+	private static final String ERROR_CANNOT_BE_NULL = "Field cannot be null";
 
 	private String name;
 	private String description;
 	private ContentType contentType;
 	private String relationKey;
 	private String converter;
-	private String expression;
+	private int index;
 
-	@Override
+	public MethodParameter() {
+		name = DEFAULT_PARAMETER_NAME;
+		description = DEFAULT_STRING_FIELD;
+		contentType = (ContentType) DEFAULT_OBJECT_TYPE;
+		relationKey = DEFAULT_STRING_FIELD;
+		converter = DEFAULT_STRING_FIELD;
+		index = DEFAULT_INDEX;
+	}
+
 	public String getName() {
 		return name;
 	}
 
-	@Override
 	public void setName(String name) {
+		if (name == null) {
+			throw new IllegalArgumentException(ERROR_CANNOT_BE_NULL);
+		}
+		if (name.isEmpty()) {
+			throw new IllegalArgumentException(ERROR_CANNOT_BE_EMPTY);
+		}
 		this.name = name;
 	}
 
-	@Override
 	public String getDescription() {
 		return description;
 	}
 
-	@Override
 	public void setDescription(String description) {
 		this.description = description;
 	}
 
-	@Override
 	public ContentType getContentType() {
 		return contentType;
 	}
 
-	@Override
 	public void setContentType(ContentType contentType) {
 		this.contentType = contentType;
 	}
 
-	@Override
 	public String getRelationKey() {
 		return relationKey;
 	}
 
-	@Override
 	public void setRelationKey(String relationKey) {
+		if (relationKey != null) {
+			try {
+				new URI(relationKey);
+			} catch (URISyntaxException e) {
+				throw new IllegalArgumentException(ERROR_INCORRECT_SYNTAX);
+			}
+		}
 		this.relationKey = relationKey;
 	}
 
-	@Override
 	public String getConverter() {
 		return converter;
 	}
 
-	@Override
 	public void setConverter(String converter) {
 		this.converter = converter;
 	}
 
 	@Override
-	public String getExpression() {
-		return expression;
+	public int getIndex() {
+		return index;
 	}
 
 	@Override
-	public void setExpression(String expression) {
-		this.expression = expression;
+	public void setIndex(int index) {
+		if (index < 0) {
+			throw new IllegalArgumentException(ERROR_LESS_THAN_ZERO);
+		}
+		this.index = index;
 	}
 
 }

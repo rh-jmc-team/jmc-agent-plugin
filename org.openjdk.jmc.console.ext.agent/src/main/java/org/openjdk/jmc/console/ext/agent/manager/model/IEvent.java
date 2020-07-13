@@ -39,6 +39,10 @@ public interface IEvent {
 		ENTRY, EXIT, WRAP,
 	}
 
+	String getId();
+
+	void setId(String id);
+
 	String getName();
 
 	void setName(String name);
