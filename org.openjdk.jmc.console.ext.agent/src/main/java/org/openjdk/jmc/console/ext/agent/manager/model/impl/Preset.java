@@ -40,12 +40,13 @@ import org.openjdk.jmc.console.ext.agent.manager.model.IEvent;
 import org.openjdk.jmc.console.ext.agent.manager.model.IPreset;
 
 public class Preset implements IPreset {
-	private static final String DEFAULT_FILE_NAME = "newFile";
+	private static final String DEFAULT_FILE_NAME = "new_file.xml";
 	private static final String DEFAULT_CLASS_PREFIX = "__JFREvent";
-	private static final boolean DEFAULT_BOOLEAN_FIELD = true;
+	private static final boolean DEFAULT_BOOLEAN_FIELD = false;
 	private static final String ERROR_CANNOT_BE_EMPTY = "Field cannot be empty";
 	private static final String ERROR_MUST_HAVE_UNIQUE_ID = "Event must have a unique Id";
 	private static final String ERROR_MUST_HAVE_UNIQUE_EVENT_CLASS_NAME = "Event must have a unique event name per class";
+	private static final String ERROR_CANNOT_BE_NULL = "Field cannot be null";
 
 	private String fileName;
 	private String classPrefix;
@@ -67,7 +68,9 @@ public class Preset implements IPreset {
 
 	@Override
 	public void setFileName(String fileName) {
-		fileName = removeWhiteSpaces(fileName);
+		if (fileName == null) {
+			throw new IllegalArgumentException(ERROR_CANNOT_BE_NULL);
+		}
 		if (fileName.isEmpty()) {
 			throw new IllegalArgumentException(ERROR_CANNOT_BE_EMPTY);
 		}
@@ -111,10 +114,10 @@ public class Preset implements IPreset {
 
 	@Override
 	public void addEvent(IEvent event) {
-		if (!hasUniqueId(event.getId())) {
+		if (containsId(event.getId())) {
 			throw new IllegalArgumentException(ERROR_MUST_HAVE_UNIQUE_ID);
 		}
-		if (!hasUniqueEventClassName(event)) {
+		if (containsEventClassName(event)) {
 			throw new IllegalArgumentException(ERROR_MUST_HAVE_UNIQUE_EVENT_CLASS_NAME);
 		}
 		events.add(event);
@@ -126,30 +129,26 @@ public class Preset implements IPreset {
 	}
 
 	@Override
-	public boolean containEvent(IEvent event) {
+	public boolean containsEvent(IEvent event) {
 		return events.contains(event);
 	}
 
-	private String removeWhiteSpaces(String stringWithSpaces) {
-		return stringWithSpaces.replaceAll("\\s+", "");
-	}
-
-	private boolean hasUniqueId(String id) {
+	private boolean containsId(String id) {
 		for (IEvent e : events) {
 			if (e.getId().equals(id)) {
-				return false;
+				return true;
 			}
 		}
-		return true;
+		return false;
 	}
 
-	private boolean hasUniqueEventClassName(IEvent event) {
+	private boolean containsEventClassName(IEvent event) {
 		for (IEvent e : events) {
 			if (e.getClazz().equals(event.getClazz()) && e.getName().equals(event.getName())) {
-				return false;
+				return true;
 			}
 		}
-		return true;
+		return false;
 	}
 
 }

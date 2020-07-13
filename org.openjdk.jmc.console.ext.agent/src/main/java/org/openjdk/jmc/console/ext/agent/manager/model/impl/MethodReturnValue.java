@@ -41,7 +41,7 @@ import org.openjdk.jmc.console.ext.agent.manager.model.IMethodReturnValue;
 public class MethodReturnValue implements IMethodReturnValue {
 
 	private static final String DEFAULT_STRING_FIELD = "";
-	private static final ContentType DEFAULT_CONTENT_TYPE = ContentType.NONE;
+	private static final Object DEFAULT_OBJECT_TYPE = null;
 
 	private String name;
 	private String description;
@@ -52,7 +52,7 @@ public class MethodReturnValue implements IMethodReturnValue {
 	public MethodReturnValue() {
 		name = DEFAULT_STRING_FIELD;
 		description = DEFAULT_STRING_FIELD;
-		contentType = DEFAULT_CONTENT_TYPE;
+		contentType = (ContentType) DEFAULT_OBJECT_TYPE;
 		relationKey = DEFAULT_STRING_FIELD;
 		converter = DEFAULT_STRING_FIELD;
 	}
@@ -78,10 +78,12 @@ public class MethodReturnValue implements IMethodReturnValue {
 	}
 
 	public void setRelationKey(String relationKey) {
-		try {
-			new URI(relationKey);
-		} catch (URISyntaxException e) {
-			throw new IllegalArgumentException();
+		if (relationKey != null) {
+			try {
+				new URI(relationKey);
+			} catch (URISyntaxException e) {
+				throw new IllegalArgumentException();
+			}
 		}
 		this.relationKey = relationKey;
 	}
@@ -101,5 +103,4 @@ public class MethodReturnValue implements IMethodReturnValue {
 	public void setName(String name) {
 		this.name = name;
 	}
-
 }

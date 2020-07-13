@@ -40,13 +40,14 @@ import org.openjdk.jmc.console.ext.agent.manager.model.IField;
 
 public class Field implements IField {
 
-	private static final String DEFAULT_STRING_FIELD = "";
-	private static final ContentType DEFAULT_CONTENT_TYPE = ContentType.NONE;
-	private static final String DEFAULT_FIELD_NAME = "'myField'";
-	private static final String DEFAULT_FIELD_EXPRESSION = "myField";
-	private static final String EXPRESSION_REGEX = "([a-zA-Z_$][a-zA-Z0-9_$]*\\.)*([a-zA-Z_$][a-zA-Z0-9_$]*)(\\.[a-zA-Z_$][a-zA-Z_$]*)*";
+	private static final String DEFAULT_STRING_FIELD = ""; // $NON-NLS-1$
+	private static final Object DEFAULT_OBJECT_TYPE = null;
+	private static final String DEFAULT_FIELD_NAME = "'myField'"; // $NON-NLS-1$
+	private static final String DEFAULT_FIELD_EXPRESSION = "myField"; // $NON-NLS-1$
+	private static final String EXPRESSION_REGEX = "([a-zA-Z_$][a-zA-Z0-9_$]*\\.)*([a-zA-Z_$][a-zA-Z0-9_$]*)(\\.[a-zA-Z_$][a-zA-Z_$]*)*"; // $NON-NLS-1$
 	private static final String ERROR_CANNOT_BE_EMPTY = "Field cannot be empty";
 	private static final String ERROR_INCORRECT_SYNTAX = "Field has incorrect syntax";
+	private static final String ERROR_CANNOT_BE_NULL = "Field cannot be null";
 	private String name;
 	private String description;
 	private ContentType contentType;
@@ -58,7 +59,7 @@ public class Field implements IField {
 		name = DEFAULT_FIELD_NAME;
 		expression = DEFAULT_FIELD_EXPRESSION;
 		description = DEFAULT_STRING_FIELD;
-		contentType = DEFAULT_CONTENT_TYPE;
+		contentType = (ContentType) DEFAULT_OBJECT_TYPE;
 		relationKey = DEFAULT_STRING_FIELD;
 		converter = DEFAULT_STRING_FIELD;
 	}
@@ -68,6 +69,9 @@ public class Field implements IField {
 	}
 
 	public void setName(String name) {
+		if (name == null) {
+			throw new IllegalArgumentException(ERROR_CANNOT_BE_NULL);
+		}
 		if (name.isEmpty()) {
 			throw new IllegalArgumentException(ERROR_CANNOT_BE_EMPTY);
 		}
@@ -96,10 +100,12 @@ public class Field implements IField {
 	}
 
 	public void setRelationKey(String relationKey) {
-		try {
-			new URI(relationKey);
-		} catch (URISyntaxException e) {
-			throw new IllegalArgumentException(ERROR_INCORRECT_SYNTAX);
+		if (relationKey != null) {
+			try {
+				new URI(relationKey);
+			} catch (URISyntaxException e) {
+				throw new IllegalArgumentException(ERROR_INCORRECT_SYNTAX);
+			}
 		}
 		this.relationKey = relationKey;
 	}
@@ -119,7 +125,10 @@ public class Field implements IField {
 
 	@Override
 	public void setExpression(String expression) {
-		expression = removeWhiteSpaces(expression);
+		if (expression == null) {
+			throw new IllegalArgumentException(ERROR_CANNOT_BE_NULL);
+		}
+		expression = collapseWhiteSpaces(expression);
 		if (expression.isEmpty()) {
 			throw new IllegalArgumentException(ERROR_CANNOT_BE_EMPTY);
 		} else if (!expression.matches(EXPRESSION_REGEX)) {
@@ -128,7 +137,7 @@ public class Field implements IField {
 		this.expression = expression;
 	}
 
-	private String removeWhiteSpaces(String stringWithSpaces) {
-		return stringWithSpaces.replaceAll("\\s+", "");
+	private static String collapseWhiteSpaces(String stringWithSpaces) {
+		return stringWithSpaces.replaceAll("\\s+", " ");
 	}
 }

@@ -40,12 +40,13 @@ import org.openjdk.jmc.console.ext.agent.manager.model.IMethodParameter;
 
 public class MethodParameter implements IMethodParameter {
 	private static final String DEFAULT_STRING_FIELD = "";
-	private static final String DEFAULT_PARAMETER_NAME = "myParameterName";
-	private static final ContentType DEFAULT_CONTENT_TYPE = ContentType.NONE;
+	private static final Object DEFAULT_OBJECT_TYPE = null;
+	private static final String DEFAULT_PARAMETER_NAME = "myParameterName"; // $NON-NLS-1$
 	private static final int DEFAULT_INDEX = 0;
 	private static final String ERROR_CANNOT_BE_EMPTY = "Field cannot be empty";
 	private static final String ERROR_INCORRECT_SYNTAX = "Field has incorrect syntax";
 	private static final String ERROR_LESS_THAN_ZERO = "Index cannot be less than zero";
+	private static final String ERROR_CANNOT_BE_NULL = "Field cannot be null";
 
 	private String name;
 	private String description;
@@ -57,7 +58,7 @@ public class MethodParameter implements IMethodParameter {
 	public MethodParameter() {
 		name = DEFAULT_PARAMETER_NAME;
 		description = DEFAULT_STRING_FIELD;
-		contentType = DEFAULT_CONTENT_TYPE;
+		contentType = (ContentType) DEFAULT_OBJECT_TYPE;
 		relationKey = DEFAULT_STRING_FIELD;
 		converter = DEFAULT_STRING_FIELD;
 		index = DEFAULT_INDEX;
@@ -68,6 +69,9 @@ public class MethodParameter implements IMethodParameter {
 	}
 
 	public void setName(String name) {
+		if (name == null) {
+			throw new IllegalArgumentException(ERROR_CANNOT_BE_NULL);
+		}
 		if (name.isEmpty()) {
 			throw new IllegalArgumentException(ERROR_CANNOT_BE_EMPTY);
 		}
@@ -95,10 +99,12 @@ public class MethodParameter implements IMethodParameter {
 	}
 
 	public void setRelationKey(String relationKey) {
-		try {
-			new URI(relationKey);
-		} catch (URISyntaxException e) {
-			throw new IllegalArgumentException(ERROR_INCORRECT_SYNTAX);
+		if (relationKey != null) {
+			try {
+				new URI(relationKey);
+			} catch (URISyntaxException e) {
+				throw new IllegalArgumentException(ERROR_INCORRECT_SYNTAX);
+			}
 		}
 		this.relationKey = relationKey;
 	}
