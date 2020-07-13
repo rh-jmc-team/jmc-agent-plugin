@@ -31,7 +31,7 @@
  * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.openjdk.jmc.console.ext.agent.manager.internal;
+package org.openjdk.jmc.console.ext.agent.manager.model.impl;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,12 +40,27 @@ import org.openjdk.jmc.console.ext.agent.manager.model.IEvent;
 import org.openjdk.jmc.console.ext.agent.manager.model.IPreset;
 
 public class Preset implements IPreset {
+	private static final String DEFAULT_FILE_NAME = "new_file.xml"; // $NON-NLS-1$
+	private static final String DEFAULT_CLASS_PREFIX = "__JFREvent"; // $NON-NLS-1$
+	private static final boolean DEFAULT_BOOLEAN_FIELD = false;
+	private static final String ERROR_CANNOT_BE_EMPTY = "Field cannot be empty";
+	private static final String ERROR_MUST_HAVE_UNIQUE_ID = "Event must have a unique Id";
+	private static final String ERROR_MUST_HAVE_UNIQUE_EVENT_CLASS_NAME = "Event must have a unique event name per class";
+	private static final String ERROR_CANNOT_BE_NULL = "Field cannot be null";
+
+	private final List<IEvent> events = new ArrayList<>();
 
 	private String fileName;
 	private String classPrefix;
 	private boolean allowToString;
 	private boolean allowConverter;
-	private List<IEvent> events = new ArrayList<>();
+
+	public Preset() {
+		fileName = DEFAULT_FILE_NAME;
+		classPrefix = DEFAULT_CLASS_PREFIX;
+		allowToString = DEFAULT_BOOLEAN_FIELD;
+		allowConverter = DEFAULT_BOOLEAN_FIELD;
+	}
 
 	@Override
 	public String getFileName() {
@@ -54,6 +69,12 @@ public class Preset implements IPreset {
 
 	@Override
 	public void setFileName(String fileName) {
+		if (fileName == null) {
+			throw new IllegalArgumentException(ERROR_CANNOT_BE_NULL);
+		}
+		if (fileName.isEmpty()) {
+			throw new IllegalArgumentException(ERROR_CANNOT_BE_EMPTY);
+		}
 		this.fileName = fileName;
 	}
 
@@ -94,6 +115,12 @@ public class Preset implements IPreset {
 
 	@Override
 	public void addEvent(IEvent event) {
+		if (containsId(event.getId())) {
+			throw new IllegalArgumentException(ERROR_MUST_HAVE_UNIQUE_ID);
+		}
+		if (containsEventClassName(event)) {
+			throw new IllegalArgumentException(ERROR_MUST_HAVE_UNIQUE_EVENT_CLASS_NAME);
+		}
 		events.add(event);
 	}
 
@@ -103,8 +130,26 @@ public class Preset implements IPreset {
 	}
 
 	@Override
-	public boolean containEvent(IEvent event) {
+	public boolean containsEvent(IEvent event) {
 		return events.contains(event);
+	}
+
+	private boolean containsId(String id) {
+		for (IEvent e : events) {
+			if (e.getId().equals(id)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private boolean containsEventClassName(IEvent event) {
+		for (IEvent e : events) {
+			if (e.getClazz().equals(event.getClazz()) && e.getName().equals(event.getName())) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 }

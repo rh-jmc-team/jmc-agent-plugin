@@ -31,14 +31,17 @@
  * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.openjdk.jmc.console.ext.agent.manager.internal;
+package org.openjdk.jmc.console.ext.agent.manager.model.impl;
+
+import java.net.URI;
+import java.net.URISyntaxException;
 
 import org.openjdk.jmc.console.ext.agent.manager.model.IMethodReturnValue;
 
 public class MethodReturnValue implements IMethodReturnValue {
 
-	private static final String DEFAULT_STRING_FIELD = "";
-	private static final ContentType DEFAULT_CONTENT_TYPE = ContentType.NONE;
+	private static final String DEFAULT_STRING_FIELD = ""; // $NON-NLS-1$
+	private static final Object DEFAULT_OBJECT_TYPE = null;
 
 	private String name;
 	private String description;
@@ -49,7 +52,7 @@ public class MethodReturnValue implements IMethodReturnValue {
 	public MethodReturnValue() {
 		name = DEFAULT_STRING_FIELD;
 		description = DEFAULT_STRING_FIELD;
-		contentType = DEFAULT_CONTENT_TYPE;
+		contentType = (ContentType) DEFAULT_OBJECT_TYPE;
 		relationKey = DEFAULT_STRING_FIELD;
 		converter = DEFAULT_STRING_FIELD;
 	}
@@ -75,6 +78,13 @@ public class MethodReturnValue implements IMethodReturnValue {
 	}
 
 	public void setRelationKey(String relationKey) {
+		if (relationKey != null) {
+			try {
+				new URI(relationKey);
+			} catch (URISyntaxException e) {
+				throw new IllegalArgumentException();
+			}
+		}
 		this.relationKey = relationKey;
 	}
 
@@ -93,5 +103,4 @@ public class MethodReturnValue implements IMethodReturnValue {
 	public void setName(String name) {
 		this.name = name;
 	}
-
 }

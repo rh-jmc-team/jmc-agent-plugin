@@ -33,7 +33,7 @@
  */
 package org.openjdk.jmc.console.ext.agent.manager.model;
 
-public interface IField extends INamedCapturedValue {
+public interface IField extends ICapturedValue {
 	String getExpression();
 
 	void setExpression(String expression);

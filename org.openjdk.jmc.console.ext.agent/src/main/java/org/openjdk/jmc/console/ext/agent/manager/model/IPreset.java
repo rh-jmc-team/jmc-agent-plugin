@@ -57,5 +57,5 @@ public interface IPreset {
 
 	void removeEvent(IEvent event);
 
-	boolean containEvent(IEvent event);
+	boolean containsEvent(IEvent event);
 }
