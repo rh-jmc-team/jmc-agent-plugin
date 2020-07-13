@@ -39,7 +39,7 @@ import java.net.URISyntaxException;
 import org.openjdk.jmc.console.ext.agent.manager.model.IMethodParameter;
 
 public class MethodParameter implements IMethodParameter {
-	private static final String DEFAULT_STRING_FIELD = "";
+	private static final String DEFAULT_STRING_FIELD = ""; // $NON-NLS-1$
 	private static final Object DEFAULT_OBJECT_TYPE = null;
 	private static final String DEFAULT_PARAMETER_NAME = "myParameterName"; // $NON-NLS-1$
 	private static final int DEFAULT_INDEX = 0;

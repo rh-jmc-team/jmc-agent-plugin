@@ -60,6 +60,9 @@ public class Event implements IEvent {
 	private static final String ERROR_INCORRECT_SYNTAX = "Field has incorrect syntax";
 	private static final String ERROR_INDEX_MUST_BE_UNIQUE = "MethodParameter index must be unique";
 
+	private final List<IMethodParameter> parameters = new ArrayList<>();
+	private final List<IField> fields = new ArrayList<>();
+
 	private String id;
 	private String name;
 	private String clazz;
@@ -70,9 +73,7 @@ public class Event implements IEvent {
 	private Location location;
 	private String methodName;
 	private String methodDescriptor;
-	private List<IMethodParameter> parameters = new ArrayList<>();
 	private IMethodReturnValue returnValue;
-	private List<IField> fields = new ArrayList<>();
 
 	public Event() {
 		id = DEFAULT_EVENT_ID;

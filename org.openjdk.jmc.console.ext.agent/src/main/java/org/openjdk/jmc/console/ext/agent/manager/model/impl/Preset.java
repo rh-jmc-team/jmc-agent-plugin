@@ -40,19 +40,20 @@ import org.openjdk.jmc.console.ext.agent.manager.model.IEvent;
 import org.openjdk.jmc.console.ext.agent.manager.model.IPreset;
 
 public class Preset implements IPreset {
-	private static final String DEFAULT_FILE_NAME = "new_file.xml";
-	private static final String DEFAULT_CLASS_PREFIX = "__JFREvent";
+	private static final String DEFAULT_FILE_NAME = "new_file.xml"; // $NON-NLS-1$
+	private static final String DEFAULT_CLASS_PREFIX = "__JFREvent"; // $NON-NLS-1$
 	private static final boolean DEFAULT_BOOLEAN_FIELD = false;
 	private static final String ERROR_CANNOT_BE_EMPTY = "Field cannot be empty";
 	private static final String ERROR_MUST_HAVE_UNIQUE_ID = "Event must have a unique Id";
 	private static final String ERROR_MUST_HAVE_UNIQUE_EVENT_CLASS_NAME = "Event must have a unique event name per class";
 	private static final String ERROR_CANNOT_BE_NULL = "Field cannot be null";
 
+	private final List<IEvent> events = new ArrayList<>();
+
 	private String fileName;
 	private String classPrefix;
 	private boolean allowToString;
 	private boolean allowConverter;
-	private List<IEvent> events = new ArrayList<>();
 
 	public Preset() {
 		fileName = DEFAULT_FILE_NAME;

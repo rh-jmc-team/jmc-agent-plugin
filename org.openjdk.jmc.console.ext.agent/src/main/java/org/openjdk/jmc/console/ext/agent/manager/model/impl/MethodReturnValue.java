@@ -40,7 +40,7 @@ import org.openjdk.jmc.console.ext.agent.manager.model.IMethodReturnValue;
 
 public class MethodReturnValue implements IMethodReturnValue {
 
-	private static final String DEFAULT_STRING_FIELD = "";
+	private static final String DEFAULT_STRING_FIELD = ""; // $NON-NLS-1$
 	private static final Object DEFAULT_OBJECT_TYPE = null;
 
 	private String name;
