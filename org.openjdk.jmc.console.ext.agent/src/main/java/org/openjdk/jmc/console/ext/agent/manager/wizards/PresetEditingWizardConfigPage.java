@@ -35,10 +35,12 @@ package org.openjdk.jmc.console.ext.agent.manager.wizards;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
+import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Text;
 import org.openjdk.jmc.console.ext.agent.manager.model.IPreset;
 
@@ -62,9 +64,6 @@ public class PresetEditingWizardConfigPage extends BaseWizardPage {
 	private Text classPrefixText;
 	private Button allowToStringButton;
 	private Button allowConverterButton;
-
-	private Exception fileNameError;
-	private Exception classPrefixError;
 
 	protected PresetEditingWizardConfigPage(IPreset preset) {
 		super(PAGE_NAME);
@@ -125,58 +124,21 @@ public class PresetEditingWizardConfigPage extends BaseWizardPage {
 		return container;
 	}
 
-	private void setErrorMessageIfAny() {
-		if (fileNameError != null) {
-			setErrorMessage(fileNameError.getMessage());
-			return;
-		}
-
-		if (classPrefixError != null) {
-			setErrorMessage(classPrefixError.getMessage());
-			return;
-		}
-
-		setErrorMessage(null);
-	}
-
-	@Override
-	public boolean canFlipToNextPage() {
-		return classPrefixError == null && fileNameError == null;
-	}
-
 	private void bindListeners() {
-		fileNameText.addModifyListener(modifyEvent -> {
-			try {
-				preset.setFileName(fileNameText.getText());
-				fileNameError = null;
-			} catch (IllegalArgumentException e) {
-				fileNameError = e;
-			}
-
-			setErrorMessageIfAny();
-		});
-
-		classPrefixText.addModifyListener(modifyEvent -> {
-			try {
-				preset.setClassPrefix(classPrefixText.getText());
-				classPrefixError = null;
-			} catch (IllegalArgumentException e) {
-				classPrefixError = e;
-			}
-
-			setErrorMessageIfAny();
-		});
-
+		fileNameText.addModifyListener(
+				handleExceptionIfAny((ModifyListener) e -> preset.setFileName(fileNameText.getText())));
+		classPrefixText.addModifyListener(
+				handleExceptionIfAny((ModifyListener) e -> preset.setClassPrefix(classPrefixText.getText())));
 		allowToStringButton.addListener(SWT.Selection,
-				e -> preset.setAllowToString(allowToStringButton.getSelection()));
+				handleExceptionIfAny((Listener) e -> preset.setAllowToString(allowToStringButton.getSelection())));
 		allowConverterButton.addListener(SWT.Selection,
-				e -> preset.setAllowConverter(allowConverterButton.getSelection()));
+				handleExceptionIfAny((Listener) e -> preset.setAllowConverter(allowConverterButton.getSelection())));
 	}
 
 	private void populateUi() {
 		setText(fileNameText, preset.getFileName());
-		setText(classPrefixText, preset.getFileName());
+		setText(classPrefixText, preset.getClassPrefix());
 		allowToStringButton.setSelection(preset.getAllowToString());
-		allowToStringButton.setSelection(preset.getAllowConverter());
+		allowConverterButton.setSelection(preset.getAllowConverter());
 	}
 }

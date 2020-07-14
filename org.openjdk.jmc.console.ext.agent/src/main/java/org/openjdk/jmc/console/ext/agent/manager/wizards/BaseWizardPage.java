@@ -7,6 +7,7 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -14,17 +15,28 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.swt.widgets.Widget;
+import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.PlatformUI;
 import org.openjdk.jmc.ui.column.ColumnBuilder;
 import org.openjdk.jmc.ui.column.ColumnManager;
 import org.openjdk.jmc.ui.column.IColumn;
+import org.openjdk.jmc.ui.misc.DialogToolkit;
 import org.openjdk.jmc.ui.misc.OptimisticComparator;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public abstract class BaseWizardPage extends WizardPage {
+
+	private static final String MESSAGE_UNEXPECTED_ERROR_HAS_OCCURRED = "An unexpected has error occurred.";
+
+	private Map<Widget, Exception> exceptions = new HashMap<>();
 
 	protected BaseWizardPage(String pageName) {
 		super(pageName);
@@ -32,6 +44,11 @@ public abstract class BaseWizardPage extends WizardPage {
 
 	protected BaseWizardPage(String pageName, String title, ImageDescriptor titleImage) {
 		super(pageName, title, titleImage);
+	}
+
+	@Override
+	public boolean canFlipToNextPage() {
+		return exceptions.isEmpty();
 	}
 
 	protected static Composite createComposite(Composite parent) {
@@ -159,6 +176,33 @@ public abstract class BaseWizardPage extends WizardPage {
 		s.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true, cols - 2, 0));
 
 		return s;
+	}
+
+	protected ModifyListener handleExceptionIfAny(ModifyListener listener) {
+		return e -> handleExceptionIfAny(e.widget, () -> listener.modifyText(e));
+	}
+
+	protected Listener handleExceptionIfAny(Listener listener) {
+		return e -> handleExceptionIfAny(e.widget, () -> listener.handleEvent(e));
+	}
+
+	protected void handleExceptionIfAny(Widget widget, Runnable runnable) {
+		try {
+			runnable.run();
+			exceptions.remove(widget);
+
+			if (exceptions.isEmpty()) {
+				setErrorMessage(null);
+			}
+		} catch (IllegalArgumentException e) {
+			exceptions.put(widget, e);
+			setErrorMessage(e.getLocalizedMessage());
+		} catch (Exception e) {
+			IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+			DialogToolkit.showException(window.getShell(), MESSAGE_UNEXPECTED_ERROR_HAS_OCCURRED, e);
+		}
+
+		getWizard().getContainer().updateButtons();
 	}
 
 	protected static abstract class TableInspector extends Composite {

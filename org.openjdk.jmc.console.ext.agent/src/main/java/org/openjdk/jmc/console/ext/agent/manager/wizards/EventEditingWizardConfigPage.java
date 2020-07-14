@@ -36,11 +36,13 @@ package org.openjdk.jmc.console.ext.agent.manager.wizards;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
+import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Text;
 import org.openjdk.jmc.console.ext.agent.manager.model.IEvent;
 import org.openjdk.jmc.console.ext.agent.manager.model.IEvent.Location;
@@ -177,19 +179,23 @@ public class EventEditingWizardConfigPage extends BaseWizardPage {
 	}
 
 	private void bindListeners() {
-		idText.addModifyListener(e -> event.setId(idText.getText()));
-		nameText.addModifyListener(e -> event.setName(nameText.getText()));
-		descriptionText.addModifyListener(e -> event.setDescription(descriptionText.getText()));
-		methodNameText.addModifyListener(e -> event.setMethodName(methodNameText.getText()));
-		methodDescriptorText.addModifyListener(e -> event.setMethodDescriptor(methodDescriptorText.getText()));
-		pathText.addModifyListener(e -> event.setPath(pathText.getText()));
-		classText.addModifyListener(e -> event.setClazz(classText.getText()));
-		locationCombo.addModifyListener(e -> event.setLocation(
-				locationCombo.getSelectionIndex() == -1 ? null : Location.valueOf(locationCombo.getText())));
+		idText.addModifyListener(handleExceptionIfAny((ModifyListener) e -> event.setId(idText.getText())));
+		nameText.addModifyListener(handleExceptionIfAny((ModifyListener) e -> event.setName(nameText.getText())));
+		descriptionText.addModifyListener(
+				handleExceptionIfAny((ModifyListener) e -> event.setDescription(descriptionText.getText())));
+		methodNameText.addModifyListener(
+				handleExceptionIfAny((ModifyListener) e -> event.setMethodName(methodNameText.getText())));
+		methodDescriptorText.addModifyListener(
+				handleExceptionIfAny((ModifyListener) e -> event.setMethodDescriptor(methodDescriptorText.getText())));
+		pathText.addModifyListener(handleExceptionIfAny((ModifyListener) e -> event.setPath(pathText.getText())));
+		classText.addModifyListener(handleExceptionIfAny((ModifyListener) e -> event.setClazz(classText.getText())));
+		locationCombo.addModifyListener(handleExceptionIfAny((ModifyListener) e -> event.setLocation(
+				locationCombo.getSelectionIndex() == -1 ? null : Location.valueOf(locationCombo.getText()))));
 		locationClearButton.addListener(SWT.Selection, e -> locationCombo.deselectAll());
-		recordExceptionsButton.addListener(SWT.Selection, e -> event.setRethrow(recordExceptionsButton.getSelection()));
+		recordExceptionsButton.addListener(SWT.Selection,
+				handleExceptionIfAny((Listener) e -> event.setRethrow(recordExceptionsButton.getSelection())));
 		recordStackTraceButton.addListener(SWT.Selection,
-				e -> event.setStackTrace(recordStackTraceButton.getSelection()));
+				handleExceptionIfAny((Listener) e -> event.setStackTrace(recordStackTraceButton.getSelection())));
 	}
 
 	private void populateUi() {

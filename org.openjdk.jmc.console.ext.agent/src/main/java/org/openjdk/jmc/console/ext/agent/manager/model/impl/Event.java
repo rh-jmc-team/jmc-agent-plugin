@@ -42,10 +42,6 @@ import org.openjdk.jmc.console.ext.agent.manager.model.IMethodParameter;
 import org.openjdk.jmc.console.ext.agent.manager.model.IMethodReturnValue;
 
 public class Event implements IEvent {
-	private static final String DEFAULT_STRING_FIELD = "";
-	private static final boolean DEFAULT_BOOLEAN_FIELD = false;
-	private static final Location DEFAULT_LOCATION = Location.WRAP;
-
 	private static final String DEFAULT_STRING_FIELD = ""; // $NON-NLS-1$
 	private static final boolean DEFAULT_BOOLEAN_FIELD = false;
 	private static final Object DEFAULT_OBJECT_FIELD = null;

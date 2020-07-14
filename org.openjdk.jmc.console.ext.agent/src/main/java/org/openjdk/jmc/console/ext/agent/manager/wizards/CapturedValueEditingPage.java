@@ -2,11 +2,13 @@ package org.openjdk.jmc.console.ext.agent.manager.wizards;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
+import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Text;
 import org.openjdk.jmc.console.ext.agent.manager.model.ICapturedValue;
@@ -138,10 +140,11 @@ public class CapturedValueEditingPage extends BaseWizardPage {
 	}
 
 	private void bindListeners() {
-		nameText.addModifyListener(e -> capturedValue.setName(nameText.getText()));
+		nameText.addModifyListener(
+				handleExceptionIfAny((ModifyListener) e -> capturedValue.setName(nameText.getText())));
 		if (indexSpinner != null) {
-			indexSpinner
-					.addModifyListener(e -> ((IMethodParameter) capturedValue).setIndex(indexSpinner.getSelection()));
+			indexSpinner.addModifyListener(handleExceptionIfAny(
+					(ModifyListener) e -> ((IMethodParameter) capturedValue).setIndex(indexSpinner.getSelection())));
 		}
 		if (isReturnValueButton != null) {
 			isReturnValueButton.addListener(SWT.Selection, e -> {
@@ -154,14 +157,19 @@ public class CapturedValueEditingPage extends BaseWizardPage {
 			});
 		}
 		if (expressionText != null) {
-			expressionText.addModifyListener(e -> ((IField) capturedValue).setExpression(expressionText.getText()));
+			expressionText.addModifyListener(handleExceptionIfAny(
+					(ModifyListener) e -> ((IField) capturedValue).setExpression(expressionText.getText())));
 		}
-		descriptionText.addModifyListener(e -> capturedValue.setDescription(descriptionText.getText()));
-		contentTypeCombo.addModifyListener(e -> capturedValue.setContentType(
-				contentTypeCombo.getSelectionIndex() == -1 ? null : ContentType.valueOf(contentTypeCombo.getText())));
-		contentTypeClearButton.addListener(SWT.Selection, e -> contentTypeCombo.deselectAll());
-		relationalKeyText.addModifyListener(e -> capturedValue.setRelationKey(relationalKeyText.getText()));
-		converterText.addModifyListener(e -> capturedValue.setConverter(converterText.getText()));
+		descriptionText.addModifyListener(
+				handleExceptionIfAny((ModifyListener) e -> capturedValue.setDescription(descriptionText.getText())));
+		contentTypeCombo.addModifyListener(handleExceptionIfAny((ModifyListener) e -> capturedValue.setContentType(
+				contentTypeCombo.getSelectionIndex() == -1 ? null : ContentType.valueOf(contentTypeCombo.getText()))));
+		contentTypeClearButton.addListener(SWT.Selection,
+				handleExceptionIfAny((Listener) e -> contentTypeCombo.deselectAll()));
+		relationalKeyText.addModifyListener(
+				handleExceptionIfAny((ModifyListener) e -> capturedValue.setRelationKey(relationalKeyText.getText())));
+		converterText.addModifyListener(
+				handleExceptionIfAny((ModifyListener) e -> capturedValue.setConverter(converterText.getText())));
 	}
 
 	private void populateUi() {
