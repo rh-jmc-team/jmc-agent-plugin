@@ -42,9 +42,9 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.openjdk.jmc.console.ext.agent.AgentPlugin;
-import org.openjdk.jmc.console.ext.agent.manager.internal.Preset;
 import org.openjdk.jmc.console.ext.agent.manager.model.IPreset;
 import org.openjdk.jmc.console.ext.agent.manager.model.PresetRepository;
+import org.openjdk.jmc.console.ext.agent.manager.model.impl.Preset;
 import org.openjdk.jmc.ui.misc.AbstractStructuredContentProvider;
 import org.openjdk.jmc.ui.misc.DialogToolkit;
 

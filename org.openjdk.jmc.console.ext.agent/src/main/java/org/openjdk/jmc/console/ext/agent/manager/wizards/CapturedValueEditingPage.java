@@ -9,13 +9,13 @@ import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Text;
-import org.openjdk.jmc.console.ext.agent.manager.internal.MethodParameter;
-import org.openjdk.jmc.console.ext.agent.manager.internal.MethodReturnValue;
+import org.openjdk.jmc.console.ext.agent.manager.model.ICapturedValue;
 import org.openjdk.jmc.console.ext.agent.manager.model.ICapturedValue.ContentType;
 import org.openjdk.jmc.console.ext.agent.manager.model.IField;
 import org.openjdk.jmc.console.ext.agent.manager.model.IMethodParameter;
 import org.openjdk.jmc.console.ext.agent.manager.model.IMethodReturnValue;
-import org.openjdk.jmc.console.ext.agent.manager.model.INamedCapturedValue;
+import org.openjdk.jmc.console.ext.agent.manager.model.impl.MethodParameter;
+import org.openjdk.jmc.console.ext.agent.manager.model.impl.MethodReturnValue;
 
 import java.util.stream.Stream;
 
@@ -43,7 +43,7 @@ public class CapturedValueEditingPage extends BaseWizardPage {
 	private static final String MESSAGE_RELATIONAL_KEY_DESCRIPTION = "(Optional) Unique URI signifying a relationship";
 	private static final String MESSAGE_CONVERTER_DESCRIPTION = "(Optional) fully qualified class name of a value converter";
 
-	private INamedCapturedValue capturedValue;
+	private ICapturedValue capturedValue;
 
 	private Text nameText;
 	private Spinner indexSpinner;
@@ -55,7 +55,7 @@ public class CapturedValueEditingPage extends BaseWizardPage {
 	private Text relationalKeyText;
 	private Text converterText;
 
-	public CapturedValueEditingPage(INamedCapturedValue capturedValue) {
+	public CapturedValueEditingPage(ICapturedValue capturedValue) {
 		super(PAGE_NAME);
 
 		this.capturedValue = capturedValue;
@@ -184,7 +184,7 @@ public class CapturedValueEditingPage extends BaseWizardPage {
 		setText(converterText, capturedValue.getConverter());
 	}
 
-	public INamedCapturedValue getResult() {
+	public ICapturedValue getResult() {
 		return capturedValue;
 	}
 

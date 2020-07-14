@@ -42,13 +42,12 @@ import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
-import org.openjdk.jmc.console.ext.agent.manager.internal.MethodParameter;
-import org.openjdk.jmc.console.ext.agent.manager.internal.MethodReturnValue;
 import org.openjdk.jmc.console.ext.agent.manager.model.ICapturedValue;
 import org.openjdk.jmc.console.ext.agent.manager.model.IEvent;
 import org.openjdk.jmc.console.ext.agent.manager.model.IMethodParameter;
 import org.openjdk.jmc.console.ext.agent.manager.model.IMethodReturnValue;
-import org.openjdk.jmc.console.ext.agent.manager.model.INamedCapturedValue;
+import org.openjdk.jmc.console.ext.agent.manager.model.impl.MethodParameter;
+import org.openjdk.jmc.console.ext.agent.manager.model.impl.MethodReturnValue;
 import org.openjdk.jmc.ui.misc.AbstractStructuredContentProvider;
 import org.openjdk.jmc.ui.wizards.OnePageWizardDialog;
 
@@ -114,7 +113,7 @@ public class EventEditingWizardParameterPage extends BaseWizardPage {
 			protected void addColumns() {
 				addColumn(LABEL_INDEX, ID_INDEX, new ParameterTableLabelProvider() {
 					@Override
-					protected String doGetText(INamedCapturedValue parameter) {
+					protected String doGetText(ICapturedValue parameter) {
 						if (parameter instanceof IMethodReturnValue) {
 							return MESSAGE_RETURN_VALUE;
 						}
@@ -130,14 +129,14 @@ public class EventEditingWizardParameterPage extends BaseWizardPage {
 
 				addColumn(LABEL_NAME, ID_NAME, new ParameterTableLabelProvider() {
 					@Override
-					protected String doGetText(INamedCapturedValue parameter) {
+					protected String doGetText(ICapturedValue parameter) {
 						return parameter.getName();
 					}
 				});
 
 				addColumn(LABEL_DESCRIPTION, ID_DESCRIPTION, new ParameterTableLabelProvider() {
 					@Override
-					protected String doGetText(INamedCapturedValue parameter) {
+					protected String doGetText(ICapturedValue parameter) {
 						return parameter.getDescription();
 					}
 				});
@@ -162,10 +161,10 @@ public class EventEditingWizardParameterPage extends BaseWizardPage {
 
 			@Override
 			protected void onEditButtonSelected(IStructuredSelection selection) {
-				INamedCapturedValue original = (INamedCapturedValue) selection.getFirstElement();
+				ICapturedValue original = (ICapturedValue) selection.getFirstElement();
 				CapturedValueEditingPage page = new CapturedValueEditingPage(original);
 				if (new OnePageWizardDialog(Display.getCurrent().getActiveShell(), page).open() == Window.OK) {
-					INamedCapturedValue modified = page.getResult();
+					ICapturedValue modified = page.getResult();
 					// TODO: save the field
 					if (original instanceof MethodParameter) {
 						event.removeMethodParameter((IMethodParameter) original);
@@ -185,7 +184,7 @@ public class EventEditingWizardParameterPage extends BaseWizardPage {
 
 			@Override
 			protected void onRemoveButtonSelected(IStructuredSelection selection) {
-				INamedCapturedValue namedCapturedValue = (INamedCapturedValue) selection.getFirstElement();
+				ICapturedValue namedCapturedValue = (ICapturedValue) selection.getFirstElement();
 				if (namedCapturedValue instanceof MethodParameter) {
 					event.removeMethodParameter((MethodParameter) namedCapturedValue);
 				} else if (namedCapturedValue instanceof MethodReturnValue) {
@@ -222,9 +221,9 @@ public class EventEditingWizardParameterPage extends BaseWizardPage {
 				return parameters;
 			}
 
-			List<INamedCapturedValue> capturedValues = new ArrayList<>(Arrays.asList(parameters));
+			List<ICapturedValue> capturedValues = new ArrayList<>(Arrays.asList(parameters));
 			capturedValues.add(event.getMethodReturnValue());
-			return capturedValues.toArray(new INamedCapturedValue[0]);
+			return capturedValues.toArray(new ICapturedValue[0]);
 		}
 	}
 
@@ -235,9 +234,9 @@ public class EventEditingWizardParameterPage extends BaseWizardPage {
 				throw new IllegalArgumentException("element must be a an IMethodParameter or IMethodReturnValue"); // $NON-NLS-1$
 			}
 
-			return doGetText((INamedCapturedValue) element);
+			return doGetText((ICapturedValue) element);
 		}
 
-		protected abstract String doGetText(INamedCapturedValue field);
+		protected abstract String doGetText(ICapturedValue field);
 	}
 }
