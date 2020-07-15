@@ -33,13 +33,13 @@
  */
 package org.openjdk.jmc.console.ext.agent.manager.model.impl;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.openjdk.jmc.console.ext.agent.manager.model.IEvent;
 import org.openjdk.jmc.console.ext.agent.manager.model.IField;
 import org.openjdk.jmc.console.ext.agent.manager.model.IMethodParameter;
 import org.openjdk.jmc.console.ext.agent.manager.model.IMethodReturnValue;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class Event implements IEvent {
 	private static final String DEFAULT_STRING_FIELD = ""; // $NON-NLS-1$
@@ -54,10 +54,19 @@ public class Event implements IEvent {
 	private static final String PATH_REGEX = "([^/]+/)*([^/]*)"; // $NON-NLS-1$
 	private static final String METHOD_NAME_REGEX = "[a-zA-Z_$][a-zA-Z0-9_$]*"; // $NON-NLS-1$
 	private static final String METHOD_DESCRIPTOR_REGEX = "\\((\\[*([BCDFIJSZ]|L([a-zA-Z_$][a-zA-Z0-9_$]*/)*[a-zA-Z_$][a-zA-Z0-9_$]*;))*\\)(V|\\[*([BCDFIJSZ]|L([a-zA-Z_$][a-zA-Z0-9_$]*/)*[a-zA-Z_$][a-zA-Z0-9_$]*;))"; // $NON-NLS-1$
-	private static final String ERROR_CANNOT_BE_EMPTY = "Field cannot be empty";
-	private static final String ERROR_CANNOT_BE_NULL = "Field cannot be null";
-	private static final String ERROR_INCORRECT_SYNTAX = "Field has incorrect syntax";
-	private static final String ERROR_INDEX_MUST_BE_UNIQUE = "MethodParameter index must be unique";
+
+	private static final String ERROR_ID_CANNOT_BE_EMPTY_OR_NULL = "ID cannot be empty or null.";
+	private static final String ERROR_NAME_CANNOT_BE_EMPTY_OR_NULL = "Name cannot be empty or null.";
+	private static final String ERROR_CLASS_CANNOT_BE_EMPTY_OR_NULL = "Class cannot be empty or null.";
+	private static final String ERROR_METHOD_NAME_CANNOT_BE_EMPTY_OR_NULL = "Method name cannot be empty or null.";
+	private static final String ERROR_METHOD_DESCRIPTOR_CANNOT_BE_EMPTY_OR_NULL = "Method descriptor cannot be empty or null.";
+	private static final String ERROR_METHOD_PARAMETER_CANNOT_BE_NULL = "Method parameter cannot be null.";
+	private static final String ERROR_FIELD_CANNOT_BE_NULL = "Field cannot be null.";
+	private static final String ERROR_CLASS_HAS_INCORRECT_SYNTAX = "Class has incorrect syntax.";
+	private static final String ERROR_PATH_HAS_INCORRECT_SYNTAX = "Path has incorrect syntax.";
+	private static final String ERROR_METHOD_NAME_HAS_INCORRECT_SYNTAX = "Method name has incorrect syntax.";
+	private static final String ERROR_METHOD_DESCRIPTOR_HAS_INCORRECT_SYNTAX = "Method descriptor has incorrect syntax.";
+	private static final String ERROR_INDEX_MUST_BE_UNIQUE = "Method parameter index must be unique.";
 
 	private final List<IMethodParameter> parameters = new ArrayList<>();
 	private final List<IField> fields = new ArrayList<>();
@@ -94,12 +103,10 @@ public class Event implements IEvent {
 
 	@Override
 	public void setId(String id) {
-		if (id == null) {
-			throw new IllegalArgumentException(ERROR_CANNOT_BE_NULL);
+		if (id == null || id.isEmpty()) {
+			throw new IllegalArgumentException(ERROR_ID_CANNOT_BE_EMPTY_OR_NULL);
 		}
-		if (id.isEmpty()) {
-			throw new IllegalArgumentException(ERROR_CANNOT_BE_EMPTY);
-		}
+
 		this.id = id;
 	}
 
@@ -110,12 +117,10 @@ public class Event implements IEvent {
 
 	@Override
 	public void setName(String name) {
-		if (name == null) {
-			throw new IllegalArgumentException(ERROR_CANNOT_BE_NULL);
+		if (name == null || name.isEmpty()) {
+			throw new IllegalArgumentException(ERROR_NAME_CANNOT_BE_EMPTY_OR_NULL);
 		}
-		if (name.isEmpty()) {
-			throw new IllegalArgumentException(ERROR_CANNOT_BE_EMPTY);
-		}
+
 		this.name = name;
 	}
 
@@ -126,15 +131,15 @@ public class Event implements IEvent {
 
 	@Override
 	public void setClazz(String clazz) {
-		if (clazz == null) {
-			throw new IllegalArgumentException(ERROR_CANNOT_BE_NULL);
+		if (clazz == null || clazz.isEmpty()) {
+			throw new IllegalArgumentException(ERROR_CLASS_CANNOT_BE_EMPTY_OR_NULL);
 		}
-		clazz = collapseWhiteSpaces(clazz);
-		if (clazz.isEmpty()) {
-			throw new IllegalArgumentException(ERROR_CANNOT_BE_EMPTY);
-		} else if (!clazz.matches(CLAZZ_REGEX)) {
-			throw new IllegalArgumentException(ERROR_INCORRECT_SYNTAX);
+
+		clazz = clazz.trim();
+		if (!clazz.matches(CLAZZ_REGEX)) {
+			throw new IllegalArgumentException(ERROR_CLASS_HAS_INCORRECT_SYNTAX);
 		}
+
 		this.clazz = clazz;
 	}
 
@@ -156,11 +161,12 @@ public class Event implements IEvent {
 	@Override
 	public void setPath(String path) {
 		if (path != null) {
-			path = collapseWhiteSpaces(path);
+			path = path.trim();
 			if (!path.matches(PATH_REGEX)) {
-				throw new IllegalArgumentException(ERROR_INCORRECT_SYNTAX);
+				throw new IllegalArgumentException(ERROR_PATH_HAS_INCORRECT_SYNTAX);
 			}
 		}
+
 		this.path = path;
 	}
 
@@ -202,15 +208,15 @@ public class Event implements IEvent {
 
 	@Override
 	public void setMethodName(String methodName) {
-		if (methodName == null) {
-			throw new IllegalArgumentException(ERROR_CANNOT_BE_NULL);
+		if (methodName == null || methodName.isEmpty()) {
+			throw new IllegalArgumentException(ERROR_METHOD_NAME_CANNOT_BE_EMPTY_OR_NULL);
 		}
-		methodName = collapseWhiteSpaces(methodName);
-		if (methodName.isEmpty()) {
-			throw new IllegalArgumentException(ERROR_CANNOT_BE_EMPTY);
-		} else if (!methodName.matches(METHOD_NAME_REGEX)) {
-			throw new IllegalArgumentException(ERROR_INCORRECT_SYNTAX);
+
+		methodName = methodName.trim();
+		if (!methodName.matches(METHOD_NAME_REGEX)) {
+			throw new IllegalArgumentException(ERROR_METHOD_NAME_HAS_INCORRECT_SYNTAX);
 		}
+
 		this.methodName = methodName;
 	}
 
@@ -221,15 +227,15 @@ public class Event implements IEvent {
 
 	@Override
 	public void setMethodDescriptor(String methodDescriptor) {
-		if (methodDescriptor == null) {
-			throw new IllegalArgumentException(ERROR_CANNOT_BE_NULL);
+		if (methodDescriptor == null || methodDescriptor.isEmpty()) {
+			throw new IllegalArgumentException(ERROR_METHOD_DESCRIPTOR_CANNOT_BE_EMPTY_OR_NULL);
 		}
-		methodDescriptor = collapseWhiteSpaces(methodDescriptor);
-		if (methodDescriptor.isEmpty()) {
-			throw new IllegalArgumentException(ERROR_CANNOT_BE_EMPTY);
-		} else if (!methodDescriptor.matches(METHOD_DESCRIPTOR_REGEX)) {
-			throw new IllegalArgumentException(ERROR_INCORRECT_SYNTAX);
+
+		methodDescriptor = methodDescriptor.trim();
+		if (!methodDescriptor.matches(METHOD_DESCRIPTOR_REGEX)) {
+			throw new IllegalArgumentException(ERROR_METHOD_DESCRIPTOR_HAS_INCORRECT_SYNTAX);
 		}
+
 		this.methodDescriptor = methodDescriptor;
 	}
 
@@ -241,11 +247,12 @@ public class Event implements IEvent {
 	@Override
 	public void addMethodParameter(IMethodParameter methodParameter) {
 		if (methodParameter == null) {
-			throw new IllegalArgumentException(ERROR_CANNOT_BE_NULL);
+			throw new IllegalArgumentException(ERROR_METHOD_PARAMETER_CANNOT_BE_NULL);
 		}
 		if (containsIndex(methodParameter.getIndex())) {
 			throw new IllegalArgumentException(ERROR_INDEX_MUST_BE_UNIQUE);
 		}
+
 		parameters.add(methodParameter);
 	}
 
@@ -277,7 +284,7 @@ public class Event implements IEvent {
 	@Override
 	public void addField(IField field) {
 		if (field == null) {
-			throw new IllegalArgumentException(ERROR_CANNOT_BE_NULL);
+			throw new IllegalArgumentException(ERROR_FIELD_CANNOT_BE_NULL);
 		}
 		fields.add(field);
 	}
@@ -290,10 +297,6 @@ public class Event implements IEvent {
 	@Override
 	public boolean containField(IField field) {
 		return fields.contains(field);
-	}
-
-	private static String collapseWhiteSpaces(String stringWithSpaces) {
-		return stringWithSpaces.replaceAll("\\s+", " ");
 	}
 
 	private boolean containsIndex(int index) {

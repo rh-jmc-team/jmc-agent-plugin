@@ -33,74 +33,11 @@
  */
 package org.openjdk.jmc.console.ext.agent.manager.model.impl;
 
-import java.net.URI;
-import java.net.URISyntaxException;
-
 import org.openjdk.jmc.console.ext.agent.manager.model.IMethodReturnValue;
 
-public class MethodReturnValue implements IMethodReturnValue {
-
-	private static final String DEFAULT_STRING_FIELD = ""; // $NON-NLS-1$
-	private static final Object DEFAULT_OBJECT_TYPE = null;
-
-	private String name;
-	private String description;
-	private ContentType contentType;
-	private String relationKey;
-	private String converter;
+public class MethodReturnValue extends CapturedValue implements IMethodReturnValue {
 
 	public MethodReturnValue() {
-		name = DEFAULT_STRING_FIELD;
-		description = DEFAULT_STRING_FIELD;
-		contentType = (ContentType) DEFAULT_OBJECT_TYPE;
-		relationKey = DEFAULT_STRING_FIELD;
-		converter = DEFAULT_STRING_FIELD;
-	}
-
-	public String getDescription() {
-		return description;
-	}
-
-	public void setDescription(String description) {
-		this.description = description;
-	}
-
-	public ContentType getContentType() {
-		return contentType;
-	}
-
-	public void setContentType(ContentType contentType) {
-		this.contentType = contentType;
-	}
-
-	public String getRelationKey() {
-		return relationKey;
-	}
-
-	public void setRelationKey(String relationKey) {
-		if (relationKey != null) {
-			try {
-				new URI(relationKey);
-			} catch (URISyntaxException e) {
-				throw new IllegalArgumentException();
-			}
-		}
-		this.relationKey = relationKey;
-	}
-
-	public String getConverter() {
-		return converter;
-	}
-
-	public void setConverter(String converter) {
-		this.converter = converter;
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
+		super();
 	}
 }

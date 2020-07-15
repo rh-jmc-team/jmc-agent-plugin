@@ -33,88 +33,24 @@
  */
 package org.openjdk.jmc.console.ext.agent.manager.model.impl;
 
-import java.net.URI;
-import java.net.URISyntaxException;
-
 import org.openjdk.jmc.console.ext.agent.manager.model.IField;
 
-public class Field implements IField {
+public class Field extends CapturedValue implements IField {
 
-	private static final String DEFAULT_STRING_FIELD = ""; // $NON-NLS-1$
-	private static final Object DEFAULT_OBJECT_TYPE = null;
-	private static final String DEFAULT_FIELD_NAME = "'myField'"; // $NON-NLS-1$
+	private static final String DEFAULT_FIELD_NAME = "New Field"; // $NON-NLS-1$
 	private static final String DEFAULT_FIELD_EXPRESSION = "myField"; // $NON-NLS-1$
 	private static final String EXPRESSION_REGEX = "([a-zA-Z_$][a-zA-Z0-9_$]*\\.)*([a-zA-Z_$][a-zA-Z0-9_$]*)(\\.[a-zA-Z_$][a-zA-Z_$]*)*"; // $NON-NLS-1$
-	private static final String ERROR_CANNOT_BE_EMPTY = "Field cannot be empty";
-	private static final String ERROR_INCORRECT_SYNTAX = "Field has incorrect syntax";
-	private static final String ERROR_CANNOT_BE_NULL = "Field cannot be null";
-	private String name;
-	private String description;
-	private ContentType contentType;
-	private String relationKey;
-	private String converter;
+
+	private static final String ERROR_EXPRESSION_CANNOT_BE_EMPTY_OR_NULL = "Expression cannot be empty or null.";
+	private static final String ERROR_EXPRESSION_HAS_INCORRECT_SYNTAX = "Expression has incorrect syntax.";
+
 	private String expression;
 
 	public Field() {
-		name = DEFAULT_FIELD_NAME;
+		super();
+
 		expression = DEFAULT_FIELD_EXPRESSION;
-		description = DEFAULT_STRING_FIELD;
-		contentType = (ContentType) DEFAULT_OBJECT_TYPE;
-		relationKey = DEFAULT_STRING_FIELD;
-		converter = DEFAULT_STRING_FIELD;
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		if (name == null) {
-			throw new IllegalArgumentException(ERROR_CANNOT_BE_NULL);
-		}
-		if (name.isEmpty()) {
-			throw new IllegalArgumentException(ERROR_CANNOT_BE_EMPTY);
-		}
-		this.name = name;
-	}
-
-	public String getDescription() {
-		return description;
-	}
-
-	public void setDescription(String description) {
-		this.description = description;
-	}
-
-	public ContentType getContentType() {
-		return contentType;
-	}
-
-	public void setContentType(ContentType contentType) {
-		this.contentType = contentType;
-	}
-
-	public String getRelationKey() {
-		return relationKey;
-	}
-
-	public void setRelationKey(String relationKey) {
-		if (relationKey != null) {
-			try {
-				new URI(relationKey);
-			} catch (URISyntaxException e) {
-				throw new IllegalArgumentException(ERROR_INCORRECT_SYNTAX);
-			}
-		}
-		this.relationKey = relationKey;
-	}
-
-	public String getConverter() {
-		return converter;
-	}
-
-	public void setConverter(String converter) {
-		this.converter = converter;
+		setName(DEFAULT_FIELD_NAME);
 	}
 
 	public String getExpression() {
@@ -122,19 +58,15 @@ public class Field implements IField {
 	}
 
 	public void setExpression(String expression) {
-		if (expression == null) {
-			throw new IllegalArgumentException(ERROR_CANNOT_BE_NULL);
+		if (expression == null || expression.isEmpty()) {
+			throw new IllegalArgumentException(ERROR_EXPRESSION_CANNOT_BE_EMPTY_OR_NULL);
 		}
-		expression = collapseWhiteSpaces(expression);
-		if (expression.isEmpty()) {
-			throw new IllegalArgumentException(ERROR_CANNOT_BE_EMPTY);
-		} else if (!expression.matches(EXPRESSION_REGEX)) {
-			throw new IllegalArgumentException(ERROR_INCORRECT_SYNTAX);
-		}
-		this.expression = expression;
-	}
 
-	private static String collapseWhiteSpaces(String stringWithSpaces) {
-		return stringWithSpaces.replaceAll("\\s+", " ");
+		expression = expression.trim();
+		if (!expression.matches(EXPRESSION_REGEX)) {
+			throw new IllegalArgumentException(ERROR_EXPRESSION_HAS_INCORRECT_SYNTAX);
+		}
+
+		this.expression = expression;
 	}
 }

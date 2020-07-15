@@ -43,10 +43,9 @@ public class Preset implements IPreset {
 	private static final String DEFAULT_FILE_NAME = "new_file.xml"; // $NON-NLS-1$
 	private static final String DEFAULT_CLASS_PREFIX = "__JFREvent"; // $NON-NLS-1$
 	private static final boolean DEFAULT_BOOLEAN_FIELD = false;
-	private static final String ERROR_CANNOT_BE_EMPTY = "Field cannot be empty";
-	private static final String ERROR_MUST_HAVE_UNIQUE_ID = "Event must have a unique Id";
+	private static final String ERROR_FILE_NAME_CANNOT_BE_EMPTY_OR_NULL = "File name cannot be empty or null.";
+	private static final String ERROR_MUST_HAVE_UNIQUE_ID = "An event with the same id already exists.";
 	private static final String ERROR_MUST_HAVE_UNIQUE_EVENT_CLASS_NAME = "Event must have a unique event name per class";
-	private static final String ERROR_CANNOT_BE_NULL = "Field cannot be null";
 
 	private final List<IEvent> events = new ArrayList<>();
 
@@ -69,17 +68,19 @@ public class Preset implements IPreset {
 
 	@Override
 	public void setFileName(String fileName) {
-		if (fileName == null) {
-			throw new IllegalArgumentException(ERROR_CANNOT_BE_NULL);
+		if (fileName == null || fileName.isEmpty()) {
+			throw new IllegalArgumentException(ERROR_FILE_NAME_CANNOT_BE_EMPTY_OR_NULL);
 		}
-		if (fileName.isEmpty()) {
-			throw new IllegalArgumentException(ERROR_CANNOT_BE_EMPTY);
-		}
+
 		this.fileName = fileName;
 	}
 
 	@Override
 	public void setClassPrefix(String prefix) {
+		if (prefix != null) {
+			prefix = prefix.trim();
+		}
+
 		this.classPrefix = prefix;
 	}
 
@@ -121,6 +122,7 @@ public class Preset implements IPreset {
 		if (containsEventClassName(event)) {
 			throw new IllegalArgumentException(ERROR_MUST_HAVE_UNIQUE_EVENT_CLASS_NAME);
 		}
+
 		events.add(event);
 	}
 
