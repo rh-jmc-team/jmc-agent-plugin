@@ -31,9 +31,7 @@
  * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.openjdk.jmc.console.ext.agent.manager.model.impl;
-
-import org.openjdk.jmc.console.ext.agent.manager.model.ICapturedValue;
+package org.openjdk.jmc.console.ext.agent.manager.model;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -131,5 +129,13 @@ class CapturedValue implements ICapturedValue {
 		}
 
 		this.converter = converter;
+	}
+
+	protected void copyContentToWorkingCopy(CapturedValue copy) {
+		copy.name = name;
+		copy.description = description;
+		copy.contentType = contentType;
+		copy.relationKey = relationKey;
+		copy.converter = converter;
 	}
 }

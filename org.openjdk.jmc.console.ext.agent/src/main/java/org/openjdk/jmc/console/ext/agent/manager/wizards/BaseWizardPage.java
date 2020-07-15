@@ -44,11 +44,13 @@ public abstract class BaseWizardPage extends WizardPage {
 
 	protected BaseWizardPage(String pageName, String title, ImageDescriptor titleImage) {
 		super(pageName, title, titleImage);
+
+		setPageComplete(true);
 	}
 
 	@Override
 	public boolean canFlipToNextPage() {
-		return exceptions.isEmpty();
+		return super.canFlipToNextPage() && exceptions.isEmpty();
 	}
 
 	protected static Composite createComposite(Composite parent) {
@@ -203,6 +205,7 @@ public abstract class BaseWizardPage extends WizardPage {
 		}
 
 		getWizard().getContainer().updateButtons();
+		setPageComplete(exceptions.isEmpty());
 	}
 
 	protected static abstract class TableInspector extends Composite {

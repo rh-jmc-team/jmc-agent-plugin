@@ -37,4 +37,8 @@ public interface IField extends ICapturedValue {
 	String getExpression();
 
 	void setExpression(String expression);
+
+	IField createWorkingCopy();
+
+	IField createDuplicate();
 }

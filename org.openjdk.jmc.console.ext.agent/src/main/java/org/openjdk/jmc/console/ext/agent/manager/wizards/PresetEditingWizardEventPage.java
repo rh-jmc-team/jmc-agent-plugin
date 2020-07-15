@@ -40,11 +40,13 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.openjdk.jmc.console.ext.agent.manager.model.Event;
 import org.openjdk.jmc.console.ext.agent.manager.model.IEvent;
 import org.openjdk.jmc.console.ext.agent.manager.model.IPreset;
-import org.openjdk.jmc.console.ext.agent.manager.model.impl.Event;
 import org.openjdk.jmc.ui.misc.AbstractStructuredContentProvider;
 import org.openjdk.jmc.ui.misc.DialogToolkit;
+
+import java.util.Iterator;
 
 public class PresetEditingWizardEventPage extends BaseWizardPage {
 	private static final String PAGE_NAME = "Agent Preset Editing";
@@ -118,30 +120,55 @@ public class PresetEditingWizardEventPage extends BaseWizardPage {
 
 			@Override
 			protected void onAddButtonSelected(IStructuredSelection selection) {
-				openEventEditingWizardFor(new Event());
+				IEvent event = preset.createEvent();
+				while (DialogToolkit.openWizardWithHelp(new EventEditingWizard(event))) {
+					try {
+						preset.addEvent(event);
+					} catch (IllegalArgumentException e) {
+						if (DialogToolkit.openConfirmOnUiThread(MESSAGE_UNABLE_TO_SAVE_THE_PRESET, e.getMessage())) {
+							continue;
+						}
+					}
+
+					break;
+				}
+
 				tableInspector.getViewer().refresh();
 			}
 
 			@Override
 			protected void onEditButtonSelected(IStructuredSelection selection) {
-				openEventEditingWizardFor((IEvent) selection.getFirstElement());
+				IEvent original = (IEvent) selection.getFirstElement();
+				IEvent workingCopy = original.createWorkingCopy();
+				while (DialogToolkit.openWizardWithHelp(new EventEditingWizard(workingCopy))) {
+					try {
+						preset.updateEvent(original, workingCopy);
+					} catch (IllegalArgumentException e) {
+						if (DialogToolkit.openConfirmOnUiThread(MESSAGE_UNABLE_TO_SAVE_THE_PRESET, e.getMessage())) {
+							continue;
+						}
+					}
+
+					break;
+				}
 				tableInspector.getViewer().refresh();
 			}
 
 			@Override
 			protected void onDuplicateButtonSelected(IStructuredSelection selection) {
-				// TODO: create a copy properly
 				IEvent original = (IEvent) selection.getFirstElement();
-				IEvent duplicate = new Event();
-				duplicate.setId(original.getId() + ".copy");
-				duplicate.setName("Copy of " + original.getName());
+				IEvent duplicate = original.createDuplicate();
 				preset.addEvent(duplicate);
+
 				tableInspector.getViewer().refresh();
 			}
 
 			@Override
 			protected void onRemoveButtonSelected(IStructuredSelection selection) {
-				preset.removeEvent((IEvent) selection.getFirstElement());
+				for (Object event : selection) {
+					preset.removeEvent((IEvent) event);
+				}
+
 				tableInspector.getViewer().refresh();
 			}
 		};
@@ -152,21 +179,6 @@ public class PresetEditingWizardEventPage extends BaseWizardPage {
 
 	private void populateUi() {
 		tableInspector.setInput(preset);
-	}
-
-	private void openEventEditingWizardFor(IEvent event) {
-		while (DialogToolkit.openWizardWithHelp(new EventEditingWizard(event))) {
-			try {
-				// TODO: save the modified event to the preset
-				preset.addEvent(event);
-			} catch (IllegalArgumentException e) {
-				if (DialogToolkit.openConfirmOnUiThread(MESSAGE_UNABLE_TO_SAVE_THE_PRESET, e.getMessage())) {
-					continue;
-				}
-			}
-
-			break;
-		}
 	}
 
 	private static class EventTableContentProvider extends AbstractStructuredContentProvider

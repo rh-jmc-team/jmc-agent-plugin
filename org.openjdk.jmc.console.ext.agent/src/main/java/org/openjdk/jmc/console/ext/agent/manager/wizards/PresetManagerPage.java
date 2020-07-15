@@ -43,8 +43,8 @@ import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.openjdk.jmc.console.ext.agent.AgentPlugin;
 import org.openjdk.jmc.console.ext.agent.manager.model.IPreset;
+import org.openjdk.jmc.console.ext.agent.manager.model.Preset;
 import org.openjdk.jmc.console.ext.agent.manager.model.PresetRepository;
-import org.openjdk.jmc.console.ext.agent.manager.model.impl.Preset;
 import org.openjdk.jmc.ui.misc.AbstractStructuredContentProvider;
 import org.openjdk.jmc.ui.misc.DialogToolkit;
 
@@ -121,14 +121,39 @@ public class PresetManagerPage extends BaseWizardPage {
 
 			@Override
 			protected void onAddButtonSelected(IStructuredSelection selection) {
-				openPresetEditingWizardFor(new Preset());
+				IPreset preset = repository.createPreset();
+				while (DialogToolkit.openWizardWithHelp(new PresetEditingWizard(preset))) {
+					try {
+						repository.addPreset(preset);
+					} catch (IllegalArgumentException e) {
+						if (DialogToolkit.openConfirmOnUiThread(MESSAGE_PRESET_MANAGER_UNABLE_TO_SAVE_THE_PRESET,
+								e.getMessage())) {
+							continue;
+						}
+					}
+
+					break;
+				}
 
 				tableInspector.getViewer().refresh();
 			}
 
 			@Override
 			protected void onEditButtonSelected(IStructuredSelection selection) {
-				openPresetEditingWizardFor((IPreset) selection.getFirstElement());
+				IPreset original = (IPreset) selection.getFirstElement();
+				IPreset workingCopy = original.createWorkingCopy();
+				while (DialogToolkit.openWizardWithHelp(new PresetEditingWizard(workingCopy))) {
+					try {
+						repository.updatePreset(original, workingCopy);
+					} catch (IllegalArgumentException e) {
+						if (DialogToolkit.openConfirmOnUiThread(MESSAGE_PRESET_MANAGER_UNABLE_TO_SAVE_THE_PRESET,
+								e.getMessage())) {
+							continue;
+						}
+					}
+
+					break;
+				}
 
 				tableInspector.getViewer().refresh();
 			}
@@ -136,16 +161,17 @@ public class PresetManagerPage extends BaseWizardPage {
 			@Override
 			protected void onDuplicateButtonSelected(IStructuredSelection selection) {
 				IPreset original = (IPreset) selection.getFirstElement();
-				IPreset duplicate = new Preset();
-				duplicate.setFileName("Copy of " + original.getFileName());
-				repository.add(duplicate);
+				IPreset duplicate = original.createDuplicate();
+				repository.addPreset(duplicate);
 
 				tableInspector.getViewer().refresh();
 			}
 
 			@Override
 			protected void onRemoveButtonSelected(IStructuredSelection selection) {
-				repository.remove((IPreset) selection.getFirstElement());
+				for (Object preset : selection) {
+					repository.removePreset((IPreset) preset);
+				}
 
 				tableInspector.getViewer().refresh();
 			}
@@ -170,22 +196,6 @@ public class PresetManagerPage extends BaseWizardPage {
 		tableInspector.setInput(repository);
 	}
 
-	private void openPresetEditingWizardFor(IPreset preset) {
-		while (DialogToolkit.openWizardWithHelp(new PresetEditingWizard(preset))) {
-			try {
-				// TODO: properly save to repository
-				repository.add(preset);
-			} catch (IllegalArgumentException e) {
-				if (DialogToolkit.openConfirmOnUiThread(MESSAGE_PRESET_MANAGER_UNABLE_TO_SAVE_THE_PRESET,
-						e.getMessage())) {
-					continue;
-				}
-			}
-
-			break;
-		}
-	}
-
 	private static class PresetTableContentProvider extends AbstractStructuredContentProvider
 			implements IContentProvider {
 		@Override
@@ -195,7 +205,7 @@ public class PresetManagerPage extends BaseWizardPage {
 			}
 
 			PresetRepository repository = (PresetRepository) inputElement;
-			return repository.list();
+			return repository.listPresets();
 		}
 	}
 }

@@ -31,9 +31,7 @@
  * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.openjdk.jmc.console.ext.agent.manager.model.impl;
-
-import org.openjdk.jmc.console.ext.agent.manager.model.IField;
+package org.openjdk.jmc.console.ext.agent.manager.model;
 
 public class Field extends CapturedValue implements IField {
 
@@ -44,10 +42,13 @@ public class Field extends CapturedValue implements IField {
 	private static final String ERROR_EXPRESSION_CANNOT_BE_EMPTY_OR_NULL = "Expression cannot be empty or null.";
 	private static final String ERROR_EXPRESSION_HAS_INCORRECT_SYNTAX = "Expression has incorrect syntax.";
 
+	private final Event event;
+
 	private String expression;
 
-	public Field() {
+	Field(Event event) {
 		super();
+		this.event = event;
 
 		expression = DEFAULT_FIELD_EXPRESSION;
 		setName(DEFAULT_FIELD_NAME);
@@ -68,5 +69,23 @@ public class Field extends CapturedValue implements IField {
 		}
 
 		this.expression = expression;
+	}
+
+	@Override
+	public Field createWorkingCopy() {
+		Field copy = new Field(event);
+
+		copyContentToWorkingCopy(copy);
+		copy.expression = expression;
+
+		return copy;
+	}
+
+	@Override
+	public Field createDuplicate() {
+		Field duplicate = createWorkingCopy();
+		duplicate.setName(event.nextUniqueFieldName(getName()));
+
+		return duplicate;
 	}
 }

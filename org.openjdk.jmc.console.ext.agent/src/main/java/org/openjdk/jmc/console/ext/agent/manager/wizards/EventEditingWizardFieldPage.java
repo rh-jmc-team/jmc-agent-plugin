@@ -44,8 +44,8 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.openjdk.jmc.console.ext.agent.manager.model.IEvent;
 import org.openjdk.jmc.console.ext.agent.manager.model.IField;
-import org.openjdk.jmc.console.ext.agent.manager.model.impl.Field;
 import org.openjdk.jmc.ui.misc.AbstractStructuredContentProvider;
+import org.openjdk.jmc.ui.misc.DialogToolkit;
 import org.openjdk.jmc.ui.wizards.OnePageWizardDialog;
 
 public class EventEditingWizardFieldPage extends BaseWizardPage {
@@ -53,6 +53,7 @@ public class EventEditingWizardFieldPage extends BaseWizardPage {
 
 	private static final String MESSAGE_EVENT_EDITING_WIZARD_FIELD_PAGE_TITLE = "Add or Remove Event Fields";
 	private static final String MESSAGE_EVENT_EDITING_WIZARD_FIELD_PAGE_DESCRIPTION = "Fields are a subset of Java primary expressions which can be evaluated and recorded when committing an event.";
+	private static final String MESSAGE_UNABLE_TO_SAVE_THE_FIELD = "Unable to add the field";
 
 	private static final String LABEL_NAME = "Name";
 	private static final String LABEL_EXPRESSION = "Expression";
@@ -128,22 +129,38 @@ public class EventEditingWizardFieldPage extends BaseWizardPage {
 
 			@Override
 			protected void onAddButtonSelected(IStructuredSelection selection) {
-				IField field = new Field();
-				CapturedValueEditingPage page = new CapturedValueEditingPage(field);
-				if (new OnePageWizardDialog(Display.getCurrent().getActiveShell(), page).open() != Window.OK) {
-					return;
+				IField field = event.createField();
+				while (new OnePageWizardDialog(Display.getCurrent().getActiveShell(),
+						new CapturedValueEditingPage(event, field)).open() == Window.OK) {
+					try {
+						event.addField(field);
+					} catch (IllegalArgumentException e) {
+						if (DialogToolkit.openConfirmOnUiThread(MESSAGE_UNABLE_TO_SAVE_THE_FIELD, e.getMessage())) {
+							continue;
+						}
+					}
+
+					break;
 				}
-				event.addField(field);
 
 				tableInspector.getViewer().refresh();
 			}
 
 			@Override
 			protected void onEditButtonSelected(IStructuredSelection selection) {
-				IField field = (IField) selection.getFirstElement();
-				CapturedValueEditingPage page = new CapturedValueEditingPage(field);
-				if (new OnePageWizardDialog(Display.getCurrent().getActiveShell(), page).open() == Window.OK) {
-					// TODO: save the field
+				IField original = (IField) selection.getFirstElement();
+				IField workingCopy = original.createWorkingCopy();
+				while (new OnePageWizardDialog(Display.getCurrent().getActiveShell(),
+						new CapturedValueEditingPage(event, workingCopy)).open() == Window.OK) {
+					try {
+						event.updateField(original, workingCopy);
+					} catch (IllegalArgumentException e) {
+						if (DialogToolkit.openConfirmOnUiThread(MESSAGE_UNABLE_TO_SAVE_THE_FIELD, e.getMessage())) {
+							continue;
+						}
+					}
+
+					break;
 				}
 
 				tableInspector.getViewer().refresh();
@@ -151,10 +168,8 @@ public class EventEditingWizardFieldPage extends BaseWizardPage {
 
 			@Override
 			protected void onDuplicateButtonSelected(IStructuredSelection selection) {
-				// TODO: create a copy properly
 				IField original = (IField) selection.getFirstElement();
-				IField duplicate = new Field();
-				duplicate.setName("Copy of " + original.getName());
+				IField duplicate = original.createDuplicate();
 				event.addField(duplicate);
 
 				tableInspector.getViewer().refresh();
@@ -162,7 +177,9 @@ public class EventEditingWizardFieldPage extends BaseWizardPage {
 
 			@Override
 			protected void onRemoveButtonSelected(IStructuredSelection selection) {
-				event.removeField((IField) selection.getFirstElement());
+				for (Object field : selection) {
+					event.removeField((IField) field);
+				}
 
 				tableInspector.getViewer().refresh();
 			}

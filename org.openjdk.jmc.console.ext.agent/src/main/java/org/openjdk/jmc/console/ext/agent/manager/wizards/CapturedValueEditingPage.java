@@ -13,11 +13,12 @@ import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Text;
 import org.openjdk.jmc.console.ext.agent.manager.model.ICapturedValue;
 import org.openjdk.jmc.console.ext.agent.manager.model.ICapturedValue.ContentType;
+import org.openjdk.jmc.console.ext.agent.manager.model.IEvent;
 import org.openjdk.jmc.console.ext.agent.manager.model.IField;
 import org.openjdk.jmc.console.ext.agent.manager.model.IMethodParameter;
 import org.openjdk.jmc.console.ext.agent.manager.model.IMethodReturnValue;
-import org.openjdk.jmc.console.ext.agent.manager.model.impl.MethodParameter;
-import org.openjdk.jmc.console.ext.agent.manager.model.impl.MethodReturnValue;
+import org.openjdk.jmc.console.ext.agent.manager.model.MethodParameter;
+import org.openjdk.jmc.console.ext.agent.manager.model.MethodReturnValue;
 
 import java.util.stream.Stream;
 
@@ -45,6 +46,7 @@ public class CapturedValueEditingPage extends BaseWizardPage {
 	private static final String MESSAGE_RELATIONAL_KEY_DESCRIPTION = "(Optional) Unique URI signifying a relationship";
 	private static final String MESSAGE_CONVERTER_DESCRIPTION = "(Optional) fully qualified class name of a value converter";
 
+	private final IEvent event;
 	private ICapturedValue capturedValue;
 
 	private Text nameText;
@@ -57,9 +59,10 @@ public class CapturedValueEditingPage extends BaseWizardPage {
 	private Text relationalKeyText;
 	private Text converterText;
 
-	public CapturedValueEditingPage(ICapturedValue capturedValue) {
+	public CapturedValueEditingPage(IEvent event, ICapturedValue capturedValue) {
 		super(PAGE_NAME);
 
+		this.event = event;
 		this.capturedValue = capturedValue;
 	}
 
@@ -200,7 +203,7 @@ public class CapturedValueEditingPage extends BaseWizardPage {
 		IMethodParameter parameter = (IMethodParameter) capturedValue;
 
 		// TODO: do this is in model instead
-		MethodReturnValue returnValue = new MethodReturnValue();
+		IMethodReturnValue returnValue = event.createMethodReturnValue();
 		returnValue.setName(parameter.getName());
 		returnValue.setDescription(parameter.getDescription());
 		returnValue.setContentType(parameter.getContentType());
@@ -214,7 +217,7 @@ public class CapturedValueEditingPage extends BaseWizardPage {
 		IMethodReturnValue returnValue = (IMethodReturnValue) capturedValue;
 
 		// TODO: do this is in model instead
-		MethodParameter parameter = new MethodParameter();
+		IMethodParameter parameter = event.createMethodParameter();
 		parameter.setIndex(0);
 		parameter.setName(returnValue.getName());
 		parameter.setDescription(returnValue.getDescription());

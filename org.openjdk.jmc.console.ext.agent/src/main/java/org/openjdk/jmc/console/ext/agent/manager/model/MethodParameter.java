@@ -31,13 +31,47 @@
  * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.openjdk.jmc.console.ext.agent.manager.model.impl;
+package org.openjdk.jmc.console.ext.agent.manager.model;
 
-import org.openjdk.jmc.console.ext.agent.manager.model.IMethodReturnValue;
+public class MethodParameter extends CapturedValue implements IMethodParameter {
+	private static final String DEFAULT_PARAMETER_NAME = "New Parameter"; // $NON-NLS-1$
+	private static final int DEFAULT_INDEX = 0;
 
-public class MethodReturnValue extends CapturedValue implements IMethodReturnValue {
+	private static final String ERROR_INDEX_CANNOT_BE_LESS_THAN_ZERO = "Index cannot be less than zero";
 
-	public MethodReturnValue() {
+	private final Event event;
+
+	private int index;
+
+	MethodParameter(Event event) {
 		super();
+		this.event = event;
+
+		index = DEFAULT_INDEX;
+		setName(DEFAULT_PARAMETER_NAME);
+	}
+
+	@Override
+	public int getIndex() {
+		return index;
+	}
+
+	@Override
+	public void setIndex(int index) {
+		if (index < 0) {
+			throw new IllegalArgumentException(ERROR_INDEX_CANNOT_BE_LESS_THAN_ZERO);
+		}
+
+		this.index = index;
+	}
+
+	@Override
+	public MethodParameter createWorkingCopy() {
+		MethodParameter parameter = new MethodParameter(event);
+
+		copyContentToWorkingCopy(parameter);
+		parameter.index = index;
+
+		return parameter;
 	}
 }

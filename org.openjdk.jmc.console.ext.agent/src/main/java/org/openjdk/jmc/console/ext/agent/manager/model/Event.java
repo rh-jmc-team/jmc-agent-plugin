@@ -31,22 +31,21 @@
  * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.openjdk.jmc.console.ext.agent.manager.model.impl;
-
-import org.openjdk.jmc.console.ext.agent.manager.model.IEvent;
-import org.openjdk.jmc.console.ext.agent.manager.model.IField;
-import org.openjdk.jmc.console.ext.agent.manager.model.IMethodParameter;
-import org.openjdk.jmc.console.ext.agent.manager.model.IMethodReturnValue;
+package org.openjdk.jmc.console.ext.agent.manager.model;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 public class Event implements IEvent {
 	private static final String DEFAULT_STRING_FIELD = ""; // $NON-NLS-1$
 	private static final boolean DEFAULT_BOOLEAN_FIELD = false;
 	private static final Object DEFAULT_OBJECT_FIELD = null;
-	private static final String DEFAULT_EVENT_ID = "my.id"; // $NON-NLS-1$
-	private static final String DEFAULT_EVENT_NAME = "MyCustomEvent"; // $NON-NLS-1$
+	private static final String DEFAULT_EVENT_ID = "event.id"; // $NON-NLS-1$
+	private static final String DEFAULT_EVENT_NAME = "New Custom Event"; // $NON-NLS-1$
 	private static final String DEFAULT_EVENT_CLAZZ = "com.company.project.MyClass"; // $NON-NLS-1$
 	private static final String DEFAULT_METHOD_NAME = "myMethod"; // $NON-NLS-1$
 	private static final String DEFAULT_METHOD_DESCRIPTOR = "()V"; // $NON-NLS-1$
@@ -68,6 +67,10 @@ public class Event implements IEvent {
 	private static final String ERROR_METHOD_DESCRIPTOR_HAS_INCORRECT_SYNTAX = "Method descriptor has incorrect syntax.";
 	private static final String ERROR_INDEX_MUST_BE_UNIQUE = "Method parameter index must be unique.";
 
+	private static final Pattern NAME_WITH_COUNT_PATTERN = Pattern.compile("^(.*)\\s*\\((\\d+)\\)$"); // $NON-NLS-1$
+	private static final Pattern COUNT_SUFFIX_PATTERN = Pattern.compile("^\\s*\\((\\d+)\\)$"); // $NON-NLS-1$
+
+	private final Preset preset;
 	private final List<IMethodParameter> parameters = new ArrayList<>();
 	private final List<IField> fields = new ArrayList<>();
 
@@ -83,7 +86,9 @@ public class Event implements IEvent {
 	private String methodDescriptor;
 	private IMethodReturnValue returnValue;
 
-	public Event() {
+	Event(Preset preset) {
+		this.preset = preset;
+
 		id = DEFAULT_EVENT_ID;
 		name = DEFAULT_EVENT_NAME;
 		clazz = DEFAULT_EVENT_CLAZZ;
@@ -262,7 +267,7 @@ public class Event implements IEvent {
 	}
 
 	@Override
-	public boolean containMethodParameter(IMethodParameter methodParameter) {
+	public boolean containsMethodParameter(IMethodParameter methodParameter) {
 		return parameters.contains(methodParameter);
 	}
 
@@ -295,8 +300,205 @@ public class Event implements IEvent {
 	}
 
 	@Override
-	public boolean containField(IField field) {
+	public boolean containsField(IField field) {
 		return fields.contains(field);
+	}
+
+	@Override
+	public Event createWorkingCopy() {
+		Event copy = new Event(preset);
+		copy.id = id;
+		copy.name = name;
+		copy.clazz = clazz;
+		copy.description = description;
+		copy.path = path;
+		copy.recordStackTrace = recordStackTrace;
+		copy.useRethrow = useRethrow;
+		copy.methodName = methodName;
+		copy.methodDescriptor = methodDescriptor;
+		copy.location = location;
+
+		if (returnValue != null) {
+			copy.returnValue = returnValue.createWorkingCopy();
+		}
+
+		copy.parameters
+				.addAll(parameters.stream().map(IMethodParameter::createWorkingCopy).collect(Collectors.toList()));
+		copy.fields.addAll(fields.stream().map(IField::createWorkingCopy).collect(Collectors.toList()));
+
+		return copy;
+	}
+
+	@Override
+	public IEvent createDuplicate() {
+		Event duplicate = createWorkingCopy();
+		duplicate.id = preset.nextUniqueEventId(id);
+		duplicate.name = preset.nextUniqueEventName(name);
+
+		return duplicate;
+	}
+
+	@Override
+	public int nextUniqueParameterIndex() {
+		List<IMethodParameter> sorted = parameters.stream().sorted(Comparator.comparingInt(IMethodParameter::getIndex))
+				.collect(Collectors.toList());
+
+		int index = 0;
+		if (sorted.isEmpty()) {
+			return index;
+		}
+
+		for (IMethodParameter parameter : sorted) {
+			if (parameter.getIndex() > index) {
+				return index;
+			}
+
+			index = parameter.getIndex() + 1;
+		}
+
+		return index;
+	}
+
+	@Override
+	public String nextUniqueParameterName(String originalName) {
+		originalName = originalName.trim();
+
+		// First, extract a base name and a count of the original name.
+		String baseName = originalName;
+		// Use count -1 to mean that no count should be appended, the baseName suffices.
+		long proposedCount = -1;
+		Matcher matcher = NAME_WITH_COUNT_PATTERN.matcher(originalName);
+		if (matcher.matches()) {
+			try {
+				long count = Long.parseLong(matcher.group(2));
+				// Valid match, use the shorter base and this count.
+				baseName = matcher.group(1).trim();
+				proposedCount = count;
+			} catch (NumberFormatException e) {
+				// Too large number. => Use the entire name as base.
+				// (Yes, we could have used BigInteger, but which sane person would want such names?)
+			}
+		}
+
+		// Second, find any existing templates matching the proposed baseName pattern,
+		// with or without count, and make sure the proposed count is greater.
+		int baseLen = baseName.length();
+		for (IMethodParameter parameter : parameters) {
+			String tempName = parameter.getName().trim();
+			if (tempName.startsWith(baseName)) {
+				if (tempName.equals(baseName) && (proposedCount < 1)) {
+					proposedCount = 1;
+				} else {
+					// Note that this pattern must ignore leading whitespace.
+					Matcher tempMatch = COUNT_SUFFIX_PATTERN.matcher(tempName.substring(baseLen));
+					if (tempMatch.matches()) {
+						try {
+							long count = Long.parseLong(tempMatch.group(1));
+							if (count < Long.MAX_VALUE) {
+								// Valid match, use a count greater than this, unless the proposed was greater.
+								proposedCount = Math.max(proposedCount, count + 1);
+							}
+						} catch (NumberFormatException e) {
+							// Too large number, pretend we didn't see this template.
+						}
+					}
+				}
+			}
+		}
+		if (proposedCount == -1) {
+			return baseName;
+		} else {
+			return baseName + " (" + proposedCount + ')'; // $NON-NLS-1$
+		}
+	}
+
+	@Override
+	public String nextUniqueFieldName(String originalName) {
+		originalName = originalName.trim();
+
+		// First, extract a base name and a count of the original name.
+		String baseName = originalName;
+		// Use count -1 to mean that no count should be appended, the baseName suffices.
+		long proposedCount = -1;
+		Matcher matcher = NAME_WITH_COUNT_PATTERN.matcher(originalName);
+		if (matcher.matches()) {
+			try {
+				long count = Long.parseLong(matcher.group(2));
+				// Valid match, use the shorter base and this count.
+				baseName = matcher.group(1).trim();
+				proposedCount = count;
+			} catch (NumberFormatException e) {
+				// Too large number. => Use the entire name as base.
+				// (Yes, we could have used BigInteger, but which sane person would want such names?)
+			}
+		}
+
+		// Second, find any existing templates matching the proposed baseName pattern,
+		// with or without count, and make sure the proposed count is greater.
+		int baseLen = baseName.length();
+		for (IField field : fields) {
+			String tempName = field.getName().trim();
+			if (tempName.startsWith(baseName)) {
+				if (tempName.equals(baseName) && (proposedCount < 1)) {
+					proposedCount = 1;
+				} else {
+					// Note that this pattern must ignore leading whitespace.
+					Matcher tempMatch = COUNT_SUFFIX_PATTERN.matcher(tempName.substring(baseLen));
+					if (tempMatch.matches()) {
+						try {
+							long count = Long.parseLong(tempMatch.group(1));
+							if (count < Long.MAX_VALUE) {
+								// Valid match, use a count greater than this, unless the proposed was greater.
+								proposedCount = Math.max(proposedCount, count + 1);
+							}
+						} catch (NumberFormatException e) {
+							// Too large number, pretend we didn't see this template.
+						}
+					}
+				}
+			}
+		}
+		if (proposedCount == -1) {
+			return baseName;
+		} else {
+			return baseName + " (" + proposedCount + ')'; // $NON-NLS-1$
+		}
+	}
+
+	@Override
+	public MethodReturnValue createMethodReturnValue() {
+		return new MethodReturnValue(this);
+	}
+
+	@Override
+	public MethodParameter createMethodParameter() {
+		MethodParameter parameter = new MethodParameter(this);
+
+		parameter.setName(nextUniqueParameterName(parameter.getName()));
+		parameter.setIndex(nextUniqueParameterIndex());
+		return parameter;
+	}
+
+	@Override
+	public void updateMethodParameter(IMethodParameter original, IMethodParameter workingCopy) {
+		if (parameters.remove(original)) {
+			parameters.add(workingCopy);
+		}
+	}
+
+	@Override
+	public Field createField() {
+		Field field = new Field(this);
+
+		field.setName(nextUniqueFieldName(field.getName()));
+		return field;
+	}
+
+	@Override
+	public void updateField(IField original, IField workingCopy) {
+		if (fields.remove(original)) {
+			fields.add(workingCopy);
+		}
 	}
 
 	private boolean containsIndex(int index) {

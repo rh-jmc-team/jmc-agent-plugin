@@ -58,4 +58,16 @@ public interface IPreset {
 	void removeEvent(IEvent event);
 
 	boolean containsEvent(IEvent event);
+
+	IEvent createEvent();
+
+	void updateEvent(IEvent original, IEvent workingCopy);
+
+	IPreset createWorkingCopy();
+
+	IPreset createDuplicate();
+
+	String nextUniqueEventName(String originalName);
+
+	String nextUniqueEventId(String originalName);
 }

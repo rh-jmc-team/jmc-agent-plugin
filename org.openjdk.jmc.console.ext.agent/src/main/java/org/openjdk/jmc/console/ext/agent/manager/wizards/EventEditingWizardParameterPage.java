@@ -46,9 +46,10 @@ import org.openjdk.jmc.console.ext.agent.manager.model.ICapturedValue;
 import org.openjdk.jmc.console.ext.agent.manager.model.IEvent;
 import org.openjdk.jmc.console.ext.agent.manager.model.IMethodParameter;
 import org.openjdk.jmc.console.ext.agent.manager.model.IMethodReturnValue;
-import org.openjdk.jmc.console.ext.agent.manager.model.impl.MethodParameter;
-import org.openjdk.jmc.console.ext.agent.manager.model.impl.MethodReturnValue;
+import org.openjdk.jmc.console.ext.agent.manager.model.MethodParameter;
+import org.openjdk.jmc.console.ext.agent.manager.model.MethodReturnValue;
 import org.openjdk.jmc.ui.misc.AbstractStructuredContentProvider;
+import org.openjdk.jmc.ui.misc.DialogToolkit;
 import org.openjdk.jmc.ui.wizards.OnePageWizardDialog;
 
 import java.util.ArrayList;
@@ -61,6 +62,7 @@ public class EventEditingWizardParameterPage extends BaseWizardPage {
 	private static final String MESSAGE_EVENT_EDITING_WIZARD_PARAMETER_PAGE_TITLE = "Add or Remove Event Parameters";
 	private static final String MESSAGE_EVENT_EDITING_WIZARD_PARAMETER_PAGE_DESCRIPTION = "Function parameters and return values can be recorded when committing an event.";
 	private static final String MESSAGE_RETURN_VALUE = "(Return value)";
+	private static final String MESSAGE_UNABLE_TO_SAVE_THE_PARAMETER_OR_RETURN_VALUE = "Unable to add the parameter/return value";
 
 	private static final String LABEL_INDEX = "Index";
 	private static final String LABEL_NAME = "Name";
@@ -144,16 +146,24 @@ public class EventEditingWizardParameterPage extends BaseWizardPage {
 
 			@Override
 			protected void onAddButtonSelected(IStructuredSelection selection) {
-//				EventMethodParameterEditingPage page = new EventMethodParameterEditingPage();
-				CapturedValueEditingPage page = new CapturedValueEditingPage(new MethodParameter());
-				if (new OnePageWizardDialog(Display.getCurrent().getActiveShell(), page).open() != Window.OK) {
-					return;
-				}
-				ICapturedValue capturedValue = page.getResult();
-				if (capturedValue instanceof MethodParameter) {
-					event.addMethodParameter((IMethodParameter) capturedValue);
-				} else {
-					event.setMethodReturnValue((IMethodReturnValue) capturedValue);
+				IMethodParameter parameter = event.createMethodParameter();
+				CapturedValueEditingPage page = new CapturedValueEditingPage(event, parameter);
+				while (new OnePageWizardDialog(Display.getCurrent().getActiveShell(), page).open() == Window.OK) {
+					try {
+						ICapturedValue capturedValue = page.getResult();
+						if (capturedValue instanceof IMethodParameter) {
+							event.addMethodParameter((IMethodParameter) capturedValue);
+						} else {
+							event.setMethodReturnValue((IMethodReturnValue) capturedValue);
+						}
+					} catch (IllegalArgumentException e) {
+						if (DialogToolkit.openConfirmOnUiThread(MESSAGE_UNABLE_TO_SAVE_THE_PARAMETER_OR_RETURN_VALUE,
+								e.getMessage())) {
+							continue;
+						}
+					}
+
+					break;
 				}
 
 				tableInspector.getViewer().refresh();
@@ -162,17 +172,22 @@ public class EventEditingWizardParameterPage extends BaseWizardPage {
 			@Override
 			protected void onEditButtonSelected(IStructuredSelection selection) {
 				ICapturedValue original = (ICapturedValue) selection.getFirstElement();
-				CapturedValueEditingPage page = new CapturedValueEditingPage(original);
+				ICapturedValue workingCopy;
+				if (original instanceof IMethodParameter) {
+					workingCopy = ((IMethodParameter) original).createWorkingCopy();
+				} else {
+					workingCopy = ((IMethodReturnValue) original).createWorkingCopy();
+				}
+				CapturedValueEditingPage page = new CapturedValueEditingPage(event, workingCopy);
 				if (new OnePageWizardDialog(Display.getCurrent().getActiveShell(), page).open() == Window.OK) {
 					ICapturedValue modified = page.getResult();
-					// TODO: save the field
-					if (original instanceof MethodParameter) {
+					if (original instanceof IMethodParameter) {
 						event.removeMethodParameter((IMethodParameter) original);
 					} else {
 						event.setMethodReturnValue(null);
 					}
 
-					if (modified instanceof MethodParameter) {
+					if (modified instanceof IMethodParameter) {
 						event.addMethodParameter((IMethodParameter) modified);
 					} else {
 						event.setMethodReturnValue((IMethodReturnValue) modified);
@@ -184,13 +199,13 @@ public class EventEditingWizardParameterPage extends BaseWizardPage {
 
 			@Override
 			protected void onRemoveButtonSelected(IStructuredSelection selection) {
-				ICapturedValue namedCapturedValue = (ICapturedValue) selection.getFirstElement();
-				if (namedCapturedValue instanceof MethodParameter) {
-					event.removeMethodParameter((MethodParameter) namedCapturedValue);
-				} else if (namedCapturedValue instanceof MethodReturnValue) {
-					event.setMethodReturnValue(null);
-				} else {
-					throw new IllegalArgumentException("element must be a an IMethodParameter or IMethodReturnValue"); // $NON-NLS-1$
+				for (Object value : selection) {
+					ICapturedValue capturedValue = (ICapturedValue) value;
+					if (capturedValue instanceof MethodParameter) {
+						event.removeMethodParameter((MethodParameter) capturedValue);
+					} else if (capturedValue instanceof MethodReturnValue) {
+						event.setMethodReturnValue(null);
+					}
 				}
 
 				tableInspector.getViewer().refresh();
