@@ -170,6 +170,8 @@ public class StartAgentWizardPage extends BaseWizardPage {
 				setText(agentXmlText, path);
 			}
 		});
+		agentJarText.addModifyListener(e -> setPageComplete(!agentJarText.getText().isEmpty()));
+		getWizard().getContainer().updateButtons();
 	}
 
 	private void populateUi() {

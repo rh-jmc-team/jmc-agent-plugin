@@ -68,6 +68,11 @@ public class StartAgentWizard extends Wizard {
 	}
 
 	@Override
+	public boolean canFinish() {
+		return !startAgentWizardPage.getAgentJarPath().isEmpty();
+	}
+
+	@Override
 	public boolean performFinish() {
 		JVMDescriptor targetJvm = startAgentWizardPage.getTargetJvm();
 		String agentJarPath = startAgentWizardPage.getAgentJarPath();

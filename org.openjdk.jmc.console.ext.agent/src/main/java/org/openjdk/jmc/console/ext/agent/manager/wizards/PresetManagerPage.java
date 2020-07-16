@@ -43,7 +43,6 @@ import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.openjdk.jmc.console.ext.agent.AgentPlugin;
 import org.openjdk.jmc.console.ext.agent.manager.model.IPreset;
-import org.openjdk.jmc.console.ext.agent.manager.model.Preset;
 import org.openjdk.jmc.console.ext.agent.manager.model.PresetRepository;
 import org.openjdk.jmc.ui.misc.AbstractStructuredContentProvider;
 import org.openjdk.jmc.ui.misc.DialogToolkit;
@@ -114,7 +113,8 @@ public class PresetManagerPage extends BaseWizardPage {
 
 					@Override
 					public Image getImage(Object element) {
-						return AgentPlugin.getDefault().getImage(AgentPlugin.ICON_AGENT); // TODO: replace the icon in the future
+						return AgentPlugin.getDefault()
+								.getImage(AgentPlugin.ICON_AGENT); // TODO: replace the icon in the future
 					}
 				});
 			}

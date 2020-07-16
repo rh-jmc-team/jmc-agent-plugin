@@ -204,8 +204,8 @@ public abstract class BaseWizardPage extends WizardPage {
 			DialogToolkit.showException(window.getShell(), MESSAGE_UNEXPECTED_ERROR_HAS_OCCURRED, e);
 		}
 
-		getWizard().getContainer().updateButtons();
 		setPageComplete(exceptions.isEmpty());
+		getWizard().getContainer().updateButtons();
 	}
 
 	protected static abstract class TableInspector extends Composite {
