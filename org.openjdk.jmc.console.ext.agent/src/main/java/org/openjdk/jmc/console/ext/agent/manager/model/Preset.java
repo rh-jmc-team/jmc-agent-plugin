@@ -33,6 +33,7 @@
  */
 package org.openjdk.jmc.console.ext.agent.manager.model;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -54,6 +55,7 @@ public class Preset implements IPreset {
 	private static final Pattern NAME_COUNT_SUFFIX_PATTERN = Pattern.compile("^\\s*\\((\\d+)\\)$"); //$NON-NLS-1$
 
 	private final PresetRepository presetRepository;
+	private IPresetStorageDelegate storageDelegate;
 	private final List<IEvent> events = new ArrayList<>();
 
 	private String fileName;
@@ -61,13 +63,16 @@ public class Preset implements IPreset {
 	private boolean allowToString;
 	private boolean allowConverter;
 
-	Preset(PresetRepository repository) {
+	Preset(PresetRepository repository, IPresetStorageDelegate storageDelegate) {
 		presetRepository = repository;
+		this.storageDelegate = storageDelegate;
 
 		fileName = DEFAULT_FILE_NAME;
 		classPrefix = DEFAULT_CLASS_PREFIX;
 		allowToString = DEFAULT_BOOLEAN_FIELD;
 		allowConverter = DEFAULT_BOOLEAN_FIELD;
+
+		// TODO: load and parse XMl model
 	}
 
 	@Override
@@ -171,7 +176,7 @@ public class Preset implements IPreset {
 
 	@Override
 	public Preset createWorkingCopy() {
-		Preset copy = new Preset(presetRepository);
+		Preset copy = new Preset(presetRepository, null);
 		copy.fileName = fileName;
 		copy.classPrefix = classPrefix;
 		copy.allowToString = allowToString;
@@ -296,6 +301,39 @@ public class Preset implements IPreset {
 		}
 	}
 
+	@Override
+	public void setStorageDelegate(IPresetStorageDelegate storageDelegate) {
+		this.storageDelegate = storageDelegate;
+	}
+
+	@Override
+	public IPresetStorageDelegate getStorageDelegate() {
+		return storageDelegate;
+	}
+
+	@Override
+	public boolean save() {
+		if (storageDelegate == null) {
+			return false;
+		}
+
+		try {
+			return storageDelegate.save(fileName, ""); // TODO: build file content
+		} catch (IOException e) {
+			// TODO: log exception
+			return false;
+		}
+	}
+
+	@Override
+	public boolean delete() {
+		if (storageDelegate == null) {
+			return true;
+		}
+
+		return storageDelegate.delete();
+	}
+
 	private boolean containsId(String id) {
 		for (IEvent e : events) {
 			if (e.getId().equals(id)) {
@@ -313,5 +351,4 @@ public class Preset implements IPreset {
 		}
 		return false;
 	}
-
 }

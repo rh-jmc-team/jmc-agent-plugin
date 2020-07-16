@@ -33,6 +33,7 @@
  */
 package org.openjdk.jmc.console.ext.agent.manager.model;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -51,35 +52,41 @@ public class PresetRepository {
 	}
 
 	public void removePreset(IPreset configuration) {
-		// TODO: persistent storage
-		presets.remove(configuration);
+		if (presets.remove(configuration)) {
+			configuration.delete();
+		}
 	}
 
-	public void addPreset(IPreset configuration) {
-		// TODO: persistent storage
+	public void addPreset(IPreset configuration) throws IOException {
 		presets.add(configuration);
+
+		if (configuration.getStorageDelegate() == null) {
+			configuration.setStorageDelegate(LocalStorageDelegate.getDelegate(configuration.getFileName()));
+		}
+
+		configuration.save();
 	}
 
 	public boolean containsPreset(IPreset configuration) {
-		// TODO: persistent storage
 		return presets.contains(configuration);
 	}
 
 	public IPreset[] listPresets() {
-		// TODO: persistent storage
 		return presets.toArray(new IPreset[0]);
 	}
 
-	public void updatePreset(IPreset original, IPreset workingCopy) {
+	public void updatePreset(IPreset original, IPreset workingCopy) throws IOException {
 		if (containsPreset(original)) {
 			removePreset(original);
+			original.delete();
+
 			addPreset(workingCopy);
 		}
 	}
 
 	public IPreset createPreset() {
 		String fileName = nextUniqueName(DEFAULT_FILE_NAME);
-		Preset preset = new Preset(this);
+		Preset preset = new Preset(this, null);
 		preset.setFileName(fileName);
 
 		return preset;

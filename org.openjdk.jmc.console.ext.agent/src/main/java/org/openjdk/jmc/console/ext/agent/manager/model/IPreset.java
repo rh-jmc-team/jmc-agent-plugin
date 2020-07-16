@@ -70,4 +70,12 @@ public interface IPreset {
 	String nextUniqueEventName(String originalName);
 
 	String nextUniqueEventId(String originalName);
+	
+	void setStorageDelegate(IPresetStorageDelegate storageDelegate);
+	
+	IPresetStorageDelegate getStorageDelegate();
+	
+	boolean save();
+
+	boolean delete();
 }

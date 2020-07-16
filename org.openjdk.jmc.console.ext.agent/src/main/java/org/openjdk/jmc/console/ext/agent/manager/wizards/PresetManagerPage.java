@@ -34,7 +34,6 @@
 package org.openjdk.jmc.console.ext.agent.manager.wizards;
 
 import org.eclipse.jface.viewers.ColumnLabelProvider;
-import org.eclipse.jface.viewers.IContentProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
@@ -47,6 +46,8 @@ import org.openjdk.jmc.console.ext.agent.manager.model.PresetRepository;
 import org.openjdk.jmc.console.ext.agent.wizards.BaseWizardPage;
 import org.openjdk.jmc.ui.misc.AbstractStructuredContentProvider;
 import org.openjdk.jmc.ui.misc.DialogToolkit;
+
+import java.io.IOException;
 
 public class PresetManagerPage extends BaseWizardPage {
 	private static final String PAGE_NAME = "Agent Preset Manager";
@@ -128,9 +129,9 @@ public class PresetManagerPage extends BaseWizardPage {
 				while (DialogToolkit.openWizardWithHelp(new PresetEditingWizard(preset))) {
 					try {
 						repository.addPreset(preset);
-					} catch (IllegalArgumentException e) {
+					} catch (IllegalArgumentException | IOException e) {
 						if (DialogToolkit.openConfirmOnUiThread(MESSAGE_PRESET_MANAGER_UNABLE_TO_SAVE_THE_PRESET,
-								e.getMessage())) {
+								e.getLocalizedMessage())) {
 							continue;
 						}
 					}
@@ -148,9 +149,9 @@ public class PresetManagerPage extends BaseWizardPage {
 				while (DialogToolkit.openWizardWithHelp(new PresetEditingWizard(workingCopy))) {
 					try {
 						repository.updatePreset(original, workingCopy);
-					} catch (IllegalArgumentException e) {
+					} catch (IllegalArgumentException | IOException e) {
 						if (DialogToolkit.openConfirmOnUiThread(MESSAGE_PRESET_MANAGER_UNABLE_TO_SAVE_THE_PRESET,
-								e.getMessage())) {
+								e.getLocalizedMessage())) {
 							continue;
 						}
 					}
@@ -165,7 +166,13 @@ public class PresetManagerPage extends BaseWizardPage {
 			protected void onDuplicateButtonSelected(IStructuredSelection selection) {
 				IPreset original = (IPreset) selection.getFirstElement();
 				IPreset duplicate = original.createDuplicate();
-				repository.addPreset(duplicate);
+
+				try {
+					repository.addPreset(duplicate);
+				} catch (IllegalArgumentException | IOException e) {
+					DialogToolkit.openConfirmOnUiThread(MESSAGE_PRESET_MANAGER_UNABLE_TO_SAVE_THE_PRESET,
+							e.getLocalizedMessage());
+				}
 
 				tableInspector.getViewer().refresh();
 			}
