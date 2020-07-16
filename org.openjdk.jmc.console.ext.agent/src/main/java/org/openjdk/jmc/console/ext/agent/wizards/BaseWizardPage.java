@@ -29,9 +29,11 @@ import org.openjdk.jmc.ui.column.IColumn;
 import org.openjdk.jmc.ui.misc.DialogToolkit;
 import org.openjdk.jmc.ui.misc.OptimisticComparator;
 
+import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -230,7 +232,8 @@ public abstract class BaseWizardPage extends WizardPage {
 			return null;
 		}
 
-		return dialog.getFileNames();
+		return Arrays.stream(dialog.getFileNames()).map(name -> dialog.getFilterPath() + File.separator + name)
+				.toArray(String[]::new);
 	}
 
 	protected static abstract class TableInspector extends Composite {
