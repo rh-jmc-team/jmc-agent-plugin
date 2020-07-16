@@ -56,7 +56,6 @@ import org.openjdk.jmc.console.ext.agent.AgentPlugin;
 import org.openjdk.jmc.console.ext.agent.tabs.editor.EditorTab;
 import org.openjdk.jmc.console.ext.agent.tabs.liveconfig.LiveConfigTab;
 import org.openjdk.jmc.console.ext.agent.tabs.overview.OverviewTab;
-import org.openjdk.jmc.console.ext.agent.tabs.presets.PresetsTab;
 import org.openjdk.jmc.rjmx.IConnectionHandle;
 import org.openjdk.jmc.rjmx.IConnectionListener;
 import org.openjdk.jmc.rjmx.IServerHandle;
@@ -75,7 +74,6 @@ public class AgentEditor extends FormEditor implements IConnectionListener {
 	public static final String EDITOR_ID = "org.openjdk.jmc.console.ext.agent.editor.AgentEditor"; //$NON-NLS-1$
 
 	private static final String CONNECTION_LOST = "Connection Lost";
-	private static final String COULD_NOT_CONNECT = "Could not connect";
 
 	private volatile IConnectionHandle connection;
 
@@ -158,7 +156,6 @@ public class AgentEditor extends FormEditor implements IConnectionListener {
 		List<AgentFormPage> pages = new ArrayList<>();
 		pages.add(new OverviewTab(this));
 		pages.add(new LiveConfigTab(this));
-		pages.add(new PresetsTab(this));
 		pages.add(new EditorTab(this));
 
 		for (AgentFormPage page : pages) {
