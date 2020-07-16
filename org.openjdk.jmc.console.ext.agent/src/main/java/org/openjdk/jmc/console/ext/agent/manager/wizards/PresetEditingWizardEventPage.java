@@ -179,8 +179,7 @@ public class PresetEditingWizardEventPage extends BaseWizardPage {
 		tableInspector.setInput(preset);
 	}
 
-	private static class EventTableContentProvider extends AbstractStructuredContentProvider
-			implements IContentProvider {
+	private static class EventTableContentProvider extends AbstractStructuredContentProvider {
 
 		@Override
 		public Object[] getElements(Object inputElement) {

@@ -101,4 +101,9 @@
 		<Method name="loadAgentListener"/>
 		<Bug pattern="UWF_FIELD_NOT_INITIALIZED_IN_CONSTRUCTOR"/>
 	</Match>
+	<Match>
+		<Class name="org.openjdk.jmc.console.ext.agent.wizards.BaseWizardPage" />
+		<Method name="openFileDialog"/>
+		<Bug pattern="PZLA_PREFER_ZERO_LENGTH_ARRAYS" />
+	</Match>
 </FindBugsFilter>

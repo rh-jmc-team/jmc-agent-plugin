@@ -222,8 +222,7 @@ public class EventEditingWizardParameterPage extends BaseWizardPage {
 		tableInspector.setInput(event);
 	}
 
-	private static class ParameterTableContentProvider extends AbstractStructuredContentProvider
-			implements IContentProvider {
+	private static class ParameterTableContentProvider extends AbstractStructuredContentProvider {
 
 		@Override
 		public Object[] getElements(Object inputElement) {

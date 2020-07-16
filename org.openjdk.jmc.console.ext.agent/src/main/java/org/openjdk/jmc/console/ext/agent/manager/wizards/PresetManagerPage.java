@@ -184,9 +184,8 @@ public class PresetManagerPage extends BaseWizardPage {
 				String[] files = openFileDialog(MESSAGE_IMPORT_EXTERNAL_PRESET_FILES,
 						new String[] {PRESET_XML_EXTENSION}, SWT.OPEN | SWT.MULTI);
 				if (files != null) {
-					for (String file : files) {
-						// TODO: import file to preset repository
-					}
+					// TODO: import files to preset repository
+					throw new UnsupportedOperationException("not implemented!");
 				}
 
 				tableInspector.getViewer().refresh();
@@ -200,9 +199,8 @@ public class PresetManagerPage extends BaseWizardPage {
 					return;
 				}
 
-				String file = files[0];
-				IPreset preset = (IPreset) selection.getFirstElement();
 				// TODO: import a preset to file system
+				throw new UnsupportedOperationException("not implemented!");
 			}
 		};
 		tableInspector.setContentProvider(new PresetTableContentProvider());
@@ -214,8 +212,7 @@ public class PresetManagerPage extends BaseWizardPage {
 		tableInspector.setInput(repository);
 	}
 
-	private static class PresetTableContentProvider extends AbstractStructuredContentProvider
-			implements IContentProvider {
+	private static class PresetTableContentProvider extends AbstractStructuredContentProvider {
 		@Override
 		public Object[] getElements(Object inputElement) {
 			if (!(inputElement instanceof PresetRepository)) {

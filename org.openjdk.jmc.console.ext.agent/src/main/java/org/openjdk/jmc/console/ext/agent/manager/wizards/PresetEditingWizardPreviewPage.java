@@ -54,14 +54,10 @@ public class PresetEditingWizardPreviewPage extends BaseWizardPage {
 	private static final String MESSAGE_PRESET_EDITING_WIZARD_PREVIEW_PAGE_TITLE = "Preview Preset Output";
 	private static final String MESSAGE_PRESET_EDITING_WIZARD_PREVIEW_PAGE_DESCRIPTION = "Inspects the generated XML before it is saved. Click Back to make any modifications if needed. Click Finish to save.";
 
-	private final IPreset preset;
-
 	private IDocument document;
 
 	protected PresetEditingWizardPreviewPage(IPreset preset) {
 		super(PAGE_NAME);
-
-		this.preset = preset;
 	}
 
 	@Override

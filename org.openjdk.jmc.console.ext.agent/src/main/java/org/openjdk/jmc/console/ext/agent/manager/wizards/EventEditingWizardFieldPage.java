@@ -194,8 +194,7 @@ public class EventEditingWizardFieldPage extends BaseWizardPage {
 		tableInspector.setInput(event);
 	}
 
-	private static class FieldTableContentProvider extends AbstractStructuredContentProvider
-			implements IContentProvider {
+	private static class FieldTableContentProvider extends AbstractStructuredContentProvider {
 
 		@Override
 		public Object[] getElements(Object inputElement) {
