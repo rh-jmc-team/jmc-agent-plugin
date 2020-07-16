@@ -37,4 +37,6 @@ public interface IMethodParameter extends ICapturedValue {
 	int getIndex();
 
 	void setIndex(int index);
+
+	IMethodParameter createWorkingCopy();
 }

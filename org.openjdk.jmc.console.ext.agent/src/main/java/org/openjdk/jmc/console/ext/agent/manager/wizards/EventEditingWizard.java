@@ -46,7 +46,7 @@ public class EventEditingWizard extends Wizard {
 
 	@Override
 	public boolean performFinish() {
-		return false;
+		return true;
 	}
 
 	@Override

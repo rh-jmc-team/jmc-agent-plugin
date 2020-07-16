@@ -33,22 +33,35 @@
  */
 package org.openjdk.jmc.console.ext.agent.manager.wizards;
 
-import org.eclipse.jface.wizard.WizardPage;
+import org.eclipse.jface.viewers.ColumnLabelProvider;
+import org.eclipse.jface.viewers.IContentProvider;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Label;
 import org.openjdk.jmc.console.ext.agent.manager.model.IEvent;
 import org.openjdk.jmc.console.ext.agent.manager.model.IPreset;
+import org.openjdk.jmc.console.ext.agent.wizards.BaseWizardPage;
+import org.openjdk.jmc.ui.misc.AbstractStructuredContentProvider;
 import org.openjdk.jmc.ui.misc.DialogToolkit;
 
-public class PresetEditingWizardEventPage extends WizardPage {
+public class PresetEditingWizardEventPage extends BaseWizardPage {
 	private static final String PAGE_NAME = "Agent Preset Editing";
-	private static final String MESSAGE_PRESET_EDITING_WIZARD_EVENT_PAGE_TITLE = "Editing Preset Events";
+
+	private static final String MESSAGE_PRESET_EDITING_WIZARD_EVENT_PAGE_TITLE = "Add or Remove Preset Events";
 	private static final String MESSAGE_PRESET_EDITING_WIZARD_EVENT_PAGE_DESCRIPTION = "Add new events to the preset, or remove/edit existing events.";
+	private static final String MESSAGE_UNABLE_TO_SAVE_THE_PRESET = "Unable to add the event";
+
+	private static final String LABEL_ID_COLUMN = "ID";
+	private static final String LABEL_NAME_COLUMN = "Name";
+
+	private static final String ID_ID_COLUMN = "id";
+	private static final String ID_NAME_COLUMN = "name";
 
 	private final IPreset preset;
+
+	private TableInspector tableInspector;
 
 	protected PresetEditingWizardEventPage(IPreset preset) {
 		super(PAGE_NAME);
@@ -67,20 +80,128 @@ public class PresetEditingWizardEventPage extends WizardPage {
 		Composite container = new Composite(sc, SWT.NONE);
 		sc.setContent(container);
 
-		// TODO: create event page control here
 		container.setLayout(new FillLayout());
-		new Label(container, SWT.NONE).setText("TODO: create event page control here");
+
+		createEventTableContainer(container);
 
 		sc.setExpandHorizontal(true);
 		sc.setExpandVertical(true);
 		sc.setMinSize(container.computeSize(SWT.DEFAULT, SWT.DEFAULT));
 		setControl(sc);
+
+		populateUi();
 	}
 
-	// TODO: call this function when "New" or "Edit" button clicked
-	private void openEventEditingWizardFor(IEvent event) {
-		if (DialogToolkit.openWizardWithHelp(new EventEditingWizard(event))) {
-			// TODO: save the modified event to the preset
+	private Composite createEventTableContainer(Composite parent) {
+		Composite container = new Composite(parent, SWT.NONE);
+		container.setLayout(new FillLayout());
+
+		tableInspector = new TableInspector(container,
+				TableInspector.MULTI | TableInspector.SHOW_HEADER | TableInspector.ADD_BUTTON
+						| TableInspector.EDIT_BUTTON | TableInspector.DUPLICATE_BUTTON | TableInspector.REMOVE_BUTTON) {
+			@Override
+			protected void addColumns() {
+				addColumn(LABEL_ID_COLUMN, ID_ID_COLUMN, new EventTableLabelProvider() {
+					@Override
+					protected String doGetText(IEvent event) {
+						return event.getId();
+					}
+				});
+
+				addColumn(LABEL_NAME_COLUMN, ID_NAME_COLUMN, new EventTableLabelProvider() {
+					@Override
+					protected String doGetText(IEvent event) {
+						return event.getName();
+					}
+				});
+			}
+
+			@Override
+			protected void onAddButtonSelected(IStructuredSelection selection) {
+				IEvent event = preset.createEvent();
+				while (DialogToolkit.openWizardWithHelp(new EventEditingWizard(event))) {
+					try {
+						preset.addEvent(event);
+					} catch (IllegalArgumentException e) {
+						if (DialogToolkit.openConfirmOnUiThread(MESSAGE_UNABLE_TO_SAVE_THE_PRESET, e.getMessage())) {
+							continue;
+						}
+					}
+
+					break;
+				}
+
+				tableInspector.getViewer().refresh();
+			}
+
+			@Override
+			protected void onEditButtonSelected(IStructuredSelection selection) {
+				IEvent original = (IEvent) selection.getFirstElement();
+				IEvent workingCopy = original.createWorkingCopy();
+				while (DialogToolkit.openWizardWithHelp(new EventEditingWizard(workingCopy))) {
+					try {
+						preset.updateEvent(original, workingCopy);
+					} catch (IllegalArgumentException e) {
+						if (DialogToolkit.openConfirmOnUiThread(MESSAGE_UNABLE_TO_SAVE_THE_PRESET, e.getMessage())) {
+							continue;
+						}
+					}
+
+					break;
+				}
+				tableInspector.getViewer().refresh();
+			}
+
+			@Override
+			protected void onDuplicateButtonSelected(IStructuredSelection selection) {
+				IEvent original = (IEvent) selection.getFirstElement();
+				IEvent duplicate = original.createDuplicate();
+				preset.addEvent(duplicate);
+
+				tableInspector.getViewer().refresh();
+			}
+
+			@Override
+			protected void onRemoveButtonSelected(IStructuredSelection selection) {
+				for (Object event : selection) {
+					preset.removeEvent((IEvent) event);
+				}
+
+				tableInspector.getViewer().refresh();
+			}
+		};
+		tableInspector.setContentProvider(new EventTableContentProvider());
+
+		return container;
+	}
+
+	private void populateUi() {
+		tableInspector.setInput(preset);
+	}
+
+	private static class EventTableContentProvider extends AbstractStructuredContentProvider {
+
+		@Override
+		public Object[] getElements(Object inputElement) {
+			if (!(inputElement instanceof IPreset)) {
+				throw new IllegalArgumentException("input element must be an IPreset"); // $NON-NLS-1$
+			}
+
+			IPreset preset = (IPreset) inputElement;
+			return preset.getEvents();
 		}
+	}
+
+	private static abstract class EventTableLabelProvider extends ColumnLabelProvider {
+		@Override
+		public String getText(Object element) {
+			if (!(element instanceof IEvent)) {
+				throw new IllegalArgumentException("element must be an IEvent"); // $NON-NLS-1$
+			}
+
+			return doGetText((IEvent) element);
+		}
+
+		protected abstract String doGetText(IEvent event);
 	}
 }

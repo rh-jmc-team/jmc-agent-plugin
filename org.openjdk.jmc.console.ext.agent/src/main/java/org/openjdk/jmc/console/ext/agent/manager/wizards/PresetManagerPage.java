@@ -33,22 +33,37 @@
  */
 package org.openjdk.jmc.console.ext.agent.manager.wizards;
 
-import org.eclipse.jface.wizard.WizardPage;
+import org.eclipse.jface.viewers.ColumnLabelProvider;
+import org.eclipse.jface.viewers.IContentProvider;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Label;
+import org.openjdk.jmc.console.ext.agent.AgentPlugin;
 import org.openjdk.jmc.console.ext.agent.manager.model.IPreset;
 import org.openjdk.jmc.console.ext.agent.manager.model.PresetRepository;
+import org.openjdk.jmc.console.ext.agent.wizards.BaseWizardPage;
+import org.openjdk.jmc.ui.misc.AbstractStructuredContentProvider;
 import org.openjdk.jmc.ui.misc.DialogToolkit;
 
-public class PresetManagerPage extends WizardPage {
+public class PresetManagerPage extends BaseWizardPage {
 	private static final String PAGE_NAME = "Agent Preset Manager";
+
 	private static final String MESSAGE_PRESET_MANAGER_PAGE_TITLE = "JMC Agent Configuration Preset Manager";
 	private static final String MESSAGE_PRESET_MANAGER_PAGE_DESCRIPTION = "Presets for JMC agent are useful to repeatedly apply configurations to a running JMC agent.";
+	private static final String MESSAGE_PRESET_MANAGER_UNABLE_TO_SAVE_THE_PRESET = "Unable to save the preset";
+	private static final String MESSAGE_IMPORT_EXTERNAL_PRESET_FILES = "Import external preset files";
+	private static final String MESSAGE_EXPORT_PRESET_TO_A_FILE = "Import the preset to a file";
+	private static final String MESSAGE_EVENTS = "event(s)";
+
+	private static final String ID_PRESET = "preset"; // $NON-NLS-1$
+	private static final String PRESET_XML_EXTENSION = "*.xml"; // $NON-NLS-1$
 
 	private final PresetRepository repository;
+
+	private TableInspector tableInspector;
 
 	public PresetManagerPage(PresetRepository repository) {
 		super(PAGE_NAME);
@@ -67,20 +82,145 @@ public class PresetManagerPage extends WizardPage {
 		Composite container = new Composite(sc, SWT.NONE);
 		sc.setContent(container);
 
-		// TODO: create manager control here
 		container.setLayout(new FillLayout());
-		new Label(container, SWT.NONE).setText("TODO: create manager control here");
+
+		createPresetTableContainer(container);
 
 		sc.setExpandHorizontal(true);
 		sc.setExpandVertical(true);
 		sc.setMinSize(container.computeSize(SWT.DEFAULT, SWT.DEFAULT));
 		setControl(sc);
+
+		populateUi();
 	}
 
-	// TODO: call this function when "New" or "Edit" button clicked
-	private void openPresetEditingWizardFor(IPreset preset) {
-		if (DialogToolkit.openWizardWithHelp(new PresetEditingWizard(preset))) {
-			// TODO: save the modified preset to the repository
+	private Composite createPresetTableContainer(Composite parent) {
+		Composite container = new Composite(parent, SWT.NONE);
+		container.setLayout(new FillLayout());
+
+		tableInspector = new TableInspector(container,
+				TableInspector.MULTI | TableInspector.ADD_BUTTON | TableInspector.EDIT_BUTTON
+						| TableInspector.DUPLICATE_BUTTON | TableInspector.REMOVE_BUTTON
+						| TableInspector.IMPORT_FILES_BUTTON | TableInspector.EXPORT_FILE_BUTTON) {
+			@Override
+			protected void addColumns() {
+				addColumn(ID_PRESET, new ColumnLabelProvider() {
+					@Override
+					public String getText(Object element) {
+						if (!(element instanceof IPreset)) {
+							throw new IllegalArgumentException("element must be an IPreset"); // $NON-NLS-1$
+						}
+
+						IPreset preset = (IPreset) element;
+						return preset.getFileName() + " - " + preset.getEvents().length + " " + MESSAGE_EVENTS;
+					}
+
+					@Override
+					public Image getImage(Object element) {
+						return AgentPlugin.getDefault().getImage(AgentPlugin.ICON_AGENT); // TODO: replace the icon in the future
+					}
+				});
+			}
+
+			@Override
+			protected void onAddButtonSelected(IStructuredSelection selection) {
+				IPreset preset = repository.createPreset();
+				while (DialogToolkit.openWizardWithHelp(new PresetEditingWizard(preset))) {
+					try {
+						repository.addPreset(preset);
+					} catch (IllegalArgumentException e) {
+						if (DialogToolkit.openConfirmOnUiThread(MESSAGE_PRESET_MANAGER_UNABLE_TO_SAVE_THE_PRESET,
+								e.getMessage())) {
+							continue;
+						}
+					}
+
+					break;
+				}
+
+				tableInspector.getViewer().refresh();
+			}
+
+			@Override
+			protected void onEditButtonSelected(IStructuredSelection selection) {
+				IPreset original = (IPreset) selection.getFirstElement();
+				IPreset workingCopy = original.createWorkingCopy();
+				while (DialogToolkit.openWizardWithHelp(new PresetEditingWizard(workingCopy))) {
+					try {
+						repository.updatePreset(original, workingCopy);
+					} catch (IllegalArgumentException e) {
+						if (DialogToolkit.openConfirmOnUiThread(MESSAGE_PRESET_MANAGER_UNABLE_TO_SAVE_THE_PRESET,
+								e.getMessage())) {
+							continue;
+						}
+					}
+
+					break;
+				}
+
+				tableInspector.getViewer().refresh();
+			}
+
+			@Override
+			protected void onDuplicateButtonSelected(IStructuredSelection selection) {
+				IPreset original = (IPreset) selection.getFirstElement();
+				IPreset duplicate = original.createDuplicate();
+				repository.addPreset(duplicate);
+
+				tableInspector.getViewer().refresh();
+			}
+
+			@Override
+			protected void onRemoveButtonSelected(IStructuredSelection selection) {
+				for (Object preset : selection) {
+					repository.removePreset((IPreset) preset);
+				}
+
+				tableInspector.getViewer().refresh();
+			}
+
+			@Override
+			protected void onImportFilesButtonSelected(IStructuredSelection selection) {
+				String[] files = openFileDialog(MESSAGE_IMPORT_EXTERNAL_PRESET_FILES,
+						new String[] {PRESET_XML_EXTENSION}, SWT.OPEN | SWT.MULTI);
+				if (files != null) {
+					// TODO: import files to preset repository
+					throw new UnsupportedOperationException("not implemented!");
+				}
+
+				tableInspector.getViewer().refresh();
+			}
+
+			@Override
+			protected void onExportFileButtonSelected(IStructuredSelection selection) {
+				String[] files = openFileDialog(MESSAGE_EXPORT_PRESET_TO_A_FILE, new String[] {PRESET_XML_EXTENSION},
+						SWT.SAVE | SWT.SINGLE);
+				if (files == null || files.length == 0) {
+					return;
+				}
+
+				// TODO: import a preset to file system
+				throw new UnsupportedOperationException("not implemented!");
+			}
+		};
+		tableInspector.setContentProvider(new PresetTableContentProvider());
+
+		return container;
+	}
+
+	private void populateUi() {
+		tableInspector.setInput(repository);
+	}
+
+	private static class PresetTableContentProvider extends AbstractStructuredContentProvider {
+		@Override
+		public Object[] getElements(Object inputElement) {
+			if (!(inputElement instanceof PresetRepository)) {
+				throw new IllegalArgumentException("input element must be a PresetRepository"); // $NON-NLS-1$
+			}
+
+			PresetRepository repository = (PresetRepository) inputElement;
+			return repository.listPresets();
 		}
 	}
 }

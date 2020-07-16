@@ -34,7 +34,6 @@
 package org.openjdk.jmc.console.ext.agent.manager.model;
 
 public interface IEvent {
-
 	enum Location {
 		ENTRY, EXIT, WRAP,
 	}
@@ -85,7 +84,7 @@ public interface IEvent {
 
 	void removeMethodParameter(IMethodParameter methodParameter);
 
-	boolean containMethodParameter(IMethodParameter methodParameter);
+	boolean containsMethodParameter(IMethodParameter methodParameter);
 
 	void setMethodReturnValue(IMethodReturnValue methodReturnValue);
 
@@ -97,5 +96,25 @@ public interface IEvent {
 
 	void removeField(IField field);
 
-	boolean containField(IField field);
+	boolean containsField(IField field);
+
+	IEvent createWorkingCopy();
+
+	IEvent createDuplicate();
+
+	int nextUniqueParameterIndex();
+
+	String nextUniqueParameterName(String originalName);
+
+	String nextUniqueFieldName(String originalName);
+
+	IMethodReturnValue createMethodReturnValue();
+
+	IMethodParameter createMethodParameter();
+
+	void updateMethodParameter(IMethodParameter original, IMethodParameter workingCopy);
+
+	IField createField();
+
+	void updateField(IField original, IField workingCopy);
 }

@@ -33,20 +33,38 @@
  */
 package org.openjdk.jmc.console.ext.agent.manager.wizards;
 
-import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
-import org.eclipse.swt.layout.FillLayout;
+import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.Text;
 import org.openjdk.jmc.console.ext.agent.manager.model.IPreset;
+import org.openjdk.jmc.console.ext.agent.wizards.BaseWizardPage;
 
-public class PresetEditingWizardConfigPage extends WizardPage {
+public class PresetEditingWizardConfigPage extends BaseWizardPage {
 	private static final String PAGE_NAME = "Agent Preset Editing";
-	private static final String MESSAGE_PRESET_EDITING_WIZARD_CONFIG_PAGE_TITLE = "Editing Preset Global Configurations";
+
+	private static final String MESSAGE_PRESET_EDITING_WIZARD_CONFIG_PAGE_TITLE = "Edit Preset Global Configurations";
 	private static final String MESSAGE_PRESET_EDITING_WIZARD_CONFIG_PAGE_DESCRIPTION = "Global configurations are defaults which applies to any event missing a per-even configuration.";
 
+	private static final String LABEL_FILE_NAME = "File Name: ";
+	private static final String LABEL_CLASS_PREFIX = "Class Prefix: ";
+	private static final String LABEL_ALLOW_TO_STRING = "Allow toString";
+	private static final String LABEL_ALLOW_CONVERTER = "Allow Converter";
+
+	private static final String MESSAGE_NAME_OF_THE_SAVED_XML = "Name of the saved XML on file system";
+	private static final String MESSAGE_PREFIX_ADDED_TO_GENERATED_EVENT_CLASSES = "Prefix added to generated event classes";
+
 	private final IPreset preset;
+
+	private Text fileNameText;
+	private Text classPrefixText;
+	private Button allowToStringButton;
+	private Button allowConverterButton;
 
 	protected PresetEditingWizardConfigPage(IPreset preset) {
 		super(PAGE_NAME);
@@ -65,13 +83,63 @@ public class PresetEditingWizardConfigPage extends WizardPage {
 		Composite container = new Composite(sc, SWT.NONE);
 		sc.setContent(container);
 
-		// TODO: create manager control here
-		container.setLayout(new FillLayout());
-		new Label(container, SWT.NONE).setText("TODO: create config page control here");
+		container.setLayout(new GridLayout());
+
+		createFileNameContainer(container).setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
+		createSeparator(container).setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
+		createGlobalConfigContainer(container).setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
+
+		populateUi();
+		bindListeners();
 
 		sc.setExpandHorizontal(true);
 		sc.setExpandVertical(true);
 		sc.setMinSize(container.computeSize(SWT.DEFAULT, SWT.DEFAULT));
 		setControl(sc);
+	}
+
+	private Composite createFileNameContainer(Composite parent) {
+		Composite container = new Composite(parent, SWT.NONE);
+		int cols = 5;
+		GridLayout layout = new GridLayout(cols, false);
+		layout.horizontalSpacing = 8;
+		container.setLayout(layout);
+
+		fileNameText = createTextInput(container, cols, LABEL_FILE_NAME, MESSAGE_NAME_OF_THE_SAVED_XML);
+
+		return container;
+	}
+
+	private Composite createGlobalConfigContainer(Composite parent) {
+		Composite container = new Composite(parent, SWT.NONE);
+		int cols = 5;
+		GridLayout layout = new GridLayout(cols, false);
+		layout.horizontalSpacing = 8;
+		container.setLayout(layout);
+
+		classPrefixText = createTextInput(container, cols, LABEL_CLASS_PREFIX,
+				MESSAGE_PREFIX_ADDED_TO_GENERATED_EVENT_CLASSES);
+		allowToStringButton = createCheckboxInput(parent, cols, LABEL_ALLOW_TO_STRING);
+		allowConverterButton = createCheckboxInput(parent, cols, LABEL_ALLOW_CONVERTER);
+
+		return container;
+	}
+
+	private void bindListeners() {
+		fileNameText.addModifyListener(
+				handleExceptionIfAny((ModifyListener) e -> preset.setFileName(fileNameText.getText())));
+		classPrefixText.addModifyListener(
+				handleExceptionIfAny((ModifyListener) e -> preset.setClassPrefix(classPrefixText.getText())));
+		allowToStringButton.addListener(SWT.Selection,
+				handleExceptionIfAny((Listener) e -> preset.setAllowToString(allowToStringButton.getSelection())));
+		allowConverterButton.addListener(SWT.Selection,
+				handleExceptionIfAny((Listener) e -> preset.setAllowConverter(allowConverterButton.getSelection())));
+	}
+
+	private void populateUi() {
+		setText(fileNameText, preset.getFileName());
+		setText(classPrefixText, preset.getClassPrefix());
+		allowToStringButton.setSelection(preset.getAllowToString());
+		allowConverterButton.setSelection(preset.getAllowConverter());
 	}
 }

@@ -33,25 +33,31 @@
  */
 package org.openjdk.jmc.console.ext.agent.manager.wizards;
 
-import org.eclipse.jface.wizard.WizardPage;
+import org.eclipse.jface.text.Document;
+import org.eclipse.jface.text.IDocument;
+import org.eclipse.jface.text.IDocumentPartitioner;
+import org.eclipse.jface.text.rules.FastPartitioner;
+import org.eclipse.jface.text.source.SourceViewer;
+import org.eclipse.jface.text.source.VerticalRuler;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Label;
 import org.openjdk.jmc.console.ext.agent.manager.model.IPreset;
+import org.openjdk.jmc.console.ext.agent.tabs.editor.internal.ColorManager;
+import org.openjdk.jmc.console.ext.agent.tabs.editor.internal.XmlConfiguration;
+import org.openjdk.jmc.console.ext.agent.tabs.editor.internal.XmlPartitionScanner;
+import org.openjdk.jmc.console.ext.agent.wizards.BaseWizardPage;
 
-public class PresetEditingWizardPreviewPage extends WizardPage {
+public class PresetEditingWizardPreviewPage extends BaseWizardPage {
 	private static final String PAGE_NAME = "Agent Preset Editing";
-	private static final String MESSAGE_PRESET_EDITING_WIZARD_PREVIEW_PAGE_TITLE = "Preview Preset";
+	private static final String MESSAGE_PRESET_EDITING_WIZARD_PREVIEW_PAGE_TITLE = "Preview Preset Output";
 	private static final String MESSAGE_PRESET_EDITING_WIZARD_PREVIEW_PAGE_DESCRIPTION = "Inspects the generated XML before it is saved. Click Back to make any modifications if needed. Click Finish to save.";
 
-	private final IPreset preset;
+	private IDocument document;
 
 	protected PresetEditingWizardPreviewPage(IPreset preset) {
 		super(PAGE_NAME);
-
-		this.preset = preset;
 	}
 
 	@Override
@@ -65,13 +71,37 @@ public class PresetEditingWizardPreviewPage extends WizardPage {
 		Composite container = new Composite(sc, SWT.NONE);
 		sc.setContent(container);
 
-		// TODO: create preview page control here
 		container.setLayout(new FillLayout());
-		new Label(container, SWT.NONE).setText("TODO: create preview page control here");
+
+		createPreviewViewer(container);
+
+		populateUi();
 
 		sc.setExpandHorizontal(true);
 		sc.setExpandVertical(true);
 		sc.setMinSize(container.computeSize(SWT.DEFAULT, SWT.DEFAULT));
 		setControl(sc);
+	}
+
+	private void createPreviewViewer(Composite container) {
+		Composite parent = new Composite(container, SWT.NONE);
+		parent.setLayout(new FillLayout());
+
+		VerticalRuler ruler = new VerticalRuler(0);
+		SourceViewer editor = new SourceViewer(parent, ruler, SWT.NONE);
+		editor.configure(new XmlConfiguration(new ColorManager()));
+
+		document = new Document();
+		IDocumentPartitioner partitioner = new FastPartitioner(new XmlPartitionScanner(),
+				new String[] {XmlPartitionScanner.XML_TAG, XmlPartitionScanner.XML_COMMENT});
+		partitioner.connect(document);
+		document.setDocumentPartitioner(partitioner);
+		editor.setDocument(document);
+
+		editor.setEditable(false);
+	}
+
+	private void populateUi() {
+		document.set("<jfragent>\n</jfragent>"); // TODO: generate real output preview from this.preset
 	}
 }

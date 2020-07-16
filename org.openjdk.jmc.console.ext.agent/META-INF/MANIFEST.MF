@@ -17,4 +17,6 @@ Require-Bundle: org.eclipse.core.runtime,
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Import-Package: javax.inject,
  org.eclipse.debug.core.sourcelookup.containers
+Bundle-ActivationPolicy: lazy
+Bundle-Activator: org.openjdk.jmc.console.ext.agent.AgentPlugin
 Automatic-Module-Name: org.openjdk.jmc.console.ext.agent

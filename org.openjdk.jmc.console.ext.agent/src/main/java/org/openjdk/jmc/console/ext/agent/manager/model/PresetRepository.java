@@ -33,17 +33,113 @@
  */
 package org.openjdk.jmc.console.ext.agent.manager.model;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 public class PresetRepository {
+	private static final String DEFAULT_FILE_NAME = "new_preset.xml"; // $NON-NLS-1$
+	private static final String FILE_NAME_EXTENSION = ".xml"; // $NON-NLS-1$
 
-	public void remove(IPreset configuration) {
-		// TODO: implementation
+	private static final Pattern NAME_WITH_COUNT_PATTERN = Pattern.compile("^(.*)_(\\d+)$"); // $NON-NLS-1$
+	private static final Pattern COUNT_SUFFIX_PATTERN = Pattern.compile("^_(\\d+)$"); // $NON-NLS-1$
+
+	private List<IPreset> presets = new ArrayList<>();
+
+	protected PresetRepository() {
 	}
 
-	public void add(IPreset configuration) {
-		// TODO: implementation
+	public void removePreset(IPreset configuration) {
+		// TODO: persistent storage
+		presets.remove(configuration);
 	}
 
-	public void contains(IPreset configuration) {
-		// TODO: implementation
+	public void addPreset(IPreset configuration) {
+		// TODO: persistent storage
+		presets.add(configuration);
+	}
+
+	public boolean containsPreset(IPreset configuration) {
+		// TODO: persistent storage
+		return presets.contains(configuration);
+	}
+
+	public IPreset[] listPresets() {
+		// TODO: persistent storage
+		return presets.toArray(new IPreset[0]);
+	}
+
+	public void updatePreset(IPreset original, IPreset workingCopy) {
+		if (containsPreset(original)) {
+			removePreset(original);
+			addPreset(workingCopy);
+		}
+	}
+
+	public IPreset createPreset() {
+		String fileName = nextUniqueName(DEFAULT_FILE_NAME);
+		Preset preset = new Preset(this);
+		preset.setFileName(fileName);
+
+		return preset;
+	}
+
+	String nextUniqueName(String originalName) {
+		originalName = originalName.trim();
+
+		// First, extract a base name and a count of the original name.
+		String baseName = originalName;
+		if (baseName.endsWith(FILE_NAME_EXTENSION)) {
+			baseName = baseName.substring(0, baseName.lastIndexOf(FILE_NAME_EXTENSION));
+		}
+		// Use count -1 to mean that no count should be appended, the baseName suffices.
+		long proposedCount = -1;
+		Matcher matcher = NAME_WITH_COUNT_PATTERN.matcher(originalName);
+		if (matcher.matches()) {
+			try {
+				long count = Long.parseLong(matcher.group(2));
+				// Valid match, use the shorter base and this count.
+				baseName = matcher.group(1).trim();
+				proposedCount = count;
+			} catch (NumberFormatException e) {
+				// Too large number. => Use the entire name as base.
+				// (Yes, we could have used BigInteger, but which sane person would want such names?)
+			}
+		}
+
+		// Second, find any existing templates matching the proposed baseName pattern,
+		// with or without count, and make sure the proposed count is greater.
+		int baseLen = baseName.length();
+		for (IPreset preset : presets) {
+			String tempName = preset.getFileName().trim();
+			if (tempName.endsWith(FILE_NAME_EXTENSION)) {
+				tempName = tempName.substring(0, tempName.lastIndexOf(FILE_NAME_EXTENSION));
+			}
+			if (tempName.startsWith(baseName)) {
+				if (tempName.equals(baseName) && (proposedCount < 1)) {
+					proposedCount = 1;
+				} else {
+					// Note that this pattern must ignore leading whitespace.
+					Matcher tempMatch = COUNT_SUFFIX_PATTERN.matcher(tempName.substring(baseLen));
+					if (tempMatch.matches()) {
+						try {
+							long count = Long.parseLong(tempMatch.group(1));
+							if (count < Long.MAX_VALUE) {
+								// Valid match, use a count greater than this, unless the proposed was greater.
+								proposedCount = Math.max(proposedCount, count + 1);
+							}
+						} catch (NumberFormatException e) {
+							// Too large number, pretend we didn't see this template.
+						}
+					}
+				}
+			}
+		}
+		if (proposedCount == -1) {
+			return baseName + FILE_NAME_EXTENSION;
+		} else {
+			return baseName + '_' + proposedCount + FILE_NAME_EXTENSION;
+		}
 	}
 }

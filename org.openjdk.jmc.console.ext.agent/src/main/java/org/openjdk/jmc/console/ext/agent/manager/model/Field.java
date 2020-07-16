@@ -31,48 +31,61 @@
  * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.openjdk.jmc.console.ext.agent.manager.wizards;
+package org.openjdk.jmc.console.ext.agent.manager.model;
 
-import org.eclipse.jface.wizard.WizardPage;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.ScrolledComposite;
-import org.eclipse.swt.layout.FillLayout;
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Label;
-import org.openjdk.jmc.console.ext.agent.manager.model.IField;
+public class Field extends CapturedValue implements IField {
 
-public class EventFieldEditingPage extends WizardPage {
-	private static final String PAGE_NAME = "Agent Parameter Editing";
-	private static final String MESSAGE_PRESET_MANAGER_PAGE_TITLE = "Editing a Parameter or Return Value Capturing";
-	private static final String MESSAGE_PRESET_MANAGER_PAGE_DESCRIPTION = "Define a custom evaluation and capturing with an expression";
+	private static final String DEFAULT_FIELD_NAME = "New Field"; // $NON-NLS-1$
+	private static final String DEFAULT_FIELD_EXPRESSION = "myField"; // $NON-NLS-1$
+	private static final String EXPRESSION_REGEX = "([a-zA-Z_$][a-zA-Z0-9_$]*\\.)*([a-zA-Z_$][a-zA-Z0-9_$]*)(\\.[a-zA-Z_$][a-zA-Z_$]*)*"; // $NON-NLS-1$
 
-	private final IField field;
+	private static final String ERROR_EXPRESSION_CANNOT_BE_EMPTY_OR_NULL = "Expression cannot be empty or null.";
+	private static final String ERROR_EXPRESSION_HAS_INCORRECT_SYNTAX = "Expression has incorrect syntax.";
 
-	public EventFieldEditingPage(IField field) {
-		super(PAGE_NAME);
+	private final Event event;
 
-		// The capturedValue could be a IMethodParameter or IMethodReturnValue
-		this.field = field;
+	private String expression;
+
+	Field(Event event) {
+		super();
+		this.event = event;
+
+		expression = DEFAULT_FIELD_EXPRESSION;
+		setName(DEFAULT_FIELD_NAME);
+	}
+
+	public String getExpression() {
+		return expression;
+	}
+
+	public void setExpression(String expression) {
+		if (expression == null || expression.isEmpty()) {
+			throw new IllegalArgumentException(ERROR_EXPRESSION_CANNOT_BE_EMPTY_OR_NULL);
+		}
+
+		expression = expression.trim();
+		if (!expression.matches(EXPRESSION_REGEX)) {
+			throw new IllegalArgumentException(ERROR_EXPRESSION_HAS_INCORRECT_SYNTAX);
+		}
+
+		this.expression = expression;
 	}
 
 	@Override
-	public void createControl(Composite parent) {
-		initializeDialogUnits(parent);
+	public Field createWorkingCopy() {
+		Field copy = new Field(event);
 
-		setTitle(MESSAGE_PRESET_MANAGER_PAGE_TITLE);
-		setDescription(MESSAGE_PRESET_MANAGER_PAGE_DESCRIPTION);
+		copyContentToWorkingCopy(copy);
+		copy.expression = expression;
 
-		ScrolledComposite sc = new ScrolledComposite(parent, SWT.H_SCROLL | SWT.V_SCROLL);
-		Composite container = new Composite(sc, SWT.NONE);
-		sc.setContent(container);
+		return copy;
+	}
 
-		// TODO: create field editor control here
-		container.setLayout(new FillLayout());
-		new Label(container, SWT.NONE).setText("TODO: create field editor control here");
+	@Override
+	public Field createDuplicate() {
+		Field duplicate = createWorkingCopy();
+		duplicate.setName(event.nextUniqueFieldName(getName()));
 
-		sc.setExpandHorizontal(true);
-		sc.setExpandVertical(true);
-		sc.setMinSize(container.computeSize(SWT.DEFAULT, SWT.DEFAULT));
-		setControl(sc);
+		return duplicate;
 	}
 }

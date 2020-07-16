@@ -33,20 +33,49 @@
  */
 package org.openjdk.jmc.console.ext.agent.manager.wizards;
 
-import org.eclipse.jface.wizard.WizardPage;
+import org.eclipse.jface.viewers.ColumnLabelProvider;
+import org.eclipse.jface.viewers.IContentProvider;
+import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Display;
+import org.openjdk.jmc.console.ext.agent.manager.model.ICapturedValue;
 import org.openjdk.jmc.console.ext.agent.manager.model.IEvent;
+import org.openjdk.jmc.console.ext.agent.manager.model.IMethodParameter;
+import org.openjdk.jmc.console.ext.agent.manager.model.IMethodReturnValue;
+import org.openjdk.jmc.console.ext.agent.manager.model.MethodParameter;
+import org.openjdk.jmc.console.ext.agent.manager.model.MethodReturnValue;
+import org.openjdk.jmc.console.ext.agent.wizards.BaseWizardPage;
+import org.openjdk.jmc.ui.misc.AbstractStructuredContentProvider;
+import org.openjdk.jmc.ui.misc.DialogToolkit;
+import org.openjdk.jmc.ui.wizards.OnePageWizardDialog;
 
-public class EventEditingWizardParameterPage extends WizardPage {
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+public class EventEditingWizardParameterPage extends BaseWizardPage {
 	private static final String PAGE_NAME = "Agent Event Editing";
-	private static final String MESSAGE_EVENT_EDITING_WIZARD_CONFIG_PAGE_TITLE = "Editing Event Parameters";
-	private static final String MESSAGE_EVENT_EDITING_WIZARD_CONFIG_PAGE_DESCRIPTION = "Function parameters and return values can be recorded when committing an event.";
+
+	private static final String MESSAGE_EVENT_EDITING_WIZARD_PARAMETER_PAGE_TITLE = "Add or Remove Event Parameters";
+	private static final String MESSAGE_EVENT_EDITING_WIZARD_PARAMETER_PAGE_DESCRIPTION = "Function parameters and return values can be recorded when committing an event.";
+	private static final String MESSAGE_RETURN_VALUE = "(Return value)";
+	private static final String MESSAGE_UNABLE_TO_SAVE_THE_PARAMETER_OR_RETURN_VALUE = "Unable to add the parameter/return value";
+
+	private static final String LABEL_INDEX = "Index";
+	private static final String LABEL_NAME = "Name";
+	private static final String LABEL_DESCRIPTION = "Description";
+
+	private static final String ID_INDEX = "index";
+	private static final String ID_NAME = "name";
+	private static final String ID_DESCRIPTION = "description";
 
 	private final IEvent event;
+
+	private TableInspector tableInspector;
 
 	protected EventEditingWizardParameterPage(IEvent event) {
 		super(PAGE_NAME);
@@ -58,20 +87,171 @@ public class EventEditingWizardParameterPage extends WizardPage {
 	public void createControl(Composite parent) {
 		initializeDialogUnits(parent);
 
-		setTitle(MESSAGE_EVENT_EDITING_WIZARD_CONFIG_PAGE_TITLE);
-		setDescription(MESSAGE_EVENT_EDITING_WIZARD_CONFIG_PAGE_DESCRIPTION);
+		setTitle(MESSAGE_EVENT_EDITING_WIZARD_PARAMETER_PAGE_TITLE);
+		setDescription(MESSAGE_EVENT_EDITING_WIZARD_PARAMETER_PAGE_DESCRIPTION);
 
 		ScrolledComposite sc = new ScrolledComposite(parent, SWT.H_SCROLL | SWT.V_SCROLL);
 		Composite container = new Composite(sc, SWT.NONE);
 		sc.setContent(container);
 
-		// TODO: create parameter page control here
 		container.setLayout(new FillLayout());
-		new Label(container, SWT.NONE).setText("TODO: create parameter page control here");
+
+		createFieldTableContainer(container);
 
 		sc.setExpandHorizontal(true);
 		sc.setExpandVertical(true);
 		sc.setMinSize(container.computeSize(SWT.DEFAULT, SWT.DEFAULT));
 		setControl(sc);
+
+		populateUi();
+	}
+
+	private Composite createFieldTableContainer(Composite parent) {
+		Composite container = new Composite(parent, SWT.NONE);
+		container.setLayout(new FillLayout());
+
+		tableInspector = new TableInspector(container, TableInspector.MULTI | TableInspector.SHOW_HEADER
+				| TableInspector.ADD_BUTTON | TableInspector.EDIT_BUTTON | TableInspector.REMOVE_BUTTON) {
+			@Override
+			protected void addColumns() {
+				addColumn(LABEL_INDEX, ID_INDEX, new ParameterTableLabelProvider() {
+					@Override
+					protected String doGetText(ICapturedValue parameter) {
+						if (parameter instanceof IMethodReturnValue) {
+							return MESSAGE_RETURN_VALUE;
+						}
+
+						if (parameter instanceof IMethodParameter) {
+							return ((IMethodParameter) parameter).getIndex() + "";
+						}
+
+						throw new IllegalArgumentException(
+								"element must be a an IMethodParameter or IMethodReturnValue"); // $NON-NLS-1$
+					}
+				});
+
+				addColumn(LABEL_NAME, ID_NAME, new ParameterTableLabelProvider() {
+					@Override
+					protected String doGetText(ICapturedValue parameter) {
+						return parameter.getName();
+					}
+				});
+
+				addColumn(LABEL_DESCRIPTION, ID_DESCRIPTION, new ParameterTableLabelProvider() {
+					@Override
+					protected String doGetText(ICapturedValue parameter) {
+						return parameter.getDescription();
+					}
+				});
+			}
+
+			@Override
+			protected void onAddButtonSelected(IStructuredSelection selection) {
+				IMethodParameter parameter = event.createMethodParameter();
+				CapturedValueEditingPage page = new CapturedValueEditingPage(event, parameter);
+				while (new OnePageWizardDialog(Display.getCurrent().getActiveShell(), page).open() == Window.OK) {
+					try {
+						ICapturedValue capturedValue = page.getResult();
+						if (capturedValue instanceof IMethodParameter) {
+							event.addMethodParameter((IMethodParameter) capturedValue);
+						} else {
+							event.setMethodReturnValue((IMethodReturnValue) capturedValue);
+						}
+					} catch (IllegalArgumentException e) {
+						if (DialogToolkit.openConfirmOnUiThread(MESSAGE_UNABLE_TO_SAVE_THE_PARAMETER_OR_RETURN_VALUE,
+								e.getMessage())) {
+							continue;
+						}
+					}
+
+					break;
+				}
+
+				tableInspector.getViewer().refresh();
+			}
+
+			@Override
+			protected void onEditButtonSelected(IStructuredSelection selection) {
+				ICapturedValue original = (ICapturedValue) selection.getFirstElement();
+				ICapturedValue workingCopy;
+				if (original instanceof IMethodParameter) {
+					workingCopy = ((IMethodParameter) original).createWorkingCopy();
+				} else {
+					workingCopy = ((IMethodReturnValue) original).createWorkingCopy();
+				}
+				CapturedValueEditingPage page = new CapturedValueEditingPage(event, workingCopy);
+				if (new OnePageWizardDialog(Display.getCurrent().getActiveShell(), page).open() == Window.OK) {
+					ICapturedValue modified = page.getResult();
+					if (original instanceof IMethodParameter) {
+						event.removeMethodParameter((IMethodParameter) original);
+					} else {
+						event.setMethodReturnValue(null);
+					}
+
+					if (modified instanceof IMethodParameter) {
+						event.addMethodParameter((IMethodParameter) modified);
+					} else {
+						event.setMethodReturnValue((IMethodReturnValue) modified);
+					}
+				}
+
+				tableInspector.getViewer().refresh();
+			}
+
+			@Override
+			protected void onRemoveButtonSelected(IStructuredSelection selection) {
+				for (Object value : selection) {
+					ICapturedValue capturedValue = (ICapturedValue) value;
+					if (capturedValue instanceof MethodParameter) {
+						event.removeMethodParameter((MethodParameter) capturedValue);
+					} else if (capturedValue instanceof MethodReturnValue) {
+						event.setMethodReturnValue(null);
+					}
+				}
+
+				tableInspector.getViewer().refresh();
+			}
+		};
+
+		tableInspector.setContentProvider(new ParameterTableContentProvider());
+
+		return container;
+	}
+
+	private void populateUi() {
+		tableInspector.setInput(event);
+	}
+
+	private static class ParameterTableContentProvider extends AbstractStructuredContentProvider {
+
+		@Override
+		public Object[] getElements(Object inputElement) {
+			if (!(inputElement instanceof IEvent)) {
+				throw new IllegalArgumentException("input element must be an IEvent"); // $NON-NLS-1$
+			}
+
+			IEvent event = (IEvent) inputElement;
+			IMethodParameter[] parameters = event.getMethodParameters();
+			if (event.getMethodReturnValue() == null) {
+				return parameters;
+			}
+
+			List<ICapturedValue> capturedValues = new ArrayList<>(Arrays.asList(parameters));
+			capturedValues.add(event.getMethodReturnValue());
+			return capturedValues.toArray(new ICapturedValue[0]);
+		}
+	}
+
+	private static abstract class ParameterTableLabelProvider extends ColumnLabelProvider {
+		@Override
+		public String getText(Object element) {
+			if (!(element instanceof IMethodParameter) && !(element instanceof IMethodReturnValue)) {
+				throw new IllegalArgumentException("element must be a an IMethodParameter or IMethodReturnValue"); // $NON-NLS-1$
+			}
+
+			return doGetText((ICapturedValue) element);
+		}
+
+		protected abstract String doGetText(ICapturedValue field);
 	}
 }
