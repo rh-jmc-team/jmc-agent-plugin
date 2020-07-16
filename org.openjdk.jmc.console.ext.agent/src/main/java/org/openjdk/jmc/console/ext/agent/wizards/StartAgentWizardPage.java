@@ -41,7 +41,6 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Text;
 import org.openjdk.jmc.console.ext.agent.AgentJmxHelper;
-import org.openjdk.jmc.console.ext.agent.manager.wizards.BaseWizardPage;
 import org.openjdk.jmc.ui.common.jvm.JVMDescriptor;
 
 public class StartAgentWizardPage extends BaseWizardPage {

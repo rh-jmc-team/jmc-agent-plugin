@@ -40,13 +40,11 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
-import org.openjdk.jmc.console.ext.agent.manager.model.Event;
 import org.openjdk.jmc.console.ext.agent.manager.model.IEvent;
 import org.openjdk.jmc.console.ext.agent.manager.model.IPreset;
+import org.openjdk.jmc.console.ext.agent.wizards.BaseWizardPage;
 import org.openjdk.jmc.ui.misc.AbstractStructuredContentProvider;
 import org.openjdk.jmc.ui.misc.DialogToolkit;
-
-import java.util.Iterator;
 
 public class PresetEditingWizardEventPage extends BaseWizardPage {
 	private static final String PAGE_NAME = "Agent Preset Editing";

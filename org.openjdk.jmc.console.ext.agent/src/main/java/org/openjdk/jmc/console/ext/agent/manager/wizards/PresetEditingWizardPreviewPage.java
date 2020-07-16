@@ -47,6 +47,7 @@ import org.openjdk.jmc.console.ext.agent.manager.model.IPreset;
 import org.openjdk.jmc.console.ext.agent.tabs.editor.internal.ColorManager;
 import org.openjdk.jmc.console.ext.agent.tabs.editor.internal.XmlConfiguration;
 import org.openjdk.jmc.console.ext.agent.tabs.editor.internal.XmlPartitionScanner;
+import org.openjdk.jmc.console.ext.agent.wizards.BaseWizardPage;
 
 public class PresetEditingWizardPreviewPage extends BaseWizardPage {
 	private static final String PAGE_NAME = "Agent Preset Editing";

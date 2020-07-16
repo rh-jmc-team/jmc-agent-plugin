@@ -43,6 +43,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Text;
 import org.openjdk.jmc.console.ext.agent.manager.model.IPreset;
+import org.openjdk.jmc.console.ext.agent.wizards.BaseWizardPage;
 
 public class PresetEditingWizardConfigPage extends BaseWizardPage {
 	private static final String PAGE_NAME = "Agent Preset Editing";

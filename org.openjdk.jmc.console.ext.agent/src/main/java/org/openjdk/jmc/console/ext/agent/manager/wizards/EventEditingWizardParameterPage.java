@@ -48,6 +48,7 @@ import org.openjdk.jmc.console.ext.agent.manager.model.IMethodParameter;
 import org.openjdk.jmc.console.ext.agent.manager.model.IMethodReturnValue;
 import org.openjdk.jmc.console.ext.agent.manager.model.MethodParameter;
 import org.openjdk.jmc.console.ext.agent.manager.model.MethodReturnValue;
+import org.openjdk.jmc.console.ext.agent.wizards.BaseWizardPage;
 import org.openjdk.jmc.ui.misc.AbstractStructuredContentProvider;
 import org.openjdk.jmc.ui.misc.DialogToolkit;
 import org.openjdk.jmc.ui.wizards.OnePageWizardDialog;

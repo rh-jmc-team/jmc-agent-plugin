@@ -46,6 +46,7 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Text;
 import org.openjdk.jmc.console.ext.agent.manager.model.IEvent;
 import org.openjdk.jmc.console.ext.agent.manager.model.IEvent.Location;
+import org.openjdk.jmc.console.ext.agent.wizards.BaseWizardPage;
 
 import java.util.stream.Stream;
 

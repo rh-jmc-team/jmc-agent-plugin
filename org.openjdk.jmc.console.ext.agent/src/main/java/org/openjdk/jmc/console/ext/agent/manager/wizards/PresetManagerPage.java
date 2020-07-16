@@ -44,6 +44,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.openjdk.jmc.console.ext.agent.AgentPlugin;
 import org.openjdk.jmc.console.ext.agent.manager.model.IPreset;
 import org.openjdk.jmc.console.ext.agent.manager.model.PresetRepository;
+import org.openjdk.jmc.console.ext.agent.wizards.BaseWizardPage;
 import org.openjdk.jmc.ui.misc.AbstractStructuredContentProvider;
 import org.openjdk.jmc.ui.misc.DialogToolkit;
 

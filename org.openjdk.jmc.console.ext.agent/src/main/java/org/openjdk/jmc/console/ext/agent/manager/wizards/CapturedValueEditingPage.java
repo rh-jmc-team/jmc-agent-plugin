@@ -17,8 +17,7 @@ import org.openjdk.jmc.console.ext.agent.manager.model.IEvent;
 import org.openjdk.jmc.console.ext.agent.manager.model.IField;
 import org.openjdk.jmc.console.ext.agent.manager.model.IMethodParameter;
 import org.openjdk.jmc.console.ext.agent.manager.model.IMethodReturnValue;
-import org.openjdk.jmc.console.ext.agent.manager.model.MethodParameter;
-import org.openjdk.jmc.console.ext.agent.manager.model.MethodReturnValue;
+import org.openjdk.jmc.console.ext.agent.wizards.BaseWizardPage;
 
 import java.util.stream.Stream;
 

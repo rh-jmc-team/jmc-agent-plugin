@@ -1,4 +1,4 @@
-package org.openjdk.jmc.console.ext.agent.manager.wizards;
+package org.openjdk.jmc.console.ext.agent.wizards;
 
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
@@ -373,7 +373,7 @@ public abstract class BaseWizardPage extends WizardPage {
 			tableViewer.setInput(input);
 		}
 
-		protected TableViewer getViewer() {
+		public TableViewer getViewer() {
 			return tableViewer;
 		}
 
