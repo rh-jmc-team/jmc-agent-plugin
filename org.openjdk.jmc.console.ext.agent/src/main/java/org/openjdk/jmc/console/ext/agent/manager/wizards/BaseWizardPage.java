@@ -14,6 +14,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Spinner;
@@ -21,12 +22,15 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Widget;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
+import org.openjdk.jmc.flightrecorder.ui.FlightRecorderUI;
 import org.openjdk.jmc.ui.column.ColumnBuilder;
 import org.openjdk.jmc.ui.column.ColumnManager;
 import org.openjdk.jmc.ui.column.IColumn;
 import org.openjdk.jmc.ui.misc.DialogToolkit;
 import org.openjdk.jmc.ui.misc.OptimisticComparator;
 
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -35,6 +39,8 @@ import java.util.Map;
 public abstract class BaseWizardPage extends WizardPage {
 
 	private static final String MESSAGE_UNEXPECTED_ERROR_HAS_OCCURRED = "An unexpected has error occurred.";
+
+	private static final String FILE_OPEN_FILTER_PATH = "file.open.filter.path"; // $NON-NLS-1$
 
 	private Map<Widget, Exception> exceptions = new HashMap<>();
 
@@ -206,6 +212,25 @@ public abstract class BaseWizardPage extends WizardPage {
 
 		setPageComplete(exceptions.isEmpty());
 		getWizard().getContainer().updateButtons();
+	}
+
+	protected String[] openFileDialog(String title, String[] extensions, int style) {
+		String filterPath = FlightRecorderUI.getDefault().getDialogSettings().get(FILE_OPEN_FILTER_PATH);
+		if (filterPath != null && Files.notExists(Paths.get(filterPath))) {
+			filterPath = System.getProperty("user.home", "./"); // $NON-NLS-1$ $NON-NLS-2$
+		}
+
+		IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+		FileDialog dialog = new FileDialog(window.getShell(), style);
+		dialog.setFilterPath(filterPath);
+		dialog.setText(title);
+		dialog.setFilterExtensions(extensions);
+
+		if (dialog.open() == null) {
+			return null;
+		}
+
+		return dialog.getFileNames();
 	}
 
 	protected static abstract class TableInspector extends Composite {

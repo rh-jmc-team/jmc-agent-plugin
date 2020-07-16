@@ -39,17 +39,10 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Text;
-import org.eclipse.ui.IWorkbenchWindow;
-import org.eclipse.ui.PlatformUI;
 import org.openjdk.jmc.console.ext.agent.AgentJmxHelper;
 import org.openjdk.jmc.console.ext.agent.manager.wizards.BaseWizardPage;
-import org.openjdk.jmc.flightrecorder.ui.FlightRecorderUI;
 import org.openjdk.jmc.ui.common.jvm.JVMDescriptor;
-
-import java.nio.file.Files;
-import java.nio.file.Paths;
 
 public class StartAgentWizardPage extends BaseWizardPage {
 	private static final String PAGE_NAME = "Start Agent Wizard Page";
@@ -66,7 +59,6 @@ public class StartAgentWizardPage extends BaseWizardPage {
 	private static final String DIALOG_BROWSER_FOR_AGENT_JAR = "Browser for JMC Agent JAR";
 	private static final String DIALOG_BROWSER_FOR_AGENT_CONFIG = "Browser for JMC Agent Configuration";
 
-	private static final String FILE_OPEN_FILTER_PATH = "file.open.filter.path"; // $NON-NLS-1$
 	private static final String FILE_OPEN_JAR_EXTENSION = "*.jar"; // $NON-NLS-1$
 	private static final String FILE_OPEN_XML_EXTENSION = "*.xml"; // $NON-NLS-1$
 
@@ -158,16 +150,17 @@ public class StartAgentWizardPage extends BaseWizardPage {
 
 	private void bindListeners() {
 		agentJarBrowseButton.addListener(SWT.Selection, e -> {
-			String path = openFileOpenerBrowser(DIALOG_BROWSER_FOR_AGENT_JAR, new String[] {FILE_OPEN_JAR_EXTENSION});
-			if (path != null && !path.isEmpty()) {
-				setText(agentJarText, path);
+			String[] path = openFileDialog(DIALOG_BROWSER_FOR_AGENT_JAR, new String[] {FILE_OPEN_JAR_EXTENSION},
+					SWT.OPEN | SWT.SINGLE);
+			if (path != null && path.length != 0) {
+				setText(agentJarText, path[0]);
 			}
 		});
 		agentXmlBrowseButton.addListener(SWT.Selection, e -> {
-			String path = openFileOpenerBrowser(DIALOG_BROWSER_FOR_AGENT_CONFIG,
-					new String[] {FILE_OPEN_XML_EXTENSION});
-			if (path != null && !path.isEmpty()) {
-				setText(agentXmlText, path);
+			String[] path = openFileDialog(DIALOG_BROWSER_FOR_AGENT_CONFIG, new String[] {FILE_OPEN_XML_EXTENSION},
+					SWT.OPEN | SWT.SINGLE);
+			if (path != null && path.length != 0) {
+				setText(agentXmlText, path[0]);
 			}
 		});
 		agentJarText.addModifyListener(e -> setPageComplete(!agentJarText.getText().isEmpty()));
@@ -176,20 +169,5 @@ public class StartAgentWizardPage extends BaseWizardPage {
 
 	private void populateUi() {
 		setText(targetJvmText, helper.getConnectionHandle().getServerDescriptor().getDisplayName());
-	}
-
-	protected String openFileOpenerBrowser(String title, String[] extensions) {
-		String filterPath = FlightRecorderUI.getDefault().getDialogSettings().get(FILE_OPEN_FILTER_PATH);
-		if (filterPath != null && Files.notExists(Paths.get(filterPath))) {
-			filterPath = System.getProperty("user.home", "./"); // $NON-NLS-1$ $NON-NLS-2$
-		}
-
-		IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-		FileDialog dialog = new FileDialog(window.getShell(), SWT.OPEN | SWT.SINGLE);
-		dialog.setFilterPath(filterPath);
-		dialog.setText(title);
-		dialog.setFilterExtensions(extensions);
-
-		return dialog.open();
 	}
 }

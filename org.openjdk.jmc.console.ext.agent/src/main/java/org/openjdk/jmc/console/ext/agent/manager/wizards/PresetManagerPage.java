@@ -53,9 +53,12 @@ public class PresetManagerPage extends BaseWizardPage {
 	private static final String MESSAGE_PRESET_MANAGER_PAGE_TITLE = "JMC Agent Configuration Preset Manager";
 	private static final String MESSAGE_PRESET_MANAGER_PAGE_DESCRIPTION = "Presets for JMC agent are useful to repeatedly apply configurations to a running JMC agent.";
 	private static final String MESSAGE_PRESET_MANAGER_UNABLE_TO_SAVE_THE_PRESET = "Unable to save the preset";
+	private static final String MESSAGE_IMPORT_EXTERNAL_PRESET_FILES = "Import external preset files";
+	private static final String MESSAGE_EXPORT_PRESET_TO_A_FILE = "Import the preset to a file";
 	private static final String MESSAGE_EVENTS = "event(s)";
 
-	private static final String ID_PRESET = "preset";
+	private static final String ID_PRESET = "preset"; // $NON-NLS-1$
+	private static final String PRESET_XML_EXTENSION = "*.xml"; // $NON-NLS-1$
 
 	private final PresetRepository repository;
 
@@ -95,9 +98,9 @@ public class PresetManagerPage extends BaseWizardPage {
 		container.setLayout(new FillLayout());
 
 		tableInspector = new TableInspector(container,
-				TableInspector.ADD_BUTTON | TableInspector.EDIT_BUTTON | TableInspector.DUPLICATE_BUTTON
-						| TableInspector.REMOVE_BUTTON | TableInspector.IMPORT_FILES_BUTTON
-						| TableInspector.EXPORT_FILE_BUTTON) {
+				TableInspector.MULTI | TableInspector.ADD_BUTTON | TableInspector.EDIT_BUTTON
+						| TableInspector.DUPLICATE_BUTTON | TableInspector.REMOVE_BUTTON
+						| TableInspector.IMPORT_FILES_BUTTON | TableInspector.EXPORT_FILE_BUTTON) {
 			@Override
 			protected void addColumns() {
 				addColumn(ID_PRESET, new ColumnLabelProvider() {
@@ -113,8 +116,7 @@ public class PresetManagerPage extends BaseWizardPage {
 
 					@Override
 					public Image getImage(Object element) {
-						return AgentPlugin.getDefault()
-								.getImage(AgentPlugin.ICON_AGENT); // TODO: replace the icon in the future
+						return AgentPlugin.getDefault().getImage(AgentPlugin.ICON_AGENT); // TODO: replace the icon in the future
 					}
 				});
 			}
@@ -178,13 +180,28 @@ public class PresetManagerPage extends BaseWizardPage {
 
 			@Override
 			protected void onImportFilesButtonSelected(IStructuredSelection selection) {
-				// TODO: file selection dialog
+				String[] files = openFileDialog(MESSAGE_IMPORT_EXTERNAL_PRESET_FILES,
+						new String[] {PRESET_XML_EXTENSION}, SWT.OPEN | SWT.MULTI);
+				if (files != null) {
+					for (String file : files) {
+						// TODO: import file to preset repository
+					}
+				}
+
 				tableInspector.getViewer().refresh();
 			}
 
 			@Override
 			protected void onExportFileButtonSelected(IStructuredSelection selection) {
-				// TODO: file selection dialog
+				String[] files = openFileDialog(MESSAGE_EXPORT_PRESET_TO_A_FILE, new String[] {PRESET_XML_EXTENSION},
+						SWT.SAVE | SWT.SINGLE);
+				if (files == null || files.length == 0) {
+					return;
+				}
+
+				String file = files[0];
+				IPreset preset = (IPreset) selection.getFirstElement();
+				// TODO: import a preset to file system
 			}
 		};
 		tableInspector.setContentProvider(new PresetTableContentProvider());
