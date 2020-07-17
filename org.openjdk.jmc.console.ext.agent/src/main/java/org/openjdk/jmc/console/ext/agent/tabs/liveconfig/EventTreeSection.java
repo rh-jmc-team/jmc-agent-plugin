@@ -103,18 +103,22 @@ public class EventTreeSection extends MCSectionPart {
 
 		@Override
 		public void run() {
-			CompositeData[] cds = null;
-			if (agentJmxHelper.isMXBeanRegistered()) {
-				cds = agentJmxHelper.retrieveCurrentTransforms();
-			}
-			final ITreeNode[] nodes = buildTreeModel(cds);
-			viewer.getControl().setRedraw(false);
-			viewer.setInput(nodes);
-			selectTopEvent();
-			viewer.getControl().setRedraw(true);
-			viewer.getControl().redraw();
+			refreshTree();
 		}
 
+	}
+
+	public void refreshTree() {
+		CompositeData[] cds = null;
+		if (agentJmxHelper.isMXBeanRegistered()) {
+			cds = agentJmxHelper.retrieveCurrentTransforms();
+		}
+		final ITreeNode[] nodes = buildTreeModel(cds);
+		viewer.getControl().setRedraw(false);
+		viewer.setInput(nodes);
+		selectTopEvent();
+		viewer.getControl().setRedraw(true);
+		viewer.getControl().redraw();
 	}
 
 	public void addEventSelectionListener(final FeatureTableSection infoPart) {

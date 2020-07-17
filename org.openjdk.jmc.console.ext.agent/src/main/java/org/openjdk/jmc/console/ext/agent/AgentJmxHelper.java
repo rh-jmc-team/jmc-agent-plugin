@@ -54,6 +54,7 @@ import java.util.logging.Level;
 public final class AgentJmxHelper {
 	private final static String AGENT_OBJECT_NAME = "org.openjdk.jmc.jfr.agent:type=AgentController";
 	private final static String DEFINE_EVENT_PROBES = "defineEventProbes";
+	private final static String RETRIEVE_EVENT_PROBES = "retrieveEventProbes";
 	private final static String RETRIEVE_CURRENT_TRANSFORMS = "retrieveCurrentTransforms";
 	private final static String CONNECTION_USAGE = "Agent MBean";
 
@@ -100,6 +101,21 @@ public final class AgentJmxHelper {
 			AgentPlugin.getDefault().getLogger().log(Level.SEVERE, "Could not check if agent MXBean is registered", e);
 		}
 		return false;
+	}
+
+	public String retrieveEventProbes() {
+		try {
+			Object result = mbsc.invoke(new ObjectName(AGENT_OBJECT_NAME), RETRIEVE_EVENT_PROBES, new Object[0],
+					new String[0]);
+			return result.toString();
+		} catch (InstanceNotFoundException
+				| MalformedObjectNameException
+				| MBeanException
+				| ReflectionException
+				| IOException e) {
+			AgentPlugin.getDefault().getLogger().log(Level.WARNING, "Could not retrieve event probes", e);
+		}
+		return null;
 	}
 
 	public CompositeData[] retrieveCurrentTransforms() {
