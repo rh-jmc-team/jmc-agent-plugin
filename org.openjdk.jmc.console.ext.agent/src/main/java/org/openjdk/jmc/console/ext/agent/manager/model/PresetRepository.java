@@ -86,7 +86,7 @@ public class PresetRepository {
 
 	public IPreset createPreset() {
 		String fileName = nextUniqueName(DEFAULT_FILE_NAME);
-		Preset preset = new Preset(this, null);
+		Preset preset = new Preset(this);
 		preset.setFileName(fileName);
 
 		return preset;

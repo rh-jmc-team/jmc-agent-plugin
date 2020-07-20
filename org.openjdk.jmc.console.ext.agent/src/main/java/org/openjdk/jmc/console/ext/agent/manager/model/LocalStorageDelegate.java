@@ -35,6 +35,11 @@ public class LocalStorageDelegate implements IPresetStorageDelegate {
 	}
 
 	@Override
+	public String getName() {
+		return file.getName();
+	}
+
+	@Override
 	public InputStream getContents() {
 		try {
 			return new FileInputStream(file);

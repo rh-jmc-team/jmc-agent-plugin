@@ -5,9 +5,11 @@ import java.io.InputStream;
 
 public interface IPresetStorageDelegate {
 
+	String getName();
+
 	InputStream getContents();
-	
+
 	boolean save(String fileName, String fileContent) throws IOException;
-	
+
 	boolean delete();
 }

@@ -33,7 +33,25 @@
  */
 package org.openjdk.jmc.console.ext.agent.manager.model;
 
+import org.openjdk.jmc.console.ext.agent.tabs.presets.internal.ProbeValidator;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.stream.StreamSource;
 import java.io.IOException;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -63,16 +81,128 @@ public class Preset implements IPreset {
 	private boolean allowToString;
 	private boolean allowConverter;
 
-	Preset(PresetRepository repository, IPresetStorageDelegate storageDelegate) {
+	Preset(PresetRepository repository) {
 		presetRepository = repository;
-		this.storageDelegate = storageDelegate;
 
 		fileName = DEFAULT_FILE_NAME;
 		classPrefix = DEFAULT_CLASS_PREFIX;
 		allowToString = DEFAULT_BOOLEAN_FIELD;
 		allowConverter = DEFAULT_BOOLEAN_FIELD;
+	}
 
-		// TODO: load and parse XMl model
+	Preset(PresetRepository repository, IPresetStorageDelegate storageDelegate) throws IOException, SAXException {
+		this(repository);
+
+		if (storageDelegate != null) {
+			deserialize(storageDelegate);
+		}
+	}
+
+	private void deserialize(IPresetStorageDelegate storageDelegate) throws IOException, SAXException {
+		ProbeValidator validator = new ProbeValidator();
+		validator.validate(new StreamSource(storageDelegate.getContents()));
+
+		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+		DocumentBuilder builder;
+		try {
+			builder = factory.newDocumentBuilder();
+		} catch (ParserConfigurationException e) {
+			// This should not happen anyway
+			throw new RuntimeException(e);
+		}
+		Document document = builder.parse(storageDelegate.getContents());
+		NodeList elements;
+
+		fileName = storageDelegate.getName();
+
+		// parse global configurations
+		// Note: we don't worry about hierarchy here and direct get nodes by tag name, since the validation already 
+		// guaranteed a correct structure
+		elements = document.getElementsByTagName("config"); // $NON-NLS-1$
+		if (elements.getLength() != 0) {
+			Element configurationElement = (Element) elements.item(0);
+
+			elements = configurationElement.getElementsByTagName("classprefix"); // $NON-NLS-1$
+			if (elements.getLength() != 0) {
+				classPrefix = elements.item(0).getTextContent();
+			}
+
+			elements = configurationElement.getElementsByTagName("allowtostring"); // $NON-NLS-1$
+			if (elements.getLength() != 0) {
+				allowToString = Boolean.parseBoolean(elements.item(0).getTextContent());
+			}
+
+			elements = configurationElement.getElementsByTagName("allowconverter"); // $NON-NLS-1$
+			if (elements.getLength() != 0) {
+				allowConverter = Boolean.parseBoolean(elements.item(0).getTextContent());
+			}
+		}
+
+		elements = document.getElementsByTagName("events"); // $NON-NLS-1$
+		if (elements.getLength() != 0) {
+			Element eventsElement = (Element) elements.item(0);
+			elements = eventsElement.getElementsByTagName("event");
+			for (int i = 0; i < elements.getLength(); i++) {
+				// TODO: deserialize events
+				events.add(createEvent());
+			}
+		}
+	}
+
+	private String serialize() {
+		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+		DocumentBuilder builder;
+		try {
+			builder = factory.newDocumentBuilder();
+		} catch (ParserConfigurationException e) {
+			// This should not happen anyway
+			throw new RuntimeException(e);
+		}
+
+		Document document = builder.newDocument();
+
+		Element jfrAgentElement = document.createElement("jfragent");
+		document.appendChild(jfrAgentElement);
+
+		Element configurationElement = document.createElement("configuration");
+		jfrAgentElement.appendChild(configurationElement);
+
+		Element classPrefixElement = document.createElement("classprefix");
+		classPrefixElement.setTextContent(classPrefix != null ? classPrefix : "");
+		configurationElement.appendChild(classPrefixElement);
+
+		Element allowToStringElement = document.createElement("allowtostring");
+		allowToStringElement.setTextContent(String.valueOf(allowToString));
+		configurationElement.appendChild(allowToStringElement);
+
+		Element allowConverterElement = document.createElement("allowconverter");
+		allowConverterElement.setTextContent(String.valueOf(allowConverter));
+		configurationElement.appendChild(allowConverterElement);
+
+		Element eventsElement = document.createElement("events");
+		jfrAgentElement.appendChild(eventsElement);
+
+		// TODO: serialize events
+
+		TransformerFactory tf = TransformerFactory.newInstance();
+		Transformer transformer;
+		try {
+			transformer = tf.newTransformer();
+		} catch (TransformerConfigurationException e) {
+			// This should not happen anyway
+			throw new RuntimeException(e);
+		}
+		transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
+		transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+		StringWriter writer = new StringWriter();
+		try {
+			transformer.transform(new DOMSource(document), new StreamResult(writer));
+		} catch (TransformerException e) {
+			// This should not happen anyway
+			throw new RuntimeException(e);
+		}
+
+		return writer.getBuffer().toString();
 	}
 
 	@Override
@@ -176,7 +306,7 @@ public class Preset implements IPreset {
 
 	@Override
 	public Preset createWorkingCopy() {
-		Preset copy = new Preset(presetRepository, null);
+		Preset copy = new Preset(presetRepository);
 		copy.fileName = fileName;
 		copy.classPrefix = classPrefix;
 		copy.allowToString = allowToString;
@@ -318,7 +448,7 @@ public class Preset implements IPreset {
 		}
 
 		try {
-			return storageDelegate.save(fileName, ""); // TODO: build file content
+			return storageDelegate.save(fileName, serialize());
 		} catch (IOException e) {
 			// TODO: log exception
 			return false;

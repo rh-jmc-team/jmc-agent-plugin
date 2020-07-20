@@ -34,9 +34,12 @@
 package org.openjdk.jmc.console.ext.agent.manager.model;
 
 import org.openjdk.jmc.console.ext.agent.AgentPlugin;
+import org.xml.sax.SAXException;
 
 import java.io.File;
 import java.io.IOException;
+
+import javax.xml.parsers.ParserConfigurationException;
 
 public class PresetRepositoryFactory {
 	static final String PRESET_FILE_EXTENSION = ".xml"; // $NON-NLS-1$
@@ -71,10 +74,10 @@ public class PresetRepositoryFactory {
 			} else {
 				IPreset preset;
 				IPresetStorageDelegate delegate = LocalStorageDelegate.getDelegate(file);
-				preset = new Preset(repository, delegate);
 				try {
+					preset = new Preset(repository, delegate);
 					repository.addPreset(preset);
-				} catch (IOException e) {
+				} catch (IOException | SAXException e1) {
 					// TODO: log exception
 				}
 			}
