@@ -33,7 +33,12 @@
  */
 package org.openjdk.jmc.console.ext.agent.manager.model;
 
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+
 public class MethodReturnValue extends CapturedValue implements IMethodReturnValue {
+
+	private static final String XML_TAG_RETURN_VALUE = "returnvalue"; // $NON-NLS-1$
 
 	private final Event event;
 
@@ -41,6 +46,18 @@ public class MethodReturnValue extends CapturedValue implements IMethodReturnVal
 		super();
 
 		this.event = event;
+	}
+
+	MethodReturnValue(Event event, Element element) {
+		super(element);
+
+		this.event = event;
+	}
+
+	@Override
+	public Element buildElement(Document document) {
+		Element element = super.buildElement(document);
+		return (Element) document.renameNode(element, null, XML_TAG_RETURN_VALUE);
 	}
 
 	@Override

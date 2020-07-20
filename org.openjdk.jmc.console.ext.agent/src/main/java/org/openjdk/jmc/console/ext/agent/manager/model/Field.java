@@ -33,12 +33,20 @@
  */
 package org.openjdk.jmc.console.ext.agent.manager.model;
 
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
+
 public class Field extends CapturedValue implements IField {
 
 	private static final String DEFAULT_FIELD_NAME = "New Field"; // $NON-NLS-1$
 	private static final String DEFAULT_FIELD_EXPRESSION = "myField"; // $NON-NLS-1$
 	private static final String EXPRESSION_REGEX = "([a-zA-Z_$][a-zA-Z0-9_$]*\\.)*([a-zA-Z_$][a-zA-Z0-9_$]*)(\\.[a-zA-Z_$][a-zA-Z_$]*)*"; // $NON-NLS-1$
 
+	private static final String XML_TAG_FIELD = "field"; // $NON-NLS-1$
+	private static final String XML_TAG_EXPRESSION = "expression"; // $NON-NLS-1$
+
+	private static final String ERROR_NAME_CANNOT_BE_EMPTY_OR_NULL = "Name cannot be empty or null.";
 	private static final String ERROR_EXPRESSION_CANNOT_BE_EMPTY_OR_NULL = "Expression cannot be empty or null.";
 	private static final String ERROR_EXPRESSION_HAS_INCORRECT_SYNTAX = "Expression has incorrect syntax.";
 
@@ -52,6 +60,37 @@ public class Field extends CapturedValue implements IField {
 
 		expression = DEFAULT_FIELD_EXPRESSION;
 		setName(DEFAULT_FIELD_NAME);
+	}
+
+	Field(Event event, Element element) {
+		super(element);
+		this.event = event;
+
+		NodeList elements = element.getElementsByTagName(XML_TAG_EXPRESSION);
+		if (elements.getLength() != 0) {
+			expression = elements.item(0).getTextContent();
+		}
+	}
+
+	@Override
+	public Element buildElement(Document document) {
+		Element element = super.buildElement(document);
+		element = (Element) document.renameNode(element, null, XML_TAG_FIELD);
+
+		Element expressionElement = document.createElement(XML_TAG_EXPRESSION);
+		expressionElement.setTextContent(expression);
+		element.appendChild(expressionElement);
+
+		return element;
+	}
+
+	@Override
+	public void setName(String name) {
+		if (name == null || name.isEmpty()) {
+			throw new IllegalArgumentException(ERROR_NAME_CANNOT_BE_EMPTY_OR_NULL);
+		}
+
+		super.setName(name);
 	}
 
 	public String getExpression() {

@@ -33,6 +33,9 @@
  */
 package org.openjdk.jmc.console.ext.agent.manager.model;
 
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+
 public interface IEvent {
 	enum Location {
 		ENTRY, EXIT, WRAP,
@@ -117,4 +120,6 @@ public interface IEvent {
 	IField createField();
 
 	void updateField(IField original, IField workingCopy);
+
+	Element buildElement(Document document);
 }

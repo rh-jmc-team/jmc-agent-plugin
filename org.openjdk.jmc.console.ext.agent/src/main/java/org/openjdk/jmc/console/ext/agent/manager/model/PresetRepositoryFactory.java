@@ -43,8 +43,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 public class PresetRepositoryFactory {
 	static final String PRESET_FILE_EXTENSION = ".xml"; // $NON-NLS-1$
-	private static final File PRESET_STORAGE_DIR = AgentPlugin.getDefault().getStateLocation()
-			.append(".presets") // $NON-NLS-1$
+	private static final File PRESET_STORAGE_DIR = AgentPlugin.getDefault().getStateLocation().append(".presets") // $NON-NLS-1$
 			.toFile();
 
 	public static PresetRepository create() {

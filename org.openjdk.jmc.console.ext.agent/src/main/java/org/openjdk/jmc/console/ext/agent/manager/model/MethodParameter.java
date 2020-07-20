@@ -33,11 +33,18 @@
  */
 package org.openjdk.jmc.console.ext.agent.manager.model;
 
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+
 public class MethodParameter extends CapturedValue implements IMethodParameter {
 	private static final String DEFAULT_PARAMETER_NAME = "New Parameter"; // $NON-NLS-1$
 	private static final int DEFAULT_INDEX = 0;
 
-	private static final String ERROR_INDEX_CANNOT_BE_LESS_THAN_ZERO = "Index cannot be less than zero";
+	private static final String XML_TAG_PARAMETER = "parameter"; // $NON-NLS-1$
+	private static final String XML_ATTRIBUTE_INDEX = "index"; // $NON-NLS-1$
+
+	private static final String ERROR_INDEX_CANNOT_BE_LESS_THAN_ZERO = "Index cannot be less than zero.";
+	private static final String ERROR_NAME_CANNOT_BE_EMPTY_OR_NULL = "Name cannot be empty or null.";
 
 	private final Event event;
 
@@ -49,6 +56,30 @@ public class MethodParameter extends CapturedValue implements IMethodParameter {
 
 		index = DEFAULT_INDEX;
 		setName(DEFAULT_PARAMETER_NAME);
+	}
+
+	MethodParameter(Event event, Element element) {
+		super(element);
+		this.event = event;
+
+		index = Integer.parseInt(element.getAttribute(XML_ATTRIBUTE_INDEX));
+	}
+
+	@Override
+	public Element buildElement(Document document) {
+		Element element = super.buildElement(document);
+		element = (Element) document.renameNode(element, null, XML_TAG_PARAMETER);
+		element.setAttribute(XML_ATTRIBUTE_INDEX, String.valueOf(index));
+		return element;
+	}
+
+	@Override
+	public void setName(String name) {
+		if (name == null || name.isEmpty()) {
+			throw new IllegalArgumentException(ERROR_NAME_CANNOT_BE_EMPTY_OR_NULL);
+		}
+
+		super.setName(name);
 	}
 
 	@Override

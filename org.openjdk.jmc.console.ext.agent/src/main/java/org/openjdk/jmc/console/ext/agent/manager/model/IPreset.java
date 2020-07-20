@@ -33,6 +33,8 @@
  */
 package org.openjdk.jmc.console.ext.agent.manager.model;
 
+import org.w3c.dom.Document;
+
 public interface IPreset {
 
 	String getFileName();
@@ -70,12 +72,16 @@ public interface IPreset {
 	String nextUniqueEventName(String originalName);
 
 	String nextUniqueEventId(String originalName);
-	
+
 	void setStorageDelegate(IPresetStorageDelegate storageDelegate);
-	
+
 	IPresetStorageDelegate getStorageDelegate();
-	
+
 	boolean save();
 
 	boolean delete();
+
+	String serialize();
+
+	Document buildDocument();
 }
