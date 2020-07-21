@@ -46,7 +46,9 @@ import org.openjdk.jmc.console.ext.agent.manager.model.PresetRepository;
 import org.openjdk.jmc.console.ext.agent.wizards.BaseWizardPage;
 import org.openjdk.jmc.ui.misc.AbstractStructuredContentProvider;
 import org.openjdk.jmc.ui.misc.DialogToolkit;
+import org.xml.sax.SAXException;
 
+import java.io.File;
 import java.io.IOException;
 
 public class PresetManagerPage extends BaseWizardPage {
@@ -55,6 +57,8 @@ public class PresetManagerPage extends BaseWizardPage {
 	private static final String MESSAGE_PRESET_MANAGER_PAGE_TITLE = "JMC Agent Configuration Preset Manager";
 	private static final String MESSAGE_PRESET_MANAGER_PAGE_DESCRIPTION = "Presets for JMC agent are useful to repeatedly apply configurations to a running JMC agent.";
 	private static final String MESSAGE_PRESET_MANAGER_UNABLE_TO_SAVE_THE_PRESET = "Unable to save the preset";
+	private static final String MESSAGE_PRESET_MANAGER_UNABLE_TO_IMPORT_THE_PRESET = "Unable to import the preset";
+	private static final String MESSAGE_PRESET_MANAGER_UNABLE_TO_EXPORT_THE_PRESET = "Unable to export the preset";
 	private static final String MESSAGE_IMPORT_EXTERNAL_PRESET_FILES = "Import external preset files";
 	private static final String MESSAGE_EXPORT_PRESET_TO_A_FILE = "Import the preset to a file";
 	private static final String MESSAGE_EVENTS = "event(s)";
@@ -191,8 +195,15 @@ public class PresetManagerPage extends BaseWizardPage {
 				String[] files = openFileDialog(MESSAGE_IMPORT_EXTERNAL_PRESET_FILES,
 						new String[] {PRESET_XML_EXTENSION}, SWT.OPEN | SWT.MULTI);
 				if (files != null) {
-					// TODO: import files to preset repository
-					throw new UnsupportedOperationException("not implemented!");
+					for (String path : files) {
+						File file = new File(path);
+						try {
+							repository.importPreset(file);
+						} catch (IOException | SAXException e) {
+							DialogToolkit.openConfirmOnUiThread(MESSAGE_PRESET_MANAGER_UNABLE_TO_IMPORT_THE_PRESET,
+									e.getLocalizedMessage());
+						}
+					}
 				}
 
 				tableInspector.getViewer().refresh();
@@ -206,8 +217,13 @@ public class PresetManagerPage extends BaseWizardPage {
 					return;
 				}
 
-				// TODO: import a preset to file system
-				throw new UnsupportedOperationException("not implemented!");
+				File file = new File(files[0]);
+				try {
+					repository.exportPreset((IPreset) selection.getFirstElement(), file);
+				} catch (IOException e) {
+					DialogToolkit.openConfirmOnUiThread(MESSAGE_PRESET_MANAGER_UNABLE_TO_EXPORT_THE_PRESET,
+							e.getLocalizedMessage());
+				}
 			}
 		};
 		tableInspector.setContentProvider(new PresetTableContentProvider());

@@ -38,8 +38,7 @@ import org.xml.sax.SAXException;
 
 import java.io.File;
 import java.io.IOException;
-
-import javax.xml.parsers.ParserConfigurationException;
+import java.util.logging.Level;
 
 public class PresetRepositoryFactory {
 	static final String PRESET_FILE_EXTENSION = ".xml"; // $NON-NLS-1$
@@ -76,8 +75,8 @@ public class PresetRepositoryFactory {
 				try {
 					preset = new Preset(repository, delegate);
 					repository.addPreset(preset);
-				} catch (IOException | SAXException e1) {
-					// TODO: log exception
+				} catch (IOException | SAXException e) {
+					AgentPlugin.getDefault().getLogger().log(Level.SEVERE, "Could not add local XML config", e);
 				}
 			}
 		}

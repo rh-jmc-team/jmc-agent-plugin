@@ -34,6 +34,7 @@
 package org.openjdk.jmc.console.ext.agent.manager.model;
 
 import org.openjdk.jmc.console.ext.agent.tabs.presets.internal.ProbeValidator;
+import org.openjdk.jmc.console.ext.agent.tabs.presets.internal.ValidationResult;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -50,9 +51,13 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.StringWriter;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -103,13 +108,50 @@ public class Preset implements IPreset {
 		this(repository);
 
 		if (storageDelegate != null) {
-			deserialize(storageDelegate);
+			deserialize(storageDelegate.getContents());
+
+			fileName = storageDelegate.getName();
 		}
 	}
 
-	private void deserialize(IPresetStorageDelegate storageDelegate) throws IOException, SAXException {
+	public void deserialize(InputStream xmlStream) throws IOException, SAXException {
+		byte[] output = {};
+		int length = Integer.MAX_VALUE;
+		int pos = 0;
+		while (pos < length) {
+			int bytesToRead;
+			if (pos >= output.length) { // Only expand when there's no room
+				bytesToRead = Math.min(length - pos, output.length + 1024);
+				if (output.length < pos + bytesToRead) {
+					output = Arrays.copyOf(output, pos + bytesToRead);
+				}
+			} else {
+				bytesToRead = output.length - pos;
+			}
+			int cc = xmlStream.read(output, pos, bytesToRead);
+			if (cc < 0) {
+				if (output.length != pos) {
+					output = Arrays.copyOf(output, pos);
+				}
+				break;
+			}
+			pos += cc;
+		}
+
+		deserialize(new String(output, StandardCharsets.UTF_8));
+	}
+
+	public void deserialize(String xmlSource) throws IOException, SAXException {
 		ProbeValidator validator = new ProbeValidator();
-		validator.validate(new StreamSource(storageDelegate.getContents()));
+		validator.validate(new StreamSource(new ByteArrayInputStream(xmlSource.getBytes())));
+		ValidationResult result = validator.getValidationResult();
+		if (!result.isValid()) {
+			if (result.getFatalError() != null) {
+				throw result.getFatalError();
+			} else {
+				throw result.getErrors().get(0);
+			}
+		}
 
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 		DocumentBuilder builder;
@@ -119,10 +161,8 @@ public class Preset implements IPreset {
 			// This should not happen anyway
 			throw new RuntimeException(e);
 		}
-		Document document = builder.parse(storageDelegate.getContents());
+		Document document = builder.parse(new ByteArrayInputStream(xmlSource.getBytes()));
 		NodeList elements;
-
-		fileName = storageDelegate.getName();
 
 		// parse global configurations
 		// Note: we don't worry about hierarchy here and directly get nodes by tag name, since the validation already 

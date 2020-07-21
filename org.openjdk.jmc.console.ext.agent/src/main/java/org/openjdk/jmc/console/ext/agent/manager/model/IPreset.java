@@ -34,6 +34,10 @@
 package org.openjdk.jmc.console.ext.agent.manager.model;
 
 import org.w3c.dom.Document;
+import org.xml.sax.SAXException;
+
+import java.io.IOException;
+import java.io.InputStream;
 
 public interface IPreset {
 
@@ -80,6 +84,10 @@ public interface IPreset {
 	boolean save();
 
 	boolean delete();
+
+	void deserialize(InputStream xmlStream) throws IOException, SAXException;
+
+	void deserialize(String xmlSource) throws IOException, SAXException;
 
 	String serialize();
 

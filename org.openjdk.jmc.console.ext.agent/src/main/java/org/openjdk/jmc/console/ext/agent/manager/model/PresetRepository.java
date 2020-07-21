@@ -33,7 +33,13 @@
  */
 package org.openjdk.jmc.console.ext.agent.manager.model;
 
+import org.xml.sax.SAXException;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -90,6 +96,21 @@ public class PresetRepository {
 		preset.setFileName(fileName);
 
 		return preset;
+	}
+
+	public void importPreset(File file) throws IOException, SAXException {
+		IPreset preset = createPreset();
+		preset.setFileName(nextUniqueName(file.getName()));
+		FileInputStream fis = new FileInputStream(file);
+		preset.deserialize(fis);
+		fis.close();
+		addPreset(preset);
+	}
+
+	public void exportPreset(IPreset preset, File file) throws IOException {
+		FileOutputStream fos = new FileOutputStream(file);
+		fos.write(preset.serialize().getBytes(StandardCharsets.UTF_8));
+		fos.close();
 	}
 
 	String nextUniqueName(String originalName) {
