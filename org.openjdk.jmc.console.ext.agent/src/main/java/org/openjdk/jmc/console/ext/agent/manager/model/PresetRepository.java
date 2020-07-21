@@ -101,16 +101,16 @@ public class PresetRepository {
 	public void importPreset(File file) throws IOException, SAXException {
 		IPreset preset = createPreset();
 		preset.setFileName(nextUniqueName(file.getName()));
-		FileInputStream fis = new FileInputStream(file);
-		preset.deserialize(fis);
-		fis.close();
+		try (FileInputStream fis = new FileInputStream(file)) {
+			preset.deserialize(fis);
+		}
 		addPreset(preset);
 	}
 
 	public void exportPreset(IPreset preset, File file) throws IOException {
-		FileOutputStream fos = new FileOutputStream(file);
-		fos.write(preset.serialize().getBytes(StandardCharsets.UTF_8));
-		fos.close();
+		try (FileOutputStream fos = new FileOutputStream(file)) {
+			fos.write(preset.serialize().getBytes(StandardCharsets.UTF_8));
+		}
 	}
 
 	String nextUniqueName(String originalName) {

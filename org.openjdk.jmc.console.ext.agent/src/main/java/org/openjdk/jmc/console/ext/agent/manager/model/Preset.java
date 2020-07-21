@@ -143,7 +143,7 @@ public class Preset implements IPreset {
 
 	public void deserialize(String xmlSource) throws IOException, SAXException {
 		ProbeValidator validator = new ProbeValidator();
-		validator.validate(new StreamSource(new ByteArrayInputStream(xmlSource.getBytes())));
+		validator.validate(new StreamSource(new ByteArrayInputStream(xmlSource.getBytes(StandardCharsets.UTF_8))));
 		ValidationResult result = validator.getValidationResult();
 		if (!result.isValid()) {
 			if (result.getFatalError() != null) {
@@ -161,7 +161,7 @@ public class Preset implements IPreset {
 			// This should not happen anyway
 			throw new RuntimeException(e);
 		}
-		Document document = builder.parse(new ByteArrayInputStream(xmlSource.getBytes()));
+		Document document = builder.parse(new ByteArrayInputStream(xmlSource.getBytes(StandardCharsets.UTF_8)));
 		NodeList elements;
 
 		// parse global configurations
