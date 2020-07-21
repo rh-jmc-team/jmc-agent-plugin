@@ -92,7 +92,7 @@ public class PresetEditingWizardPreviewPage extends BaseWizardPage {
 		parent.setLayout(new FillLayout());
 
 		VerticalRuler ruler = new VerticalRuler(0);
-		SourceViewer editor = new SourceViewer(parent, ruler, SWT.NONE);
+		SourceViewer editor = new SourceViewer(parent, ruler, SWT.V_SCROLL | SWT.H_SCROLL);
 		editor.configure(new XmlConfiguration(new ColorManager()));
 
 		document = new Document();
