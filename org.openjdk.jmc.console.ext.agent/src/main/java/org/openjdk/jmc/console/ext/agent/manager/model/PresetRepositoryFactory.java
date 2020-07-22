@@ -33,10 +33,62 @@
  */
 package org.openjdk.jmc.console.ext.agent.manager.model;
 
+import org.openjdk.jmc.console.ext.agent.AgentPlugin;
+import org.xml.sax.SAXException;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.logging.Level;
+
 public class PresetRepositoryFactory {
+	static final String PRESET_FILE_EXTENSION = ".xml"; // $NON-NLS-1$
+	private static final File PRESET_STORAGE_DIR = AgentPlugin.getDefault().getStateLocation().append(".presets") // $NON-NLS-1$
+			.toFile();
+
 	public static PresetRepository create() {
 		PresetRepository repository = new PresetRepository();
-		// TODO: any initialization (if needed) for the repository
+		initiate(repository);
 		return repository;
+	}
+
+	protected static void initiate(PresetRepository repository) {
+		addLocalPresetTo(repository);
+	}
+
+	private static void addLocalPresetTo(PresetRepository repository) {
+		File localDir = PRESET_STORAGE_DIR;
+		if (!localDir.isDirectory()) {
+			return;
+		}
+
+		File[] files = localDir.listFiles((dir, name) -> name.endsWith(PRESET_FILE_EXTENSION));
+		if (files == null) {
+			return;
+		}
+
+		for (File file : files) {
+			if (file.length() == 0) {
+				// FIXME: delete or just ignore empty files? 
+			} else {
+				IPreset preset;
+				IPresetStorageDelegate delegate = LocalStorageDelegate.getDelegate(file);
+				try {
+					preset = new Preset(repository, delegate);
+					repository.addPreset(preset);
+				} catch (IOException | SAXException e) {
+					AgentPlugin.getDefault().getLogger().log(Level.SEVERE, "Could not add local XML config", e);
+				}
+			}
+		}
+	}
+
+	public static File getCreatedStorageDir() throws IOException {
+		if (!PRESET_STORAGE_DIR.isDirectory()) {
+			// Since the parent directory should exist, we explicitly avoid "mkdirs()".
+			if (!PRESET_STORAGE_DIR.mkdir()) {
+				throw new IOException("Could not create the directory " + PRESET_STORAGE_DIR.toString()); //$NON-NLS-1$
+			}
+		}
+		return PRESET_STORAGE_DIR;
 	}
 }

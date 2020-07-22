@@ -33,6 +33,9 @@
  */
 package org.openjdk.jmc.console.ext.agent.manager.model;
 
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+
 public interface ICapturedValue {
 	enum ContentType {
 		NONE, BYTES, TIMESTAMP, MILLIS, NANOS, TICKS, ADDRESS, OS_THREAD, JAVA_THREAD, STACK_TRACE, CLASS, PERCENTAGE
@@ -57,4 +60,6 @@ public interface ICapturedValue {
 	String getConverter();
 
 	void setConverter(String converter);
+
+	Element buildElement(Document document);
 }

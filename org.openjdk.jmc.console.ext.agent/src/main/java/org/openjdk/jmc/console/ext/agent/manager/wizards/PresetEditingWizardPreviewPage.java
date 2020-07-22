@@ -54,10 +54,14 @@ public class PresetEditingWizardPreviewPage extends BaseWizardPage {
 	private static final String MESSAGE_PRESET_EDITING_WIZARD_PREVIEW_PAGE_TITLE = "Preview Preset Output";
 	private static final String MESSAGE_PRESET_EDITING_WIZARD_PREVIEW_PAGE_DESCRIPTION = "Inspects the generated XML before it is saved. Click Back to make any modifications if needed. Click Finish to save.";
 
+	private IPreset preset;
+
 	private IDocument document;
 
 	protected PresetEditingWizardPreviewPage(IPreset preset) {
 		super(PAGE_NAME);
+
+		this.preset = preset;
 	}
 
 	@Override
@@ -88,7 +92,7 @@ public class PresetEditingWizardPreviewPage extends BaseWizardPage {
 		parent.setLayout(new FillLayout());
 
 		VerticalRuler ruler = new VerticalRuler(0);
-		SourceViewer editor = new SourceViewer(parent, ruler, SWT.NONE);
+		SourceViewer editor = new SourceViewer(parent, ruler, SWT.V_SCROLL | SWT.H_SCROLL);
 		editor.configure(new XmlConfiguration(new ColorManager()));
 
 		document = new Document();
@@ -102,6 +106,12 @@ public class PresetEditingWizardPreviewPage extends BaseWizardPage {
 	}
 
 	private void populateUi() {
-		document.set("<jfragent>\n</jfragent>"); // TODO: generate real output preview from this.preset
+		document.set(preset.serialize());
+	}
+
+	public void refresh() {
+		if (document != null) {
+			document.set(preset.serialize());
+		}
 	}
 }

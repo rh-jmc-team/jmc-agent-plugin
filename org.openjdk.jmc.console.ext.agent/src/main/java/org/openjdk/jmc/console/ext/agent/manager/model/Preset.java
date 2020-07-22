@@ -33,7 +33,31 @@
  */
 package org.openjdk.jmc.console.ext.agent.manager.model;
 
+import org.openjdk.jmc.console.ext.agent.tabs.presets.internal.ProbeValidator;
+import org.openjdk.jmc.console.ext.agent.tabs.presets.internal.ValidationResult;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.stream.StreamSource;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.StringWriter;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -44,9 +68,18 @@ public class Preset implements IPreset {
 	private static final String DEFAULT_FILE_NAME = "new_file.xml"; // $NON-NLS-1$
 	private static final String DEFAULT_CLASS_PREFIX = "__JFREvent"; // $NON-NLS-1$
 	private static final boolean DEFAULT_BOOLEAN_FIELD = false;
+
 	private static final String ERROR_FILE_NAME_CANNOT_BE_EMPTY_OR_NULL = "File name cannot be empty or null.";
 	private static final String ERROR_MUST_HAVE_UNIQUE_ID = "An event with the same id already exists.";
 	private static final String ERROR_MUST_HAVE_UNIQUE_EVENT_CLASS_NAME = "Event must have a unique event name per class";
+
+	private static final String XML_TAG_JFR_AGENT = "jfragent"; // $NON-NLS-1$
+	private static final String XML_TAG_CONFIG = "config"; // $NON-NLS-1$
+	private static final String XML_TAG_CLASS_PREFIX = "classprefix"; // $NON-NLS-1$
+	private static final String XML_TAG_ALLOW_TO_STRING = "allowtostring"; // $NON-NLS-1$
+	private static final String XML_TAG_ALLOW_CONVERTER = "allowconverter"; // $NON-NLS-1$
+	private static final String XML_TAG_EVENTS = "events"; // $NON-NLS-1$
+	private static final String XML_TAG_EVENT = "event"; // $NON-NLS-1$
 
 	private static final Pattern ID_WITH_COUNT_PATTERN = Pattern.compile("^(.*)\\.(\\d+)$"); // $NON-NLS-1$
 	private static final Pattern ID_COUNT_SUFFIX_PATTERN = Pattern.compile("^\\.(\\d+)$"); // $NON-NLS-1$
@@ -54,6 +87,7 @@ public class Preset implements IPreset {
 	private static final Pattern NAME_COUNT_SUFFIX_PATTERN = Pattern.compile("^\\s*\\((\\d+)\\)$"); //$NON-NLS-1$
 
 	private final PresetRepository presetRepository;
+	private IPresetStorageDelegate storageDelegate;
 	private final List<IEvent> events = new ArrayList<>();
 
 	private String fileName;
@@ -68,6 +102,168 @@ public class Preset implements IPreset {
 		classPrefix = DEFAULT_CLASS_PREFIX;
 		allowToString = DEFAULT_BOOLEAN_FIELD;
 		allowConverter = DEFAULT_BOOLEAN_FIELD;
+	}
+
+	Preset(PresetRepository repository, IPresetStorageDelegate storageDelegate) throws IOException, SAXException {
+		this(repository);
+
+		if (storageDelegate != null) {
+			deserialize(storageDelegate.getContents());
+
+			fileName = storageDelegate.getName();
+		}
+	}
+
+	public void deserialize(InputStream xmlStream) throws IOException, SAXException {
+		byte[] output = {};
+		int length = Integer.MAX_VALUE;
+		int pos = 0;
+		while (pos < length) {
+			int bytesToRead;
+			if (pos >= output.length) { // Only expand when there's no room
+				bytesToRead = Math.min(length - pos, output.length + 1024);
+				if (output.length < pos + bytesToRead) {
+					output = Arrays.copyOf(output, pos + bytesToRead);
+				}
+			} else {
+				bytesToRead = output.length - pos;
+			}
+			int cc = xmlStream.read(output, pos, bytesToRead);
+			if (cc < 0) {
+				if (output.length != pos) {
+					output = Arrays.copyOf(output, pos);
+				}
+				break;
+			}
+			pos += cc;
+		}
+
+		deserialize(new String(output, StandardCharsets.UTF_8));
+	}
+
+	public void deserialize(String xmlSource) throws IOException, SAXException {
+		ProbeValidator validator = new ProbeValidator();
+		validator.validate(new StreamSource(new ByteArrayInputStream(xmlSource.getBytes(StandardCharsets.UTF_8))));
+		ValidationResult result = validator.getValidationResult();
+		if (!result.isValid()) {
+			if (result.getFatalError() != null) {
+				throw result.getFatalError();
+			} else {
+				throw result.getErrors().get(0);
+			}
+		}
+
+		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+		DocumentBuilder builder;
+		try {
+			builder = factory.newDocumentBuilder();
+		} catch (ParserConfigurationException e) {
+			// This should not happen anyway
+			throw new RuntimeException(e);
+		}
+		Document document = builder.parse(new ByteArrayInputStream(xmlSource.getBytes(StandardCharsets.UTF_8)));
+		NodeList elements;
+
+		// parse global configurations
+		// Note: we don't worry about hierarchy here and directly get nodes by tag name, since the validation already 
+		// guaranteed a correct structure and tag names are unique.
+		elements = document.getElementsByTagName(XML_TAG_CONFIG); // $NON-NLS-1$
+		if (elements.getLength() != 0) {
+			Element configElement = (Element) elements.item(0);
+
+			elements = configElement.getElementsByTagName(XML_TAG_CLASS_PREFIX); // $NON-NLS-1$
+			if (elements.getLength() != 0) {
+				classPrefix = elements.item(0).getTextContent();
+			}
+
+			elements = configElement.getElementsByTagName(XML_TAG_ALLOW_TO_STRING); // $NON-NLS-1$
+			if (elements.getLength() != 0) {
+				allowToString = Boolean.parseBoolean(elements.item(0).getTextContent());
+			}
+
+			elements = configElement.getElementsByTagName(XML_TAG_ALLOW_CONVERTER); // $NON-NLS-1$
+			if (elements.getLength() != 0) {
+				allowConverter = Boolean.parseBoolean(elements.item(0).getTextContent());
+			}
+		}
+
+		elements = document.getElementsByTagName(XML_TAG_EVENTS); // $NON-NLS-1$
+		if (elements.getLength() != 0) {
+			Element eventsElement = (Element) elements.item(0);
+			elements = eventsElement.getElementsByTagName(XML_TAG_EVENT);
+			for (int i = 0; i < elements.getLength(); i++) {
+				events.add(createEvent((Element) elements.item(i)));
+			}
+		}
+	}
+
+	private Element buildConfigElement(Document document) {
+		Element element = document.createElement(XML_TAG_CONFIG);
+
+		Element classPrefixElement = document.createElement(XML_TAG_CLASS_PREFIX);
+		classPrefixElement.setTextContent(classPrefix != null ? classPrefix : "");
+		element.appendChild(classPrefixElement);
+
+		Element allowToStringElement = document.createElement(XML_TAG_ALLOW_TO_STRING);
+		allowToStringElement.setTextContent(String.valueOf(allowToString));
+		element.appendChild(allowToStringElement);
+
+		Element allowConverterElement = document.createElement(XML_TAG_ALLOW_CONVERTER);
+		allowConverterElement.setTextContent(String.valueOf(allowConverter));
+		element.appendChild(allowConverterElement);
+
+		return element;
+	}
+
+	@Override
+	public Document buildDocument() {
+		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+		DocumentBuilder builder;
+		try {
+			builder = factory.newDocumentBuilder();
+		} catch (ParserConfigurationException e) {
+			// This should not happen anyway
+			throw new RuntimeException(e);
+		}
+
+		Document document = builder.newDocument();
+
+		Element jfrAgentElement = document.createElement(XML_TAG_JFR_AGENT);
+		document.appendChild(jfrAgentElement);
+
+		jfrAgentElement.appendChild(buildConfigElement(document));
+
+		Element eventsElement = document.createElement(XML_TAG_EVENTS);
+		for (IEvent event : events) {
+			eventsElement.appendChild(event.buildElement(document));
+		}
+		jfrAgentElement.appendChild(eventsElement);
+
+		return document;
+	}
+
+	public String serialize() {
+		Document document = buildDocument();
+
+		TransformerFactory tf = TransformerFactory.newInstance();
+		Transformer transformer;
+		try {
+			transformer = tf.newTransformer();
+		} catch (TransformerConfigurationException e) {
+			// This should not happen anyway
+			throw new RuntimeException(e);
+		}
+		transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
+		transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+		StringWriter writer = new StringWriter(2000);
+		try {
+			transformer.transform(new DOMSource(document), new StreamResult(writer));
+		} catch (TransformerException e) {
+			// This should not happen anyway
+			throw new RuntimeException(e);
+		}
+
+		return writer.getBuffer().toString();
 	}
 
 	@Override
@@ -149,17 +345,21 @@ public class Preset implements IPreset {
 	public IEvent createEvent() {
 		Event event = new Event(this);
 
-		String id = fileName;
-		if (id.endsWith(FILE_NAME_EXTENSION)) {
-			id = id.substring(0, id.lastIndexOf(FILE_NAME_EXTENSION)).replaceAll("\\s", "_");
+		String idPrefix = fileName;
+		if (idPrefix.endsWith(FILE_NAME_EXTENSION)) {
+			idPrefix = idPrefix.substring(0, idPrefix.lastIndexOf(FILE_NAME_EXTENSION)).replaceAll("\\s", "_");
 		}
-		id = nextUniqueEventId(id + ".event.1"); // $NON-NLS-1$
+		idPrefix = nextUniqueEventId(idPrefix + ".event.1"); // $NON-NLS-1$
 
 		String name = nextUniqueEventName(event.getName());
-		event.setId(id);
+		event.setId(idPrefix);
 		event.setName(name);
 
 		return event;
+	}
+
+	private IEvent createEvent(Element element) {
+		return new Event(this, element);
 	}
 
 	@Override
@@ -296,6 +496,39 @@ public class Preset implements IPreset {
 		}
 	}
 
+	@Override
+	public void setStorageDelegate(IPresetStorageDelegate storageDelegate) {
+		this.storageDelegate = storageDelegate;
+	}
+
+	@Override
+	public IPresetStorageDelegate getStorageDelegate() {
+		return storageDelegate;
+	}
+
+	@Override
+	public boolean save() {
+		if (storageDelegate == null) {
+			return false;
+		}
+
+		try {
+			return storageDelegate.save(fileName, serialize());
+		} catch (IOException e) {
+			// TODO: log exception
+			return false;
+		}
+	}
+
+	@Override
+	public boolean delete() {
+		if (storageDelegate == null) {
+			return true;
+		}
+
+		return storageDelegate.delete();
+	}
+
 	private boolean containsId(String id) {
 		for (IEvent e : events) {
 			if (e.getId().equals(id)) {
@@ -313,5 +546,4 @@ public class Preset implements IPreset {
 		}
 		return false;
 	}
-
 }

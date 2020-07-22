@@ -33,6 +33,12 @@
  */
 package org.openjdk.jmc.console.ext.agent.manager.model;
 
+import org.w3c.dom.Document;
+import org.xml.sax.SAXException;
+
+import java.io.IOException;
+import java.io.InputStream;
+
 public interface IPreset {
 
 	String getFileName();
@@ -70,4 +76,20 @@ public interface IPreset {
 	String nextUniqueEventName(String originalName);
 
 	String nextUniqueEventId(String originalName);
+
+	void setStorageDelegate(IPresetStorageDelegate storageDelegate);
+
+	IPresetStorageDelegate getStorageDelegate();
+
+	boolean save();
+
+	boolean delete();
+
+	void deserialize(InputStream xmlStream) throws IOException, SAXException;
+
+	void deserialize(String xmlSource) throws IOException, SAXException;
+
+	String serialize();
+
+	Document buildDocument();
 }

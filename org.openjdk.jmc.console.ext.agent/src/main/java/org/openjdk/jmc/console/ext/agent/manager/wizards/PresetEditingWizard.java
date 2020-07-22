@@ -33,6 +33,7 @@
  */
 package org.openjdk.jmc.console.ext.agent.manager.wizards;
 
+import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.Wizard;
 import org.openjdk.jmc.console.ext.agent.manager.model.IPreset;
 
@@ -54,5 +55,15 @@ public class PresetEditingWizard extends Wizard {
 		addPage(new PresetEditingWizardConfigPage(preset));
 		addPage(new PresetEditingWizardEventPage(preset));
 		addPage(new PresetEditingWizardPreviewPage(preset));
+	}
+
+	@Override
+	public IWizardPage getNextPage(IWizardPage page) {
+		IWizardPage nextPage = super.getNextPage(page);
+		if (nextPage instanceof PresetEditingWizardPreviewPage) {
+			((PresetEditingWizardPreviewPage) nextPage).refresh();
+		}
+
+		return nextPage;
 	}
 }

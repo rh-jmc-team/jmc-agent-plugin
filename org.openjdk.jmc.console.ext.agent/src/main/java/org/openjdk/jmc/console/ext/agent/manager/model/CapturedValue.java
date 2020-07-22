@@ -33,6 +33,10 @@
  */
 package org.openjdk.jmc.console.ext.agent.manager.model;
 
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
+
 import java.net.URI;
 import java.net.URISyntaxException;
 
@@ -40,12 +44,17 @@ class CapturedValue implements ICapturedValue {
 
 	private static final String DEFAULT_STRING_FIELD = ""; // $NON-NLS-1$
 	private static final Object DEFAULT_OBJECT_TYPE = null;
-	private static final String DEFAULT_FIELD_NAME = "'New Captured Value'"; // $NON-NLS-1$
 	private static final String CONVERTER_REGEX = "([a-zA-Z_$][a-zA-Z0-9_$]*\\.)*([a-zA-Z_$][a-zA-Z0-9_$]*)"; // $NON-NLS-1$
 
-	private static final String ERROR_NAME_CANNOT_BE_EMPTY_OR_NULL = "Name cannot be empty or null.";
 	private static final String ERROR_RELATION_KEY_HAS_INCORRECT_SYNTAX = "Relation key has incorrect syntax.";
 	private static final String ERROR_CONVERTER_HAS_INCORRECT_SYNTAX = "Converter has incorrect syntax.";
+
+	private static final String XML_TAG_CAPTURED_VALUE = "capturedvalue"; // $NON-NLS-1$
+	private static final String XML_TAG_NAME = "name"; // $NON-NLS-1$
+	private static final String XML_TAG_DESCRIPTION = "description"; // $NON-NLS-1$
+	private static final String XML_TAG_CONTENT_TYPE = "contenttype"; // $NON-NLS-1$
+	private static final String XML_TAG_RELATION_KEY = "relationkey"; // $NON-NLS-1$
+	private static final String XML_TAG_CONVERTER = "converter"; // $NON-NLS-1$
 
 	private String name;
 	private String description;
@@ -54,11 +63,78 @@ class CapturedValue implements ICapturedValue {
 	private String converter;
 
 	CapturedValue() {
-		name = DEFAULT_FIELD_NAME;
+		name = DEFAULT_STRING_FIELD;
 		description = DEFAULT_STRING_FIELD;
 		contentType = (ContentType) DEFAULT_OBJECT_TYPE;
 		relationKey = DEFAULT_STRING_FIELD;
 		converter = DEFAULT_STRING_FIELD;
+	}
+
+	CapturedValue(Element element) {
+		this();
+
+		NodeList elements;
+		elements = element.getElementsByTagName(XML_TAG_NAME);
+		if (elements.getLength() != 0) {
+			name = elements.item(0).getTextContent();
+		}
+
+		elements = element.getElementsByTagName(XML_TAG_DESCRIPTION);
+		if (elements.getLength() != 0) {
+			description = elements.item(0).getTextContent();
+		}
+
+		elements = element.getElementsByTagName(XML_TAG_CONTENT_TYPE);
+		if (elements.getLength() != 0) {
+			contentType = ContentType.valueOf(elements.item(0).getTextContent());
+		}
+
+		elements = element.getElementsByTagName(XML_TAG_RELATION_KEY);
+		if (elements.getLength() != 0) {
+			relationKey = elements.item(0).getTextContent();
+		}
+
+		elements = element.getElementsByTagName(XML_TAG_CONVERTER);
+		if (elements.getLength() != 0) {
+			converter = elements.item(0).getTextContent();
+		}
+	}
+
+	@Override
+	public Element buildElement(Document document) {
+		Element element = document.createElement(XML_TAG_CAPTURED_VALUE);
+
+		if (name != null && !name.isEmpty()) {
+			Element nameElement = document.createElement(XML_TAG_NAME);
+			nameElement.setTextContent(name);
+			element.appendChild(nameElement);
+		}
+
+		if (description != null && !description.isEmpty()) {
+			Element descriptionElement = document.createElement(XML_TAG_DESCRIPTION);
+			descriptionElement.setTextContent(description);
+			element.appendChild(descriptionElement);
+		}
+
+		if (contentType != null) {
+			Element contentTypeElement = document.createElement(XML_TAG_CONTENT_TYPE);
+			contentTypeElement.setTextContent(contentType.toString());
+			element.appendChild(contentTypeElement);
+		}
+
+		if (relationKey != null && !relationKey.isEmpty()) {
+			Element relationKeyElement = document.createElement(XML_TAG_RELATION_KEY);
+			relationKeyElement.setTextContent(relationKey);
+			element.appendChild(relationKeyElement);
+		}
+
+		if (converter != null && !converter.isEmpty()) {
+			Element converterElement = document.createElement(XML_TAG_CONVERTER);
+			converterElement.setTextContent(converter);
+			element.appendChild(converterElement);
+		}
+
+		return element;
 	}
 
 	@Override
@@ -68,10 +144,6 @@ class CapturedValue implements ICapturedValue {
 
 	@Override
 	public void setName(String name) {
-		if (name == null || name.isEmpty()) {
-			throw new IllegalArgumentException(ERROR_NAME_CANNOT_BE_EMPTY_OR_NULL);
-		}
-
 		this.name = name;
 	}
 

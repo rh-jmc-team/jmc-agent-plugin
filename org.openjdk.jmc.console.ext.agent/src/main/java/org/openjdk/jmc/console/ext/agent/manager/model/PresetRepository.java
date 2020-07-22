@@ -33,6 +33,13 @@
  */
 package org.openjdk.jmc.console.ext.agent.manager.model;
 
+import org.xml.sax.SAXException;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -51,28 +58,34 @@ public class PresetRepository {
 	}
 
 	public void removePreset(IPreset configuration) {
-		// TODO: persistent storage
-		presets.remove(configuration);
+		if (presets.remove(configuration)) {
+			configuration.delete();
+		}
 	}
 
-	public void addPreset(IPreset configuration) {
-		// TODO: persistent storage
+	public void addPreset(IPreset configuration) throws IOException {
 		presets.add(configuration);
+
+		if (configuration.getStorageDelegate() == null) {
+			configuration.setStorageDelegate(LocalStorageDelegate.getDelegate(configuration.getFileName()));
+		}
+
+		configuration.save();
 	}
 
 	public boolean containsPreset(IPreset configuration) {
-		// TODO: persistent storage
 		return presets.contains(configuration);
 	}
 
 	public IPreset[] listPresets() {
-		// TODO: persistent storage
 		return presets.toArray(new IPreset[0]);
 	}
 
-	public void updatePreset(IPreset original, IPreset workingCopy) {
+	public void updatePreset(IPreset original, IPreset workingCopy) throws IOException {
 		if (containsPreset(original)) {
 			removePreset(original);
+			original.delete();
+
 			addPreset(workingCopy);
 		}
 	}
@@ -83,6 +96,21 @@ public class PresetRepository {
 		preset.setFileName(fileName);
 
 		return preset;
+	}
+
+	public void importPreset(File file) throws IOException, SAXException {
+		IPreset preset = createPreset();
+		preset.setFileName(nextUniqueName(file.getName()));
+		try (FileInputStream fis = new FileInputStream(file)) {
+			preset.deserialize(fis);
+		}
+		addPreset(preset);
+	}
+
+	public void exportPreset(IPreset preset, File file) throws IOException {
+		try (FileOutputStream fos = new FileOutputStream(file)) {
+			fos.write(preset.serialize().getBytes(StandardCharsets.UTF_8));
+		}
 	}
 
 	String nextUniqueName(String originalName) {
