@@ -106,4 +106,9 @@
 		<Method name="openFileDialog"/>
 		<Bug pattern="PZLA_PREFER_ZERO_LENGTH_ARRAYS" />
 	</Match>
+	<Match>
+		<Class name="org.openjdk.jmc.console.ext.agent.manager.model.PresetRepositoryFactory" />
+		<Method name="createSingleton"/>
+		<Bug pattern="DC_DOUBLECHECK" />
+	</Match>
 </FindBugsFilter>
