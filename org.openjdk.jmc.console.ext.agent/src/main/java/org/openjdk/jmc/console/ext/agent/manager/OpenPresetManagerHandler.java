@@ -46,7 +46,7 @@ public class OpenPresetManagerHandler extends AbstractHandler {
 	@Override
 	public Object execute(ExecutionEvent event) {
 		Shell shell = Display.getCurrent().getActiveShell();
-		PresetRepository repository = PresetRepositoryFactory.create();
+		PresetRepository repository = PresetRepositoryFactory.createSingleton();
 
 		Dialog dialog = PresetManager.createFor(shell, repository);
 		dialog.open();

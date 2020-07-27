@@ -45,7 +45,17 @@ public class PresetRepositoryFactory {
 	private static final File PRESET_STORAGE_DIR = AgentPlugin.getDefault().getStateLocation().append(".presets") // $NON-NLS-1$
 			.toFile();
 
-	public static PresetRepository create() {
+	private static PresetRepository singleton;
+
+	public static PresetRepository createSingleton() {
+		if (singleton == null) {
+			singleton = create();
+		}
+
+		return create();
+	}
+
+	protected static PresetRepository create() {
 		PresetRepository repository = new PresetRepository();
 		initiate(repository);
 		return repository;
