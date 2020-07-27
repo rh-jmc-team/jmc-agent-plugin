@@ -49,10 +49,14 @@ public class PresetRepositoryFactory {
 
 	public static PresetRepository createSingleton() {
 		if (singleton == null) {
-			singleton = create();
+			synchronized (PresetRepositoryFactory.class) {
+				if (singleton == null) {
+					singleton = create();
+				}
+			}
 		}
 
-		return create();
+		return singleton;
 	}
 
 	protected static PresetRepository create() {
