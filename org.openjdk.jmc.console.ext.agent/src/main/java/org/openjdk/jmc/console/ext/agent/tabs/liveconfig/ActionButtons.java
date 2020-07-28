@@ -36,6 +36,7 @@ package org.openjdk.jmc.console.ext.agent.tabs.liveconfig;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Arrays;
@@ -285,7 +286,7 @@ public class ActionButtons extends Composite {
 		dialog.setFilterExtensions(extensions);
 
 		if (dialog.open() == null) {
-			return null;
+			return new String[0];
 		}
 
 		return Arrays.stream(dialog.getFileNames()).map(name -> dialog.getFilterPath() + File.separator + name)
@@ -295,12 +296,12 @@ public class ActionButtons extends Composite {
 	private void applyConfig(String path) {
 		try {
 			byte[] bytes = Files.readAllBytes(Paths.get(path));
-			String validationMessage = validateProbeDefinition(new String(bytes));
+			String validationMessage = validateProbeDefinition(new String(bytes, StandardCharsets.UTF_8));
 			if (!validationMessage.isEmpty()) {
 				DialogToolkit.openConfirmOnUiThread(ERROR_PAGE_TITLE, validationMessage);
 				return;
 			}
-			helper.defineEventProbes(new String(bytes));
+			helper.defineEventProbes(new String(bytes, StandardCharsets.UTF_8));
 		} catch (IOException e) {
 			AgentPlugin.getDefault().getLogger().log(Level.WARNING, "Could not apply XML config", e);
 		}
@@ -309,7 +310,8 @@ public class ActionButtons extends Composite {
 	private String validateProbeDefinition(String configuration) {
 		ProbeValidator validator = new ProbeValidator();
 		try {
-			validator.validate(new StreamSource(new ByteArrayInputStream(configuration.getBytes())));
+			validator.validate(
+					new StreamSource(new ByteArrayInputStream(configuration.getBytes(StandardCharsets.UTF_8))));
 		} catch (IOException e) {
 			return e.getMessage();
 		} catch (SAXException e) {

@@ -66,7 +66,6 @@ public class LiveConfigTab extends AgentFormPage {
 
 	@Inject
 	protected void createPageContent(IManagedForm managedForm, AgentJmxHelper helper, IConnectionHandle handle) {
-
 		ScrolledForm form = managedForm.getForm();
 		FormToolkit toolkit = managedForm.getToolkit();
 
@@ -90,7 +89,6 @@ public class LiveConfigTab extends AgentFormPage {
 		sashForm.setWeights(new int[] {3, 4});
 
 		new ActionButtons(pageContainer, presetRepository, helper, eventTree);
-
 	}
 
 }
