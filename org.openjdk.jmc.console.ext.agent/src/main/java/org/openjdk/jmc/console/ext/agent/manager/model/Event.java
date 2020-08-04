@@ -41,6 +41,7 @@ import org.w3c.dom.NodeList;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -152,7 +153,7 @@ public class Event implements IEvent {
 
 		Element locationElement = getFirstDirectChildElementByTagName(element, XML_TAG_LOCATION);
 		if (locationElement != null) {
-			location = Location.valueOf(locationElement.getTextContent());
+			location = Location.valueOf(locationElement.getTextContent().toUpperCase(Locale.ENGLISH));
 		}
 
 		Element methodElement = getFirstDirectChildElementByTagName(element, XML_TAG_METHOD);

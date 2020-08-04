@@ -39,6 +39,7 @@ import org.w3c.dom.NodeList;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Locale;
 
 class CapturedValue implements ICapturedValue {
 
@@ -86,7 +87,7 @@ class CapturedValue implements ICapturedValue {
 
 		elements = element.getElementsByTagName(XML_TAG_CONTENT_TYPE);
 		if (elements.getLength() != 0) {
-			contentType = ContentType.valueOf(elements.item(0).getTextContent());
+			contentType = ContentType.valueOf(elements.item(0).getTextContent().toUpperCase(Locale.ENGLISH));
 		}
 
 		elements = element.getElementsByTagName(XML_TAG_RELATION_KEY);

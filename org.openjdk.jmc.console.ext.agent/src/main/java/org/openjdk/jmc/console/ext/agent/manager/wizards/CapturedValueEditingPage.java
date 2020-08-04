@@ -19,6 +19,7 @@ import org.openjdk.jmc.console.ext.agent.manager.model.IMethodParameter;
 import org.openjdk.jmc.console.ext.agent.manager.model.IMethodReturnValue;
 import org.openjdk.jmc.console.ext.agent.wizards.BaseWizardPage;
 
+import java.util.Locale;
 import java.util.stream.Stream;
 
 public class CapturedValueEditingPage extends BaseWizardPage {
@@ -164,8 +165,9 @@ public class CapturedValueEditingPage extends BaseWizardPage {
 		}
 		descriptionText.addModifyListener(
 				handleExceptionIfAny((ModifyListener) e -> capturedValue.setDescription(descriptionText.getText())));
-		contentTypeCombo.addModifyListener(handleExceptionIfAny((ModifyListener) e -> capturedValue.setContentType(
-				contentTypeCombo.getSelectionIndex() == -1 ? null : ContentType.valueOf(contentTypeCombo.getText()))));
+		contentTypeCombo.addModifyListener(handleExceptionIfAny(
+				(ModifyListener) e -> capturedValue.setContentType(contentTypeCombo.getSelectionIndex() == -1 ? null
+						: ContentType.valueOf(contentTypeCombo.getText().toUpperCase(Locale.ENGLISH)))));
 		contentTypeClearButton.addListener(SWT.Selection,
 				handleExceptionIfAny((Listener) e -> contentTypeCombo.deselectAll()));
 		relationalKeyText.addModifyListener(
