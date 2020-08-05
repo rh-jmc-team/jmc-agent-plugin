@@ -48,6 +48,7 @@ import org.openjdk.jmc.console.ext.agent.manager.model.IEvent;
 import org.openjdk.jmc.console.ext.agent.manager.model.IEvent.Location;
 import org.openjdk.jmc.console.ext.agent.wizards.BaseWizardPage;
 
+import java.util.Locale;
 import java.util.stream.Stream;
 
 public class EventEditingWizardConfigPage extends BaseWizardPage {
@@ -190,8 +191,9 @@ public class EventEditingWizardConfigPage extends BaseWizardPage {
 				handleExceptionIfAny((ModifyListener) e -> event.setMethodDescriptor(methodDescriptorText.getText())));
 		pathText.addModifyListener(handleExceptionIfAny((ModifyListener) e -> event.setPath(pathText.getText())));
 		classText.addModifyListener(handleExceptionIfAny((ModifyListener) e -> event.setClazz(classText.getText())));
-		locationCombo.addModifyListener(handleExceptionIfAny((ModifyListener) e -> event.setLocation(
-				locationCombo.getSelectionIndex() == -1 ? null : Location.valueOf(locationCombo.getText()))));
+		locationCombo.addModifyListener(
+				handleExceptionIfAny((ModifyListener) e -> event.setLocation(locationCombo.getSelectionIndex() == -1
+						? null : Location.valueOf(locationCombo.getText().toUpperCase(Locale.ENGLISH)))));
 		locationClearButton.addListener(SWT.Selection, e -> locationCombo.deselectAll());
 		recordExceptionsButton.addListener(SWT.Selection,
 				handleExceptionIfAny((Listener) e -> event.setRethrow(recordExceptionsButton.getSelection())));
