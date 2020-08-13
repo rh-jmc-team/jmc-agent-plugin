@@ -3,9 +3,9 @@ name: Check formatting and run tests
 on: [push, pull_request]
 
 jobs:
-    linux:
-      runs-on: 'ubuntu-latest'
-      steps:
+  linux:
+    runs-on: 'ubuntu-latest'
+    steps:
       - uses: actions/checkout@v1
       - name: Build JMC
         run: ./scripts/buildjmc.sh
