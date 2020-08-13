@@ -8,7 +8,7 @@ The JMC Agent Plugin is implemented as an Eclipse platform plug-in, thus, you'll
 
 ### 1.1 Download a Pre-release
 
-Alpha pre-leases are available for downloading from the [release page](./releases)
+Alpha pre-leases are available for downloading from the [release page](https://github.com/rh-jmc-team/jmc-agent-plugin/releases/)
 
 ## 2. Building from Source
 
