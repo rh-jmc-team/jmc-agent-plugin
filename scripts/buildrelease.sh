@@ -2,18 +2,15 @@
 
 set -e
 
-AGENT_PLUGIN_ROOT=$(pwd)
-
 echo "======== Building JMC with Agent Plugin ================="
-cd $HOME
 sh -c "git clone --depth 1 https://github.com/openjdk/jmc.git"
 
 echo "======== Copying Agent Plugin files ====================="
-cp -r ${AGENT_PLUGIN_ROOT}/org.openjdk.jmc* jmc/application
+cp -r ../org.openjdk.jmc* jmc/application
 
 echo "======== Applying patch ================================="
 cd jmc
-patch -p0 < ${AGENT_PLUGIN_ROOT}/scripts/diff.patch
+patch -p0 < ../scripts/diff.patch
 cd ..
 
 echo "======== Building p2 repo ==============================="
