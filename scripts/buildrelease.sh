@@ -6,7 +6,7 @@ echo "======== Building JMC with Agent Plugin ================="
 sh -c "git clone --depth 1 https://github.com/openjdk/jmc.git"
 
 echo "======== Copying Agent Plugin files ====================="
-cp -r ../org.openjdk.jmc* jmc/application
+cp -r org.openjdk.jmc* jmc/application
 
 echo "======== Applying patch ================================="
 cd jmc
