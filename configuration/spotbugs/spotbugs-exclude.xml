@@ -39,12 +39,12 @@
 		<Bug pattern="PZLA_PREFER_ZERO_LENGTH_ARRAYS"/>
 	</Match>
 	<Match>
-		<Class name="org.openjdk.jmc.console.ext.agent.editor.AgentEditor"/>
+		<Class name="org.openjdk.jmc.console.ext.agent.editor.AgentEditorBak"/>
 		<Method name="doAddPages"/>
 		<Bug pattern="REC_CATCH_EXCEPTION"/>
 	</Match>
 	<Match>
-		<Class name="org.openjdk.jmc.console.ext.agent.editor.AgentEditor"/>
+		<Class name="org.openjdk.jmc.console.ext.agent.editor.AgentEditorBak"/>
 		<Bug pattern="UWF_FIELD_NOT_INITIALIZED_IN_CONSTRUCTOR"/>
 	</Match>
 	<Match>

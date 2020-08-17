@@ -54,13 +54,13 @@ public class AgentFormPage extends FormPage /* implements IConsolePageContainer 
 	@Inject
 	private IConnectionHandle connectionHandle;
 
-	public AgentFormPage(AgentEditor editor, String id, String title) {
+	public AgentFormPage(AgentEditorBak editor, String id, String title) {
 		super(editor, id, title); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 	@Override
-	public AgentEditor getEditor() {
-		return (AgentEditor) super.getEditor();
+	public AgentEditorBak getEditor() {
+		return (AgentEditorBak) super.getEditor();
 	}
 
 	public Composite getBody() {

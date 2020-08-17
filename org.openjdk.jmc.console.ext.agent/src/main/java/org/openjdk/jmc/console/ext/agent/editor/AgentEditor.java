@@ -1,138 +1,66 @@
-/*
- * Copyright (c) 2020, Oracle and/or its affiliates. All rights reserved.
- * Copyright (c) 2020, Red Hat Inc. All rights reserved.
- *
- * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
- *
- * The contents of this file are subject to the terms of either the Universal Permissive License
- * v 1.0 as shown at http://oss.oracle.com/licenses/upl
- *
- * or the following license:
- *
- * Redistribution and use in source and binary forms, with or without modification, are permitted
- * provided that the following conditions are met:
- *
- * 1. Redistributions of source code must retain the above copyright notice, this list of conditions
- * and the following disclaimer.
- *
- * 2. Redistributions in binary form must reproduce the above copyright notice, this list of
- * conditions and the following disclaimer in the documentation and/or other materials provided with
- * the distribution.
- *
- * 3. Neither the name of the copyright holder nor the names of its contributors may be used to
- * endorse or promote products derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
- * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
- * FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR
- * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY
- * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */
 package org.openjdk.jmc.console.ext.agent.editor;
 
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.e4.core.contexts.ContextInjectionFactory;
-import org.eclipse.e4.core.contexts.IEclipseContext;
+import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.dialogs.IMessageProvider;
+import org.eclipse.jface.dialogs.ProgressIndicator;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StackLayout;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IEditorInput;
-import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.PartInitException;
-import org.eclipse.ui.forms.IManagedForm;
-import org.eclipse.ui.forms.IMessageManager;
-import org.eclipse.ui.forms.editor.FormEditor;
-import org.eclipse.ui.forms.editor.IFormPage;
+import org.eclipse.ui.forms.widgets.Form;
 import org.eclipse.ui.forms.widgets.FormToolkit;
-import org.openjdk.jmc.common.io.IOToolkit;
-import org.openjdk.jmc.console.ext.agent.AgentJmxHelper;
-import org.openjdk.jmc.console.ext.agent.AgentPlugin;
-import org.openjdk.jmc.console.ext.agent.tabs.editor.EditorTab;
-import org.openjdk.jmc.console.ext.agent.tabs.liveconfig.LiveConfigTab;
-import org.openjdk.jmc.console.ext.agent.tabs.overview.OverviewTab;
-import org.openjdk.jmc.console.ext.agent.tabs.presets.PresetsTab;
+import org.eclipse.ui.part.EditorPart;
+import org.openjdk.jmc.flightrecorder.ui.FlightRecorderUI;
 import org.openjdk.jmc.rjmx.IConnectionHandle;
 import org.openjdk.jmc.rjmx.IConnectionListener;
 import org.openjdk.jmc.rjmx.IServerHandle;
 import org.openjdk.jmc.ui.UIPlugin;
 import org.openjdk.jmc.ui.WorkbenchToolkit;
 import org.openjdk.jmc.ui.misc.CompositeToolkit;
-import org.openjdk.jmc.ui.misc.DisplayToolkit;
 
-import javax.management.MBeanServerConnection;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.logging.Level;
-
-public class AgentEditor extends FormEditor implements IConnectionListener {
-
+public class AgentEditor extends EditorPart implements IConnectionListener {
 	public static final String EDITOR_ID = "org.openjdk.jmc.console.ext.agent.editor.AgentEditor"; //$NON-NLS-1$
 
+	private static final String AGENT_EDITOR_TITLE = "Agent Live Config";
+	private static final String AGENT_EDITOR_ACTION_REFRESH = "Refresh";
 	private static final String CONNECTION_LOST = "Connection Lost";
-	private static final String COULD_NOT_CONNECT = "Could not connect";
 
 	private volatile IConnectionHandle connection;
 
+	private Composite parentComposite;
+	private FormToolkit formToolkit;
 	private StackLayout stackLayout;
-	private Composite mainUi;
+	private AgentEditorUi agentEditorUi;
+	private Form form;
 
+	@Override
 	public void onConnectionChange(IConnectionHandle connection) {
-		boolean serverDisposed = getEditorInput().getServerHandle().getState() == IServerHandle.State.DISPOSED;
+		boolean serverDisposed = getAgentEditorInput().getServerHandle().getState() == IServerHandle.State.DISPOSED;
 		if (serverDisposed) {
 			WorkbenchToolkit.asyncCloseEditor(AgentEditor.this);
-		} else if (!connection.isConnected()) {
-			DisplayToolkit.safeAsyncExec(() -> {
-				if (pages != null) {
-					for (Object page : pages) {
-						if (page instanceof IFormPage) {
-							IMessageManager mm = ((IFormPage) page).getManagedForm().getMessageManager();
-							mm.addMessage(this, CONNECTION_LOST, null, IMessageProvider.ERROR);
-						}
-					}
-				}
-			});
+			return;
+		}
+
+		if (!connection.isConnected() && form != null) {
+			form.setMessage(CONNECTION_LOST, IMessageProvider.ERROR);
 		}
 	}
 
 	@Override
-	public void init(IEditorSite site, IEditorInput input) throws PartInitException {
-		super.init(site, input);
-		setPartName("JMC Agent Plugin: " + getEditorInput().getName());
-
-		connection = getEditorInput().getConnectionHandle();
-		setUpInjectables();
-
-		getEditorInput().getAgentJmxHelper().addConnectionChangedListener(this);
-	}
-
-	@Override
-	protected Composite createPageContainer(Composite parent) {
-		parent = super.createPageContainer(parent);
-		FormToolkit toolkit = getToolkit();
-		mainUi = toolkit.createComposite(parent);
-		Composite progress = toolkit.createComposite(parent);
-		CompositeToolkit.createWaitIndicator(progress, toolkit);
-		stackLayout = new StackLayout();
-		parent.setLayout(stackLayout);
-		stackLayout.topControl = progress;
-		mainUi.setLayout(new FillLayout());
-		return mainUi;
-	}
-
-	@Override
-	public void doSave(IProgressMonitor monitor) {
-		// TODO Auto-generated method stub
+	public void doSave(IProgressMonitor iProgressMonitor) {
+		// intentionally empty
 	}
 
 	@Override
 	public void doSaveAs() {
-		// TODO Auto-generated method stub
+		// intentionally empty
 	}
 
 	@Override
@@ -146,106 +74,90 @@ public class AgentEditor extends FormEditor implements IConnectionListener {
 	}
 
 	@Override
-	protected void addPages() {
-		doAddPages();
-
-		stackLayout.topControl.dispose();
-		stackLayout.topControl = mainUi;
-		mainUi.getParent().layout(true, true);
+	public void setFocus() {
+		parentComposite.setFocus();
 	}
 
-	private void doAddPages() {
-		List<AgentFormPage> pages = new ArrayList<>();
-		pages.add(new OverviewTab(this));
-		pages.add(new LiveConfigTab(this));
-		pages.add(new PresetsTab(this));
-		pages.add(new EditorTab(this));
+	@Override
+	public void init(IEditorSite site, IEditorInput input) throws PartInitException {
+		setSite(site);
+		setInput(input);
 
-		for (AgentFormPage page : pages) {
-			try {
-				addPage(page);
-				final IEclipseContext eclipseContext = this.getSite().getService(IEclipseContext.class);
-				IEclipseContext childContext = eclipseContext.createChild();
-				childContext.set(IManagedForm.class, page.getManagedForm());
-				childContext.set(Composite.class, page.getBody());
-				ContextInjectionFactory.inject(page, childContext);
-			} catch (Exception e) {
-				AgentPlugin.getDefault().getLogger().log(Level.SEVERE, "Error when creating page", e); //$NON-NLS-1$
-			}
+		try {
+			getAgentEditorInput();
+		} catch (Exception e) {
+			throw new PartInitException(e.getMessage(), e);
 		}
-		setActivePage(0);
+
+		setPartName(getAgentEditorInput().getName());
+
+		connection = getAgentEditorInput().getConnectionHandle();
+		getAgentEditorInput().getAgentJmxHelper().addConnectionChangedListener(this);
 	}
 
-	@Override
-	public int addPage(IFormPage page) throws PartInitException {
-		int index = super.addPage(page);
-		/*
-		 * NOTE: Calling setActivePage(index) causes AgentFormPage.createPartControl to be called
-		 * which is needed since it creates the IManagedForm which is fetched in doAddPages() (using
-		 * page.getManagedForm() page.getBody()). The call to setActivePage can be removed if
-		 * fetching the IManagedForm can be delayed until after the page is activated.
-		 */
-		setActivePage(index);
-		setPageImage(index, page.getTitleImage());
-
-		return index;
-	}
-
-	@Override
-	protected void setActivePage(int pageIndex) {
-		// Range check since MultiPageEditorPart.createPartControl calls
-		// setActivePage(0) even though there are no pages
-		if (pageIndex >= 0 && pageIndex < getPageCount()) {
-			super.setActivePage(pageIndex);
+	protected AgentEditorInput getAgentEditorInput() {
+		AgentEditorInput aei;
+		IEditorInput input = super.getEditorInput();
+		if (input instanceof AgentEditorInput) {
+			aei = (AgentEditorInput) input;
+		} else {
+			aei = input.getAdapter(AgentEditorInput.class);
 		}
-	}
 
-	@Override
-	protected IEditorPart getEditor(int pageIndex) {
-		// Range check since MultiPageEditorPart.createPartControl calls
-		// getEditor(0) even though there are no pages
-		if (pageIndex >= 0 && pageIndex < getPageCount()) {
-			return super.getEditor(pageIndex);
+		if (aei == null) {
+			// Not likely to be null, but guard just in case
+			throw new RuntimeException("The agent editor cannot handle the provided editor input"); //$NON-NLS-1$
 		}
-		return null;
-	}
 
-	/**
-	 * Creates a {@link FormToolkit}
-	 */
-	@Override
-	protected FormToolkit createToolkit(Display display) {
-		return new FormToolkit(UIPlugin.getDefault().getFormColors(display));
-	}
-
-	@Override
-	public AgentEditorInput getEditorInput() {
 		return (AgentEditorInput) super.getEditorInput();
 	}
 
 	@Override
-	public void dispose() {
-		super.dispose();
-		getEditorInput().getAgentJmxHelper().removeConnectionChangedListener(this);
-		IOToolkit.closeSilently(connection);
+	public void createPartControl(Composite parent) {
+		parentComposite = parent;
+		stackLayout = new StackLayout();
+		parentComposite.setLayout(stackLayout);
+
+		formToolkit = new FormToolkit(FlightRecorderUI.getDefault().getFormColors(Display.getCurrent()));
+		formToolkit.setBorderStyle(SWT.NULL);
+
+		stackLayout.topControl = formToolkit.createComposite(parent);
+		ProgressIndicator progressIndicator = CompositeToolkit
+				.createWaitIndicator((Composite) stackLayout.topControl, formToolkit);
+		progressIndicator.beginTask(1);
+
+		createAgentEditorUi(parent);
 	}
 
-	@Override
-	public <T> T getAdapter(Class<T> adapter) {
-		if (adapter == IConnectionHandle.class && connection != null) {
-			return adapter.cast(connection);
-		}
-		return super.getAdapter(adapter);
+	private void createAgentEditorUi(Composite parent) {
+		form = formToolkit.createForm(parent);
+		form.setText(AGENT_EDITOR_TITLE);
+		form.setImage(getTitleImage());
+		formToolkit.decorateFormHeading(form);
+
+		IToolBarManager manager = form.getToolBarManager();
+		// TODO: optimize action design
+		manager.add((new Action(AGENT_EDITOR_ACTION_REFRESH) {
+			{
+				setImageDescriptor(UIPlugin.getDefault().getMCImageDescriptor(UIPlugin.ICON_REFRESH));
+			}
+
+			@Override
+			public void run() {
+				// TODO: refresh event list
+			}
+		}));
+		form.updateToolBar();
+
+		Composite body = form.getBody();
+		body.setLayout(new FillLayout());
+
+		agentEditorUi = new AgentEditorUi(this);
+		agentEditorUi.createContent(form, formToolkit);
+		agentEditorUi.refresh(() -> {
+			stackLayout.topControl.dispose();
+			stackLayout.topControl = form;
+			parentComposite.layout();
+		});
 	}
-
-	private void setUpInjectables() {
-		IEclipseContext context = this.getSite().getService(IEclipseContext.class);
-
-		// TODO: Consider carefully which services we want to support.
-		AgentJmxHelper helper = getEditorInput().getAgentJmxHelper();
-		context.set(AgentJmxHelper.class, helper);
-		context.set(IConnectionHandle.class, helper.getConnectionHandle());
-		context.set(MBeanServerConnection.class, helper.getMBeanServerConnection());
-	}
-
 }

@@ -76,7 +76,7 @@ public class ActionButtons extends Composite {
 	private static final String LABEL_SAVE_TO_PRESET_BUTTON = "Save to Preset";
 	private static final String LABEL_SAVE_TO_FILE_BUTTON = "Save to File";
 	private static final String LABEL_APPLY_PRESET_BUTTON = "Apply Preset";
-	private static final String LABEL_APPLY_LOCAL_CONFIG_BUTTON = "Apply Local Config";
+	private static final String LABEL_APPLY_LOCAL_CONFIG_BUTTON = "Apprivate final PresetRepository presetRepository = PresetRepositoryFactory.createSingleton();ply Local Config";
 	private static final String ERROR_PAGE_TITLE = "Error in Configuration";
 	private static final String FILE_OPEN_FILTER_PATH = "file.open.filter.path"; // $NON-NLS-1$
 	private static final String PRESET_XML_EXTENSION = "*.xml"; // $NON-NLS-1$
@@ -91,7 +91,7 @@ public class ActionButtons extends Composite {
 	private Button applyPresetButton;
 	private Button applyLocalConfigButton;
 
-	protected ActionButtons(Composite parent, PresetRepository repository, AgentJmxHelper helper,
+	public ActionButtons(Composite parent, PresetRepository repository, AgentJmxHelper helper,
 			EventTreeSection eventTree) {
 		super(parent, SWT.NONE);
 

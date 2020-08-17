@@ -44,7 +44,7 @@ import org.eclipse.ui.forms.IManagedForm;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.ScrolledForm;
 import org.openjdk.jmc.console.ext.agent.AgentJmxHelper;
-import org.openjdk.jmc.console.ext.agent.editor.AgentEditor;
+import org.openjdk.jmc.console.ext.agent.editor.AgentEditorBak;
 import org.openjdk.jmc.console.ext.agent.editor.AgentFormPage;
 import org.openjdk.jmc.console.ext.agent.manager.model.PresetRepository;
 import org.openjdk.jmc.console.ext.agent.manager.model.PresetRepositoryFactory;
@@ -60,7 +60,7 @@ public class LiveConfigTab extends AgentFormPage {
 	private FeatureTableSection eventTable;
 	private final PresetRepository presetRepository = PresetRepositoryFactory.createSingleton();
 
-	public LiveConfigTab(AgentEditor editor) {
+	public LiveConfigTab(AgentEditorBak editor) {
 		super(editor, ID, TITLE);
 	}
 
