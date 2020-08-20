@@ -147,7 +147,7 @@ public class EventTreeSection extends MCSectionPart {
 	}
 
 	private TreeViewer createViewer(Composite parent, FormToolkit formToolkit) {
-		Tree tree = formToolkit.createTree(parent, SWT.NONE);
+		Tree tree = formToolkit.createTree(parent, SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL);
 		tree.setData("name", EVENTS_TREE_NAME); //$NON-NLS-1$
 		tree.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
