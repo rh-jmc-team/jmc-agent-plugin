@@ -1,7 +1,6 @@
 package org.openjdk.jmc.console.ext.agent.editor;
 
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.dialogs.ProgressIndicator;
@@ -20,9 +19,10 @@ import org.openjdk.jmc.flightrecorder.ui.FlightRecorderUI;
 import org.openjdk.jmc.rjmx.IConnectionHandle;
 import org.openjdk.jmc.rjmx.IConnectionListener;
 import org.openjdk.jmc.rjmx.IServerHandle;
-import org.openjdk.jmc.ui.UIPlugin;
 import org.openjdk.jmc.ui.WorkbenchToolkit;
 import org.openjdk.jmc.ui.misc.CompositeToolkit;
+
+import java.util.stream.Stream;
 
 public class AgentEditor extends EditorPart implements IConnectionListener {
 	public static final String EDITOR_ID = "org.openjdk.jmc.console.ext.agent.editor.AgentEditor"; //$NON-NLS-1$
@@ -135,23 +135,20 @@ public class AgentEditor extends EditorPart implements IConnectionListener {
 		formToolkit.decorateFormHeading(form);
 
 		IToolBarManager manager = form.getToolBarManager();
-		// TODO: optimize action design
-		manager.add((new Action(AGENT_EDITOR_ACTION_REFRESH) {
-			{
-				setImageDescriptor(UIPlugin.getDefault().getMCImageDescriptor(UIPlugin.ICON_REFRESH));
-			}
 
-			@Override
-			public void run() {
-				// TODO: refresh event list
-			}
-		}));
+		AgentEditorAction[] actions = new AgentEditorAction[] {
+				new AgentEditorAction(AgentEditorAction.AgentEditorActionType.REFRESH), //
+				new AgentEditorAction(AgentEditorAction.AgentEditorActionType.LOAD_PRESET), //
+				new AgentEditorAction(AgentEditorAction.AgentEditorActionType.SAVE_AS_PRESET), //
+		};
+		Stream.of(actions).forEach(manager::add);
+		Stream.of(actions).forEach((action) -> action.setEnabled(false));
 		form.updateToolBar();
 
 		Composite body = form.getBody();
 		body.setLayout(new FillLayout());
 
-		agentEditorUi = new AgentEditorUi(this);
+		agentEditorUi = new AgentEditorUi(this, actions);
 		agentEditorUi.createContent(form, formToolkit);
 		agentEditorUi.refresh(() -> {
 			stackLayout.topControl.dispose();
