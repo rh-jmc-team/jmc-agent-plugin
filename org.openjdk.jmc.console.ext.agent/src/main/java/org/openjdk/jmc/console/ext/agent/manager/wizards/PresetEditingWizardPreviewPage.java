@@ -44,9 +44,9 @@ import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.openjdk.jmc.console.ext.agent.manager.model.IPreset;
-import org.openjdk.jmc.console.ext.agent.tabs.editor.internal.ColorManager;
-import org.openjdk.jmc.console.ext.agent.tabs.editor.internal.XmlConfiguration;
-import org.openjdk.jmc.console.ext.agent.tabs.editor.internal.XmlPartitionScanner;
+import org.openjdk.jmc.console.ext.agent.raweditor.internal.ColorManager;
+import org.openjdk.jmc.console.ext.agent.raweditor.internal.XmlConfiguration;
+import org.openjdk.jmc.console.ext.agent.raweditor.internal.XmlPartitionScanner;
 import org.openjdk.jmc.console.ext.agent.wizards.BaseWizardPage;
 
 public class PresetEditingWizardPreviewPage extends BaseWizardPage {

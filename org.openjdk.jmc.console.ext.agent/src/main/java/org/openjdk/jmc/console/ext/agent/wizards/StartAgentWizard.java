@@ -43,7 +43,7 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.openjdk.jmc.console.ext.agent.AgentJmxHelper;
-import org.openjdk.jmc.console.ext.agent.editor.AgentEditorBak;
+import org.openjdk.jmc.console.ext.agent.editor.AgentEditor;
 import org.openjdk.jmc.console.ext.agent.editor.AgentEditorInput;
 import org.openjdk.jmc.ui.common.jvm.JVMDescriptor;
 import org.openjdk.jmc.ui.misc.DialogToolkit;
@@ -83,7 +83,7 @@ public class StartAgentWizard extends Wizard {
 			VirtualMachine vm = VirtualMachine.attach(targetJvm.getPid() + "");
 			loadAgent(vm, agentJarPath, agentXmlPath);
 			IEditorInput ei = new AgentEditorInput(helper.getServerHandle(), helper.getConnectionHandle(), helper);
-			window.getActivePage().openEditor(ei, AgentEditorBak.EDITOR_ID, true);
+			window.getActivePage().openEditor(ei, AgentEditor.EDITOR_ID, true);
 		} catch (IllegalArgumentException e) {
 			DialogToolkit.showException(window.getShell(), MESSAGE_FAILED_TO_START_AGENT, MESSAGE_INVALID_AGENT_CONFIG,
 					e);
