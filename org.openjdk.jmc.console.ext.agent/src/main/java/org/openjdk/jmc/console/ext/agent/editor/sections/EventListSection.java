@@ -49,20 +49,7 @@ public class EventListSection extends MCSectionPart {
 	private TableViewer createViewer(Composite parent, FormToolkit formToolkit) {
 		Table table = formToolkit.createTable(parent, SWT.V_SCROLL | SWT.H_SCROLL | SWT.BORDER | SWT.FULL_SELECTION);
 		TableViewer viewer = new TableViewer(table);
-		viewer.setContentProvider(new AbstractStructuredContentProvider() {
-			@Override
-			public Object[] getElements(Object inputElement) {
-				if (inputElement == null) {
-					return new Object[0];
-				}
-
-				if (!(inputElement instanceof IPreset)) {
-					throw new IllegalArgumentException("input element must be an IPreset"); // $NON-NLS-1$
-				}
-
-				return ((IPreset) inputElement).getEvents();
-			}
-		});
+		viewer.setContentProvider(new ListContentProvider());
 
 		viewer.setLabelProvider(new ColumnLabelProvider() {
 			@Override
@@ -86,5 +73,20 @@ public class EventListSection extends MCSectionPart {
 
 	public void removeSelectionChangedListener(ISelectionChangedListener listener) {
 		viewer.removeSelectionChangedListener(listener);
+	}
+
+	private static class ListContentProvider extends AbstractStructuredContentProvider {
+		@Override
+		public Object[] getElements(Object inputElement) {
+			if (inputElement == null) {
+				return new Object[0];
+			}
+
+			if (!(inputElement instanceof IPreset)) {
+				throw new IllegalArgumentException("input element must be an IPreset"); // $NON-NLS-1$
+			}
+
+			return ((IPreset) inputElement).getEvents();
+		}
 	}
 }

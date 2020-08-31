@@ -28,15 +28,11 @@ public class AgentEditor extends EditorPart implements IConnectionListener {
 	public static final String EDITOR_ID = "org.openjdk.jmc.console.ext.agent.editor.AgentEditor"; //$NON-NLS-1$
 
 	private static final String AGENT_EDITOR_TITLE = "Agent Live Config";
-	private static final String AGENT_EDITOR_ACTION_REFRESH = "Refresh";
 	private static final String CONNECTION_LOST = "Connection Lost";
-
-	private volatile IConnectionHandle connection;
 
 	private Composite parentComposite;
 	private FormToolkit formToolkit;
 	private StackLayout stackLayout;
-	private AgentEditorUi agentEditorUi;
 	private Form form;
 
 	@Override
@@ -90,7 +86,6 @@ public class AgentEditor extends EditorPart implements IConnectionListener {
 
 		setPartName(getAgentEditorInput().getName());
 
-		connection = getAgentEditorInput().getConnectionHandle();
 		getAgentEditorInput().getAgentJmxHelper().addConnectionChangedListener(this);
 	}
 
@@ -148,7 +143,7 @@ public class AgentEditor extends EditorPart implements IConnectionListener {
 		Composite body = form.getBody();
 		body.setLayout(new FillLayout());
 
-		agentEditorUi = new AgentEditorUi(this, actions);
+		AgentEditorUi agentEditorUi = new AgentEditorUi(this, actions);
 		agentEditorUi.createContent(form, formToolkit);
 		agentEditorUi.refresh(() -> {
 			stackLayout.topControl.dispose();

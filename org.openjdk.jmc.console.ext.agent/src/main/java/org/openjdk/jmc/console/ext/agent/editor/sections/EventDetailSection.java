@@ -61,106 +61,7 @@ public class EventDetailSection extends MCSectionPart {
 	private TreeViewer createViewer(Composite parent, FormToolkit formToolkit) {
 		Tree tree = formToolkit.createTree(parent, SWT.V_SCROLL | SWT.BORDER | SWT.FULL_SELECTION);
 		TreeViewer viewer = new TreeViewer(tree);
-		viewer.setContentProvider(new ITreeContentProvider() {
-
-			private Map<String, Object> serializeEvent(IEvent event) {
-				Map<String, Object> entries = new HashMap<>();
-				entries.put("ID", event.getId());
-				entries.put("Name", event.getName());
-				entries.put("Class", event.getClazz());
-				entries.put("Description", event.getDescription());
-				entries.put("Path", event.getPath());
-				entries.put("Stack Trace", String.valueOf(event.getStackTrace()));
-				entries.put("Rethrow", String.valueOf(event.getRethrow()));
-				entries.put("Location", String.valueOf(event.getLocation()));
-				entries.put("Method", serializeMethod(event));
-				entries.put("Fields", serializeFields(event));
-
-				return entries;
-			}
-
-			private Map<String, Object> serializeFields(IEvent event) {
-				Map<String, Object> fields = new HashMap<>();
-				int i = 0;
-				for (IField field : event.getFields()) {
-					fields.put("[" + (i++) + "]", serializeField(field));
-				}
-
-				return fields;
-			}
-
-			private Map<String, String> serializeField(IField field) {
-				Map<String, String> f = serializeCapturedValue(field);
-				f.put("Expression", field.getExpression());
-				return f;
-			}
-
-			private Map<String, Object> serializeMethod(IEvent event) {
-				Map<String, Object> method = new HashMap<>();
-				method.put("Name", event.getMethodName());
-				method.put("Descriptor", event.getMethodDescriptor());
-				Map<String, Object> parameters = new HashMap<>();
-				int i = 0;
-				for (IMethodParameter methodParameter : event.getMethodParameters()) {
-					parameters.put("[" + (i++) + "]", serializeParameter(methodParameter));
-				}
-				method.put("Parameters", parameters);
-				method.put("Return Value", event.getMethodReturnValue());
-				return method;
-			}
-
-			private Map<String, String> serializeCapturedValue(ICapturedValue capturedValue) {
-				Map<String, String> value = new HashMap<>();
-				value.put("Name", capturedValue.getName());
-				value.put("Description", capturedValue.getDescription());
-				value.put("Content Type", String.valueOf(capturedValue.getContentType()));
-				value.put("Relation Key", capturedValue.getRelationKey());
-				value.put("Converter", capturedValue.getConverter());
-
-				return value;
-			}
-
-			private Map<String, String> serializeParameter(IMethodParameter methodParameter) {
-				Map<String, String> method = serializeCapturedValue(methodParameter);
-				method.put("Index", String.valueOf(methodParameter.getIndex()));
-
-				return method;
-			}
-
-			@Override
-			public Object[] getElements(Object o) {
-				if (o == null) {
-					return new Object[0];
-				}
-
-				if (!(o instanceof IEvent)) {
-					throw new IllegalArgumentException("input element must be an IEvent"); // $NON-NLS-1$
-				}
-
-				return serializeEvent((IEvent) o).entrySet().toArray(new Map.Entry[0]);
-			}
-
-			@Override
-			public Object[] getChildren(Object o) {
-				Map.Entry<String, ?> entry = (Map.Entry<String, ?>) o;
-				if (entry.getValue() instanceof Map) {
-					return ((Map) entry.getValue()).entrySet().toArray(new Map.Entry[0]);
-				}
-
-				return new Object[0];
-			}
-
-			@Override
-			public Object getParent(Object o) {
-				return null;
-			}
-
-			@Override
-			public boolean hasChildren(Object o) {
-				Map.Entry<String, ?> entry = (Map.Entry<String, ?>) o;
-				return entry.getValue() instanceof Map;
-			}
-		});
+		viewer.setContentProvider(new TreeContentProvider());
 
 		List<IColumn> columns = new ArrayList<>();
 		columns.add(new ColumnBuilder(HEADER_KEY, HEADER_KEY, new ColumnLabelProvider() {
@@ -186,5 +87,106 @@ public class EventDetailSection extends MCSectionPart {
 		viewer.setInput(event);
 		stackLayout.topControl = event == null ? message : viewer.getControl();
 		stack.layout();
+	}
+
+	private static class TreeContentProvider implements ITreeContentProvider {
+
+		private Map<String, Object> serializeEvent(IEvent event) {
+			Map<String, Object> entries = new HashMap<>();
+			entries.put("ID", event.getId());
+			entries.put("Name", event.getName());
+			entries.put("Class", event.getClazz());
+			entries.put("Description", event.getDescription());
+			entries.put("Path", event.getPath());
+			entries.put("Stack Trace", String.valueOf(event.getStackTrace()));
+			entries.put("Rethrow", String.valueOf(event.getRethrow()));
+			entries.put("Location", String.valueOf(event.getLocation()));
+			entries.put("Method", serializeMethod(event));
+			entries.put("Fields", serializeFields(event));
+
+			return entries;
+		}
+
+		private Map<String, Object> serializeFields(IEvent event) {
+			Map<String, Object> fields = new HashMap<>();
+			int i = 0;
+			for (IField field : event.getFields()) {
+				fields.put("[" + (i++) + "]", serializeField(field));
+			}
+
+			return fields;
+		}
+
+		private Map<String, String> serializeField(IField field) {
+			Map<String, String> f = serializeCapturedValue(field);
+			f.put("Expression", field.getExpression());
+			return f;
+		}
+
+		private Map<String, Object> serializeMethod(IEvent event) {
+			Map<String, Object> method = new HashMap<>();
+			method.put("Name", event.getMethodName());
+			method.put("Descriptor", event.getMethodDescriptor());
+			Map<String, Object> parameters = new HashMap<>();
+			int i = 0;
+			for (IMethodParameter methodParameter : event.getMethodParameters()) {
+				parameters.put("[" + (i++) + "]", serializeParameter(methodParameter));
+			}
+			method.put("Parameters", parameters);
+			method.put("Return Value", event.getMethodReturnValue());
+			return method;
+		}
+
+		private Map<String, String> serializeCapturedValue(ICapturedValue capturedValue) {
+			Map<String, String> value = new HashMap<>();
+			value.put("Name", capturedValue.getName());
+			value.put("Description", capturedValue.getDescription());
+			value.put("Content Type", String.valueOf(capturedValue.getContentType()));
+			value.put("Relation Key", capturedValue.getRelationKey());
+			value.put("Converter", capturedValue.getConverter());
+
+			return value;
+		}
+
+		private Map<String, String> serializeParameter(IMethodParameter methodParameter) {
+			Map<String, String> method = serializeCapturedValue(methodParameter);
+			method.put("Index", String.valueOf(methodParameter.getIndex()));
+
+			return method;
+		}
+
+		@Override
+		public Object[] getElements(Object o) {
+			if (o == null) {
+				return new Object[0];
+			}
+
+			if (!(o instanceof IEvent)) {
+				throw new IllegalArgumentException("input element must be an IEvent"); // $NON-NLS-1$
+			}
+
+			return serializeEvent((IEvent) o).entrySet().toArray(new Map.Entry[0]);
+		}
+
+		@Override
+		public Object[] getChildren(Object o) {
+			Map.Entry<String, ?> entry = (Map.Entry<String, ?>) o;
+			if (entry.getValue() instanceof Map) {
+				return ((Map) entry.getValue()).entrySet().toArray(new Map.Entry[0]);
+			}
+
+			return new Object[0];
+		}
+
+		@Override
+		public Object getParent(Object o) {
+			return null;
+		}
+
+		@Override
+		public boolean hasChildren(Object o) {
+			Map.Entry<String, ?> entry = (Map.Entry<String, ?>) o;
+			return entry.getValue() instanceof Map;
+		}
 	}
 }

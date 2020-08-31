@@ -61,27 +61,7 @@ public class GlobalConfigSection extends MCSectionPart {
 	private TableViewer createViewer(Composite parent, FormToolkit formToolkit) {
 		Table table = formToolkit.createTable(parent, SWT.V_SCROLL | SWT.BORDER | SWT.FULL_SELECTION);
 		TableViewer viewer = new TableViewer(table);
-		viewer.setContentProvider(new AbstractStructuredContentProvider() {
-			@Override
-			public Object[] getElements(Object inputElement) {
-				if (inputElement == null) {
-					return new Object[0];
-				}
-
-				if (!(inputElement instanceof IPreset)) {
-					throw new IllegalArgumentException("input element must be an IPreset"); // $NON-NLS-1$
-				}
-
-				IPreset preset = (IPreset) inputElement;
-
-				Map<String, String> entries = new HashMap<>(3);
-				entries.put(ALLOW_TO_STRING, String.valueOf(preset.getAllowToString()));
-				entries.put(ALLOW_CONVERTER, String.valueOf(preset.getAllowConverter()));
-				entries.put(CLASS_PREFIX, preset.getClassPrefix());
-
-				return entries.entrySet().toArray(new Map.Entry[0]);
-			}
-		});
+		viewer.setContentProvider(new ConfigContentProvider());
 
 		List<IColumn> columns = new ArrayList<>(2);
 		columns.add(new ColumnBuilder(HEADER_OPTION, HEADER_OPTION, new ColumnLabelProvider() {
@@ -105,5 +85,27 @@ public class GlobalConfigSection extends MCSectionPart {
 		viewer.setInput(preset);
 		stackLayout.topControl = preset == null ? message : viewer.getControl();
 		stack.layout();
+	}
+
+	private static class ConfigContentProvider extends AbstractStructuredContentProvider {
+		@Override
+		public Object[] getElements(Object inputElement) {
+			if (inputElement == null) {
+				return new Object[0];
+			}
+
+			if (!(inputElement instanceof IPreset)) {
+				throw new IllegalArgumentException("input element must be an IPreset"); // $NON-NLS-1$
+			}
+
+			IPreset preset = (IPreset) inputElement;
+
+			Map<String, String> entries = new HashMap<>(3);
+			entries.put(ALLOW_TO_STRING, String.valueOf(preset.getAllowToString()));
+			entries.put(ALLOW_CONVERTER, String.valueOf(preset.getAllowConverter()));
+			entries.put(CLASS_PREFIX, preset.getClassPrefix());
+
+			return entries.entrySet().toArray(new Map.Entry[0]);
+		}
 	}
 }

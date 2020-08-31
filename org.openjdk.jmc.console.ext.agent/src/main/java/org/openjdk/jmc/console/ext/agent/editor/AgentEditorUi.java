@@ -52,9 +52,7 @@ import java.util.stream.Stream;
 public class AgentEditorUi {
 	private final ExecutorService EXECUTOR_SERVICE = Executors.newSingleThreadExecutor();
 
-	private final AgentEditor editor;
 	private final AgentJmxHelper helper;
-	private final IConnectionHandle handle;
 	private final PresetRepository presetRepository = PresetRepositoryFactory.createSingleton();
 
 	private final AgentEditorAction[] actions;
@@ -64,12 +62,8 @@ public class AgentEditorUi {
 	private EventDetailSection eventDetailSection;
 
 	public AgentEditorUi(AgentEditor editor, AgentEditorAction[] actions) {
-		this.editor = editor;
-
 		helper = editor.getAgentEditorInput().getAgentJmxHelper();
-		handle = editor.getAgentEditorInput().getConnectionHandle();
-
-		this.actions = actions;
+		this.actions = Arrays.copyOf(actions, actions.length);
 
 		bindAgentEditorActions();
 	}
@@ -259,28 +253,6 @@ public class AgentEditorUi {
 			PresetRepository repository = (PresetRepository) inputElement;
 			return repository.listPresets();
 		}
-	}
-
-	private static final String FILE_OPEN_FILTER_PATH = "file.open.filter.path"; // $NON-NLS-1$
-
-	private String[] openFileDialog(String title, String[] extensions, int style) {
-		String filterPath = FlightRecorderUI.getDefault().getDialogSettings().get(FILE_OPEN_FILTER_PATH);
-		if (filterPath != null && Files.notExists(Paths.get(filterPath))) {
-			filterPath = System.getProperty("user.home", "./"); // $NON-NLS-1$ $NON-NLS-2$
-		}
-
-		IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-		FileDialog dialog = new FileDialog(window.getShell(), style);
-		dialog.setFilterPath(filterPath);
-		dialog.setText(title);
-		dialog.setFilterExtensions(extensions);
-
-		if (dialog.open() == null) {
-			return new String[0];
-		}
-
-		return Arrays.stream(dialog.getFileNames()).map(name -> dialog.getFilterPath() + File.separator + name)
-				.toArray(String[]::new);
 	}
 
 	private static final String ERROR_PAGE_TITLE = "Error in Configuration";
