@@ -5,6 +5,8 @@ bin/
 
 # Ignore settings changes by the IDE
 .settings/
+.idea
+*.iml
 
 # Ignore test recordings
 application/tests/org.openjdk.jmc.rjmx.services.jfr.test/recording.jfr

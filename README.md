@@ -55,7 +55,7 @@ $ cp -r jmc-agent-plugin/org.openjdk.jmc* jmc/application
 Apply the patch to JMC's root directory:
 ```sh
 $ cd jmc
-$ patch -p0 < ../jmc-agent-plugin/scripts/diff.patch
+$ git apply ../jmc-agent-plugin/scripts/diff.patch
 ``` 
 
 Get third party dependencies into a local p2 repo and make it available on localhost:
