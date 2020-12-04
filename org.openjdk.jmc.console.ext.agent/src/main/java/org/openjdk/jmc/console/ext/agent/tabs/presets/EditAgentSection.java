@@ -9,6 +9,7 @@ import java.util.logging.Level;
 
 import javax.xml.transform.stream.StreamSource;
 
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.layout.GridData;
@@ -30,6 +31,7 @@ import org.openjdk.jmc.console.ext.agent.tabs.editor.internal.XmlEditor;
 import org.openjdk.jmc.console.ext.agent.tabs.presets.internal.ProbeValidator;
 import org.openjdk.jmc.console.ext.agent.tabs.presets.internal.ValidationResult;
 import org.openjdk.jmc.ui.MCPathEditorInput;
+import org.openjdk.jmc.ui.misc.DialogToolkit;
 import org.xml.sax.SAXException;
 
 public class EditAgentSection extends Composite {
@@ -40,6 +42,8 @@ public class EditAgentSection extends Composite {
 	private static final String MESSAGE_VALIDATE = "Validate";
 	private static final String MESSAGE_APPLY = "Apply";
 	private static final String MESSAGE_NO_WARNINGS_OR_ERRORS_FOUND = "No errors/warnings found!";
+	private static final String MESSAGE_ERROR_OPENING_TITLE = "Problem opening the XML file";
+	private static final String MESSAGE_FILE_NOT_FOUND = "The XML file to open does not exist: {0}";
 
 	private AgentJmxHelper agentJmxHelper = null;
 	final private Text messageOutput;
@@ -83,7 +87,13 @@ public class EditAgentSection extends Composite {
 			edit.setText(MESSAGE_EDIT);
 			edit.setLayoutData(gridData);
 			edit.addListener(SWT.Selection, event -> {
-				IEditorInput input = new MCPathEditorInput(new File(text.getText()), false);
+				File file = new File(text.getText());
+				if (!file.exists()) {
+					DialogToolkit.showErrorDialogAsync(Display.getDefault(), MESSAGE_ERROR_OPENING_TITLE,
+							NLS.bind(MESSAGE_FILE_NOT_FOUND, text.getText()));
+					return;
+				}
+				IEditorInput input = new MCPathEditorInput(file, false);
 				input = XmlEditor.convertInput(input);
 				try {
 					PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().openEditor(input,
