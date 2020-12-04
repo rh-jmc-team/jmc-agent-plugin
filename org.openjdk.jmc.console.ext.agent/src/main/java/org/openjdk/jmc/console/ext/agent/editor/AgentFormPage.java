@@ -35,17 +35,24 @@ package org.openjdk.jmc.console.ext.agent.editor;
 import javax.inject.Inject;
 
 import org.eclipse.jface.action.GroupMarker;
+import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.jface.action.IToolBarManager;
+import org.eclipse.jface.action.MenuManager;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.ui.IWorkbenchActionConstants;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.forms.IManagedForm;
 import org.eclipse.ui.forms.editor.FormPage;
 import org.eclipse.ui.forms.widgets.Form;
+import org.eclipse.ui.internal.WorkbenchWindow;
 import org.openjdk.jmc.rjmx.IConnectionHandle;
 
 /**
  * Extension point class that agent console tabs can subclass. The ConsoleTab uses the FormPage .
  */
+//TODO: remove the @SuppressWarnings once IWorkbenchActionConstants.FIND_EXT is added to ApplicationActionBarAdvisor in JMC
+@SuppressWarnings("restriction")
 public class AgentFormPage extends FormPage /* implements IConsolePageContainer */ {
 
 	private String id;
@@ -87,6 +94,21 @@ public class AgentFormPage extends FormPage /* implements IConsolePageContainer 
 		IToolBarManager toolBar = managedForm.getForm().getToolBarManager();
 		toolBar.add(new GroupMarker("first"));
 		toolBar.update(true);
+
+		// TODO: move the addition of this ContributionItem to ApplicationActionBarAdvisor in JMC when integrating to main repository
+		((WorkbenchWindow) PlatformUI.getWorkbench().getActiveWorkbenchWindow()).getMenuBarManager().getItems();
+		for (IContributionItem m : ((WorkbenchWindow) PlatformUI.getWorkbench().getActiveWorkbenchWindow())
+				.getMenuBarManager().getItems()) {
+			if (m.getId() == IWorkbenchActionConstants.M_EDIT) {
+				MenuManager mm = ((MenuManager) m);
+				if (mm.indexOf(IWorkbenchActionConstants.FIND_EXT) == -1) {
+					mm.add(new GroupMarker(IWorkbenchActionConstants.FIND_EXT));
+					mm.update(true);
+					break;
+				}
+			}
+		}
+
 	}
 
 	protected void validateDependencies() {

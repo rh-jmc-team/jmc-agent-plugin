@@ -36,6 +36,9 @@ package org.openjdk.jmc.console.ext.agent.editor;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
+import org.eclipse.jface.action.GroupMarker;
+import org.eclipse.jface.action.IContributionItem;
+import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.swt.custom.StackLayout;
 import org.eclipse.swt.layout.FillLayout;
@@ -44,12 +47,15 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorSite;
+import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.forms.IManagedForm;
 import org.eclipse.ui.forms.IMessageManager;
 import org.eclipse.ui.forms.editor.FormEditor;
 import org.eclipse.ui.forms.editor.IFormPage;
 import org.eclipse.ui.forms.widgets.FormToolkit;
+import org.eclipse.ui.internal.WorkbenchWindow;
 import org.openjdk.jmc.common.io.IOToolkit;
 import org.openjdk.jmc.console.ext.agent.AgentJmxHelper;
 import org.openjdk.jmc.console.ext.agent.AgentPlugin;
@@ -70,6 +76,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 
+//TODO: remove the @SuppressWarnings once IWorkbenchActionConstants.FIND_EXT is added to ApplicationActionBarAdvisor in JMC
 public class AgentEditor extends FormEditor implements IConnectionListener {
 
 	public static final String EDITOR_ID = "org.openjdk.jmc.console.ext.agent.editor.AgentEditor"; //$NON-NLS-1$
@@ -109,6 +116,20 @@ public class AgentEditor extends FormEditor implements IConnectionListener {
 		setUpInjectables();
 
 		getEditorInput().getAgentJmxHelper().addConnectionChangedListener(this);
+
+		// TODO: move the addition of this ContributionItem to ApplicationActionBarAdvisor in JMC when integrating to main repository
+		((WorkbenchWindow) PlatformUI.getWorkbench().getActiveWorkbenchWindow()).getMenuBarManager().getItems();
+		for (IContributionItem m : ((WorkbenchWindow) PlatformUI.getWorkbench().getActiveWorkbenchWindow())
+				.getMenuBarManager().getItems()) {
+			if (m.getId() == IWorkbenchActionConstants.M_EDIT) {
+				MenuManager mm = ((MenuManager) m);
+				if (mm.indexOf(IWorkbenchActionConstants.FIND_EXT) == -1) {
+					mm.add(new GroupMarker(IWorkbenchActionConstants.FIND_EXT));
+					mm.update(true);
+					break;
+				}
+			}
+		}
 	}
 
 	@Override
