@@ -37,7 +37,11 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.jface.dialogs.IDialogConstants;
+import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.osgi.util.NLS;
+import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IWorkbenchWindow;
@@ -111,8 +115,20 @@ public class AgentEditorOpener implements IActionFactory {
 
 			// local JVM but agent not running
 			if (!helper.isMXBeanRegistered() && helper.isLocalJvm()) {
-				DisplayToolkit.safeAsyncExec(Display.getDefault(),
-						() -> DialogToolkit.openWizardWithHelp(new StartAgentWizard(helper)));
+				DisplayToolkit.safeAsyncExec(Display.getDefault(), () -> {
+					WizardDialog dialog = new WizardDialog(Display.getDefault().getActiveShell(),
+							new StartAgentWizard(helper)) {
+						@Override
+						public void createButtonsForButtonBar(Composite parent) {
+							super.createButtonsForButtonBar(parent);
+							Button finishButton = getButton(IDialogConstants.FINISH_ID);
+							finishButton.setText(StartAgentWizard.WIZARD_FINISH_BUTTON_TEXT);
+						}
+					};
+					dialog.setHelpAvailable(true);
+					dialog.create();
+					dialog.open();
+				});
 				return Status.OK_STATUS;
 			}
 
