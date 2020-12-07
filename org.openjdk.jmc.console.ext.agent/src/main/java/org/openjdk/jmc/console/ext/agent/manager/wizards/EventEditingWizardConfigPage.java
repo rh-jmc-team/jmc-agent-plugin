@@ -46,34 +46,13 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Text;
 import org.openjdk.jmc.console.ext.agent.manager.model.IEvent;
 import org.openjdk.jmc.console.ext.agent.manager.model.IEvent.Location;
+import org.openjdk.jmc.console.ext.agent.messages.internal.Messages;
 import org.openjdk.jmc.console.ext.agent.wizards.BaseWizardPage;
 
 import java.util.Locale;
 import java.util.stream.Stream;
 
 public class EventEditingWizardConfigPage extends BaseWizardPage {
-	private static final String PAGE_NAME = "Agent Event Editing";
-	private static final String MESSAGE_EVENT_EDITING_WIZARD_CONFIG_PAGE_TITLE = "Edit Event Configurations";
-	private static final String MESSAGE_EVENT_EDITING_WIZARD_CONFIG_PAGE_DESCRIPTION = "Edit basic information of an event on how it should be instrumented and injected.";
-
-	private static final String LABEL_ID = "ID: ";
-	private static final String LABEL_NAME = "Name: ";
-	private static final String LABEL_DESCRIPTION = "Description: ";
-	private static final String LABEL_CLASS = "Class: ";
-	private static final String LABEL_METHOD = "Method: ";
-	private static final String LABEL_PATH = "Path: ";
-	private static final String LABEL_LOCATION = "Location: ";
-	private static final String LABEL_CLEAR = "Clear";
-	private static final String LABEL_RECORD_EXCEPTIONS = "Record exceptions";
-	private static final String LABEL_RECORD_STACK_TRACE = "Record stack trace";
-
-	private static final String MESSAGE_EVENT_ID = "Event ID";
-	private static final String MESSAGE_NAME_OF_THE_EVENT = "Name of the event";
-	private static final String MESSAGE_FULLY_QUALIFIED_CLASS_NAME = "Fully qualified class name"; // $NON-NLS-1$
-	private static final String MESSAGE_METHOD_NAME = "Method name";
-	private static final String MESSAGE_METHOD_DESCRIPTOR = "Method descriptor";
-	private static final String MESSAGE_OPTIONAL_DESCRIPTION_OF_THIS_EVENT = "(Optional) Description of this event";
-	private static final String MESSAGE_PATH_TO_EVENT = "Path to event in event browser"; // $NON-NLS-1$
 
 	private final IEvent event;
 
@@ -90,7 +69,7 @@ public class EventEditingWizardConfigPage extends BaseWizardPage {
 	private Button recordStackTraceButton;
 
 	protected EventEditingWizardConfigPage(IEvent event) {
-		super(PAGE_NAME);
+		super(Messages.EventEditingWizardConfigPage_PAGE_NAME);
 
 		this.event = event;
 	}
@@ -104,8 +83,8 @@ public class EventEditingWizardConfigPage extends BaseWizardPage {
 	public void createControl(Composite parent) {
 		initializeDialogUnits(parent);
 
-		setTitle(MESSAGE_EVENT_EDITING_WIZARD_CONFIG_PAGE_TITLE);
-		setDescription(MESSAGE_EVENT_EDITING_WIZARD_CONFIG_PAGE_DESCRIPTION);
+		setTitle(Messages.EventEditingWizardConfigPage_MESSAGE_EVENT_EDITING_WIZARD_CONFIG_PAGE_TITLE);
+		setDescription(Messages.EventEditingWizardConfigPage_MESSAGE_EVENT_EDITING_WIZARD_CONFIG_PAGE_DESCRIPTION);
 
 		ScrolledComposite sc = new ScrolledComposite(parent, SWT.H_SCROLL | SWT.V_SCROLL);
 		Composite container = new Composite(sc, SWT.NONE);
@@ -136,10 +115,12 @@ public class EventEditingWizardConfigPage extends BaseWizardPage {
 		layout.horizontalSpacing = 8;
 		container.setLayout(layout);
 
-		idText = createTextInput(container, cols, LABEL_ID, MESSAGE_EVENT_ID);
-		nameText = createTextInput(container, cols, LABEL_NAME, MESSAGE_NAME_OF_THE_EVENT);
-		descriptionText = createMultiTextInput(container, cols, LABEL_DESCRIPTION,
-				MESSAGE_OPTIONAL_DESCRIPTION_OF_THIS_EVENT);
+		idText = createTextInput(container, cols, Messages.EventEditingWizardConfigPage_LABEL_ID,
+				Messages.EventEditingWizardConfigPage_MESSAGE_EVENT_ID);
+		nameText = createTextInput(container, cols, Messages.EventEditingWizardConfigPage_LABEL_NAME,
+				Messages.EventEditingWizardConfigPage_MESSAGE_NAME_OF_THE_EVENT);
+		descriptionText = createMultiTextInput(container, cols, Messages.EventEditingWizardConfigPage_LABEL_DESCRIPTION,
+				Messages.EventEditingWizardConfigPage_MESSAGE_OPTIONAL_DESCRIPTION_OF_THIS_EVENT);
 
 		return container;
 	}
@@ -151,9 +132,12 @@ public class EventEditingWizardConfigPage extends BaseWizardPage {
 		layout.horizontalSpacing = 8;
 		container.setLayout(layout);
 
-		classText = createTextInput(container, cols, LABEL_CLASS, MESSAGE_FULLY_QUALIFIED_CLASS_NAME);
-		Text[] receivers = createMultiInputTextInput(container, cols, LABEL_METHOD,
-				new String[] {MESSAGE_METHOD_NAME, MESSAGE_METHOD_DESCRIPTOR});
+		classText = createTextInput(container, cols, Messages.EventEditingWizardConfigPage_LABEL_CLASS,
+				Messages.EventEditingWizardConfigPage_MESSAGE_FULLY_QUALIFIED_CLASS_NAME); // $NON-NLS-1$
+		Text[] receivers = createMultiInputTextInput(container, cols,
+				Messages.EventEditingWizardConfigPage_LABEL_METHOD,
+				new String[] {Messages.EventEditingWizardConfigPage_MESSAGE_METHOD_NAME,
+						Messages.EventEditingWizardConfigPage_MESSAGE_METHOD_DESCRIPTOR});
 
 		methodNameText = receivers[0];
 		methodDescriptorText = receivers[1];
@@ -168,14 +152,17 @@ public class EventEditingWizardConfigPage extends BaseWizardPage {
 		layout.horizontalSpacing = 8;
 		container.setLayout(layout);
 
-		pathText = createTextInput(container, cols, LABEL_PATH, MESSAGE_PATH_TO_EVENT);
-		locationCombo = createComboInput(container, cols - 2, LABEL_LOCATION,
+		pathText = createTextInput(container, cols, Messages.EventEditingWizardConfigPage_LABEL_PATH,
+				Messages.EventEditingWizardConfigPage_MESSAGE_PATH_TO_EVENT); // $NON-NLS-1$
+		locationCombo = createComboInput(container, cols - 2, Messages.EventEditingWizardConfigPage_LABEL_LOCATION,
 				Stream.of(Location.values()).map(Location::toString).toArray(String[]::new));
-		locationClearButton = createButton(container, LABEL_CLEAR);
+		locationClearButton = createButton(container, Messages.EventEditingWizardConfigPage_LABEL_CLEAR);
 		locationClearButton.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 2, 0));
 
-		recordExceptionsButton = createCheckboxInput(container, cols, LABEL_RECORD_EXCEPTIONS);
-		recordStackTraceButton = createCheckboxInput(container, cols, LABEL_RECORD_STACK_TRACE);
+		recordExceptionsButton = createCheckboxInput(container, cols,
+				Messages.EventEditingWizardConfigPage_LABEL_RECORD_EXCEPTIONS);
+		recordStackTraceButton = createCheckboxInput(container, cols,
+				Messages.EventEditingWizardConfigPage_LABEL_RECORD_STACK_TRACE);
 
 		return container;
 	}

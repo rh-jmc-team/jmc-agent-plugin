@@ -42,29 +42,19 @@ import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.openjdk.jmc.console.ext.agent.manager.model.IEvent;
 import org.openjdk.jmc.console.ext.agent.manager.model.IPreset;
+import org.openjdk.jmc.console.ext.agent.messages.internal.Messages;
 import org.openjdk.jmc.console.ext.agent.wizards.BaseWizardPage;
 import org.openjdk.jmc.ui.misc.AbstractStructuredContentProvider;
 import org.openjdk.jmc.ui.misc.DialogToolkit;
 
 public class PresetEditingWizardEventPage extends BaseWizardPage {
-	private static final String PAGE_NAME = "Agent Preset Editing";
-
-	private static final String MESSAGE_PRESET_EDITING_WIZARD_EVENT_PAGE_TITLE = "Add or Remove Preset Events";
-	private static final String MESSAGE_PRESET_EDITING_WIZARD_EVENT_PAGE_DESCRIPTION = "Add new events to the preset, or remove/edit existing events.";
-	private static final String MESSAGE_UNABLE_TO_SAVE_THE_PRESET = "Unable to add the event";
-
-	private static final String LABEL_ID_COLUMN = "ID";
-	private static final String LABEL_NAME_COLUMN = "Name";
-
-	private static final String ID_ID_COLUMN = "id";
-	private static final String ID_NAME_COLUMN = "name";
 
 	private final IPreset preset;
 
 	private TableInspector tableInspector;
 
 	protected PresetEditingWizardEventPage(IPreset preset) {
-		super(PAGE_NAME);
+		super(Messages.PresetEditingWizardEventPage_PAGE_NAME);
 
 		this.preset = preset;
 	}
@@ -73,8 +63,8 @@ public class PresetEditingWizardEventPage extends BaseWizardPage {
 	public void createControl(Composite parent) {
 		initializeDialogUnits(parent);
 
-		setTitle(MESSAGE_PRESET_EDITING_WIZARD_EVENT_PAGE_TITLE);
-		setDescription(MESSAGE_PRESET_EDITING_WIZARD_EVENT_PAGE_DESCRIPTION);
+		setTitle(Messages.PresetEditingWizardEventPage_MESSAGE_PRESET_EDITING_WIZARD_EVENT_PAGE_TITLE);
+		setDescription(Messages.PresetEditingWizardEventPage_MESSAGE_PRESET_EDITING_WIZARD_EVENT_PAGE_DESCRIPTION);
 
 		ScrolledComposite sc = new ScrolledComposite(parent, SWT.H_SCROLL | SWT.V_SCROLL);
 		Composite container = new Composite(sc, SWT.NONE);
@@ -101,19 +91,21 @@ public class PresetEditingWizardEventPage extends BaseWizardPage {
 						| TableInspector.EDIT_BUTTON | TableInspector.DUPLICATE_BUTTON | TableInspector.REMOVE_BUTTON) {
 			@Override
 			protected void addColumns() {
-				addColumn(LABEL_ID_COLUMN, ID_ID_COLUMN, new EventTableLabelProvider() {
-					@Override
-					protected String doGetText(IEvent event) {
-						return event.getId();
-					}
-				});
+				addColumn(Messages.PresetEditingWizardEventPage_LABEL_ID_COLUMN,
+						Messages.PresetEditingWizardEventPage_ID_ID_COLUMN, new EventTableLabelProvider() {
+							@Override
+							protected String doGetText(IEvent event) {
+								return event.getId();
+							}
+						});
 
-				addColumn(LABEL_NAME_COLUMN, ID_NAME_COLUMN, new EventTableLabelProvider() {
-					@Override
-					protected String doGetText(IEvent event) {
-						return event.getName();
-					}
-				});
+				addColumn(Messages.PresetEditingWizardEventPage_LABEL_NAME_COLUMN,
+						Messages.PresetEditingWizardEventPage_ID_NAME_COLUMN, new EventTableLabelProvider() {
+							@Override
+							protected String doGetText(IEvent event) {
+								return event.getName();
+							}
+						});
 			}
 
 			@Override
@@ -123,7 +115,9 @@ public class PresetEditingWizardEventPage extends BaseWizardPage {
 					try {
 						preset.addEvent(event);
 					} catch (IllegalArgumentException e) {
-						if (DialogToolkit.openConfirmOnUiThread(MESSAGE_UNABLE_TO_SAVE_THE_PRESET, e.getMessage())) {
+						if (DialogToolkit.openConfirmOnUiThread(
+								Messages.PresetEditingWizardEventPage_MESSAGE_UNABLE_TO_SAVE_THE_PRESET,
+								e.getMessage())) {
 							continue;
 						}
 					}
@@ -142,7 +136,9 @@ public class PresetEditingWizardEventPage extends BaseWizardPage {
 					try {
 						preset.updateEvent(original, workingCopy);
 					} catch (IllegalArgumentException e) {
-						if (DialogToolkit.openConfirmOnUiThread(MESSAGE_UNABLE_TO_SAVE_THE_PRESET, e.getMessage())) {
+						if (DialogToolkit.openConfirmOnUiThread(
+								Messages.PresetEditingWizardEventPage_MESSAGE_UNABLE_TO_SAVE_THE_PRESET,
+								e.getMessage())) {
 							continue;
 						}
 					}

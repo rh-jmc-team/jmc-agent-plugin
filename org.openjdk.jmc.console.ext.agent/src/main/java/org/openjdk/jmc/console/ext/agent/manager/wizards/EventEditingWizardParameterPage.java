@@ -48,6 +48,7 @@ import org.openjdk.jmc.console.ext.agent.manager.model.IMethodParameter;
 import org.openjdk.jmc.console.ext.agent.manager.model.IMethodReturnValue;
 import org.openjdk.jmc.console.ext.agent.manager.model.MethodParameter;
 import org.openjdk.jmc.console.ext.agent.manager.model.MethodReturnValue;
+import org.openjdk.jmc.console.ext.agent.messages.internal.Messages;
 import org.openjdk.jmc.console.ext.agent.wizards.BaseWizardPage;
 import org.openjdk.jmc.ui.misc.AbstractStructuredContentProvider;
 import org.openjdk.jmc.ui.misc.DialogToolkit;
@@ -58,27 +59,13 @@ import java.util.Arrays;
 import java.util.List;
 
 public class EventEditingWizardParameterPage extends BaseWizardPage {
-	private static final String PAGE_NAME = "Agent Event Editing";
-
-	private static final String MESSAGE_EVENT_EDITING_WIZARD_PARAMETER_PAGE_TITLE = "Add or Remove Event Parameters";
-	private static final String MESSAGE_EVENT_EDITING_WIZARD_PARAMETER_PAGE_DESCRIPTION = "Function parameters and return values can be recorded when committing an event.";
-	private static final String MESSAGE_RETURN_VALUE = "(Return value)";
-	private static final String MESSAGE_UNABLE_TO_SAVE_THE_PARAMETER_OR_RETURN_VALUE = "Unable to add the parameter/return value";
-
-	private static final String LABEL_INDEX = "Index";
-	private static final String LABEL_NAME = "Name";
-	private static final String LABEL_DESCRIPTION = "Description";
-
-	private static final String ID_INDEX = "index";
-	private static final String ID_NAME = "name";
-	private static final String ID_DESCRIPTION = "description";
 
 	private final IEvent event;
 
 	private TableInspector tableInspector;
 
 	protected EventEditingWizardParameterPage(IEvent event) {
-		super(PAGE_NAME);
+		super(Messages.EventEditingWizardParameterPage_PAGE_NAME);
 
 		this.event = event;
 	}
@@ -87,8 +74,9 @@ public class EventEditingWizardParameterPage extends BaseWizardPage {
 	public void createControl(Composite parent) {
 		initializeDialogUnits(parent);
 
-		setTitle(MESSAGE_EVENT_EDITING_WIZARD_PARAMETER_PAGE_TITLE);
-		setDescription(MESSAGE_EVENT_EDITING_WIZARD_PARAMETER_PAGE_DESCRIPTION);
+		setTitle(Messages.EventEditingWizardParameterPage_MESSAGE_EVENT_EDITING_WIZARD_PARAMETER_PAGE_TITLE);
+		setDescription(
+				Messages.EventEditingWizardParameterPage_MESSAGE_EVENT_EDITING_WIZARD_PARAMETER_PAGE_DESCRIPTION);
 
 		ScrolledComposite sc = new ScrolledComposite(parent, SWT.H_SCROLL | SWT.V_SCROLL);
 		Composite container = new Composite(sc, SWT.NONE);
@@ -114,35 +102,38 @@ public class EventEditingWizardParameterPage extends BaseWizardPage {
 				| TableInspector.ADD_BUTTON | TableInspector.EDIT_BUTTON | TableInspector.REMOVE_BUTTON) {
 			@Override
 			protected void addColumns() {
-				addColumn(LABEL_INDEX, ID_INDEX, new ParameterTableLabelProvider() {
-					@Override
-					protected String doGetText(ICapturedValue parameter) {
-						if (parameter instanceof IMethodReturnValue) {
-							return MESSAGE_RETURN_VALUE;
-						}
+				addColumn(Messages.EventEditingWizardParameterPage_LABEL_INDEX,
+						Messages.EventEditingWizardParameterPage_ID_INDEX, new ParameterTableLabelProvider() {
+							@Override
+							protected String doGetText(ICapturedValue parameter) {
+								if (parameter instanceof IMethodReturnValue) {
+									return Messages.EventEditingWizardParameterPage_MESSAGE_RETURN_VALUE;
+								}
 
-						if (parameter instanceof IMethodParameter) {
-							return ((IMethodParameter) parameter).getIndex() + "";
-						}
+								if (parameter instanceof IMethodParameter) {
+									return ((IMethodParameter) parameter).getIndex() + "";
+								}
 
-						throw new IllegalArgumentException(
-								"element must be a an IMethodParameter or IMethodReturnValue"); // $NON-NLS-1$
-					}
-				});
+								throw new IllegalArgumentException(
+										"element must be a an IMethodParameter or IMethodReturnValue"); // $NON-NLS-1$
+							}
+						});
 
-				addColumn(LABEL_NAME, ID_NAME, new ParameterTableLabelProvider() {
-					@Override
-					protected String doGetText(ICapturedValue parameter) {
-						return parameter.getName();
-					}
-				});
+				addColumn(Messages.EventEditingWizardParameterPage_LABEL_NAME,
+						Messages.EventEditingWizardParameterPage_ID_NAME, new ParameterTableLabelProvider() {
+							@Override
+							protected String doGetText(ICapturedValue parameter) {
+								return parameter.getName();
+							}
+						});
 
-				addColumn(LABEL_DESCRIPTION, ID_DESCRIPTION, new ParameterTableLabelProvider() {
-					@Override
-					protected String doGetText(ICapturedValue parameter) {
-						return parameter.getDescription();
-					}
-				});
+				addColumn(Messages.EventEditingWizardParameterPage_LABEL_DESCRIPTION,
+						Messages.EventEditingWizardParameterPage_ID_DESCRIPTION, new ParameterTableLabelProvider() {
+							@Override
+							protected String doGetText(ICapturedValue parameter) {
+								return parameter.getDescription();
+							}
+						});
 			}
 
 			@Override
@@ -158,7 +149,8 @@ public class EventEditingWizardParameterPage extends BaseWizardPage {
 							event.setMethodReturnValue((IMethodReturnValue) capturedValue);
 						}
 					} catch (IllegalArgumentException e) {
-						if (DialogToolkit.openConfirmOnUiThread(MESSAGE_UNABLE_TO_SAVE_THE_PARAMETER_OR_RETURN_VALUE,
+						if (DialogToolkit.openConfirmOnUiThread(
+								Messages.EventEditingWizardParameterPage_MESSAGE_UNABLE_TO_SAVE_THE_PARAMETER_OR_RETURN_VALUE,
 								e.getMessage())) {
 							continue;
 						}

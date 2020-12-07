@@ -9,17 +9,17 @@ import org.eclipse.ui.forms.widgets.ScrolledForm;
 import org.openjdk.jmc.console.ext.agent.AgentJmxHelper;
 import org.openjdk.jmc.console.ext.agent.editor.AgentEditor;
 import org.openjdk.jmc.console.ext.agent.editor.AgentFormPage;
+import org.openjdk.jmc.console.ext.agent.messages.internal.Messages;
 import org.openjdk.jmc.rjmx.IConnectionHandle;
 import org.openjdk.jmc.ui.misc.MCLayoutFactory;
 
 public class PresetsTab extends AgentFormPage {
-	private static final String ID = "org.openjdk.jmc.console.ext.agent.tabs.presets.PresetsTab";
-	private static final String TITLE = "Presets";
+	private static final String ID = "org.openjdk.jmc.console.ext.agent.tabs.presets.PresetsTab"; //$NON-NLS-1$
 
 	private EditAgentSection editAgentSection;
 
 	public PresetsTab(AgentEditor editor) {
-		super(editor, ID, TITLE);
+		super(editor, ID, Messages.PresetsTab_TITLE);
 		// TODO Auto-generated constructor stub
 	}
 

@@ -26,6 +26,7 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.openjdk.jmc.console.ext.agent.AgentJmxHelper;
 import org.openjdk.jmc.console.ext.agent.AgentPlugin;
+import org.openjdk.jmc.console.ext.agent.messages.internal.Messages;
 import org.openjdk.jmc.console.ext.agent.tabs.editor.internal.XmlEditor;
 import org.openjdk.jmc.console.ext.agent.tabs.presets.internal.ProbeValidator;
 import org.openjdk.jmc.console.ext.agent.tabs.presets.internal.ValidationResult;
@@ -33,13 +34,6 @@ import org.openjdk.jmc.ui.MCPathEditorInput;
 import org.xml.sax.SAXException;
 
 public class EditAgentSection extends Composite {
-	private static final String MESSAGE_ENTER_PATH = "Enter Path...";
-	private static final String MESSAGE_AGENT_XML_PATH = "XML Path: ";
-	private static final String MESSAGE_BROWSE = "Browse";
-	private static final String MESSAGE_EDIT = "Edit";
-	private static final String MESSAGE_VALIDATE = "Validate";
-	private static final String MESSAGE_APPLY = "Apply";
-	private static final String MESSAGE_NO_WARNINGS_OR_ERRORS_FOUND = "No errors/warnings found!";
 
 	private AgentJmxHelper agentJmxHelper = null;
 	final private Text messageOutput;
@@ -57,15 +51,15 @@ public class EditAgentSection extends Composite {
 			gridData.widthHint = 100;
 
 			Label label = new Label(row, SWT.NONE);
-			label.setText(MESSAGE_AGENT_XML_PATH);
+			label.setText(Messages.EditAgentSection_MESSAGE_AGENT_XML_PATH);
 			label.setLayoutData(gridData);
 
 			Text text = new Text(row, SWT.LEFT | SWT.BORDER);
 			text.setLayoutData(gridData);
-			text.setText(MESSAGE_ENTER_PATH);
+			text.setText(Messages.EditAgentSection_MESSAGE_ENTER_PATH);
 
 			Button browse = new Button(row, SWT.PUSH);
-			browse.setText(MESSAGE_BROWSE);
+			browse.setText(Messages.EditAgentSection_MESSAGE_BROWSE);
 			browse.setLayoutData(gridData);
 			browse.addListener(SWT.Selection, e -> {
 				FileDialog fd = new FileDialog(Display.getCurrent().getActiveShell());
@@ -80,7 +74,7 @@ public class EditAgentSection extends Composite {
 			row.setLayout(new GridLayout(3, false));
 
 			Button edit = new Button(row, SWT.PUSH);
-			edit.setText(MESSAGE_EDIT);
+			edit.setText(Messages.EditAgentSection_MESSAGE_EDIT);
 			edit.setLayoutData(gridData);
 			edit.addListener(SWT.Selection, event -> {
 				IEditorInput input = new MCPathEditorInput(new File(text.getText()), false);
@@ -94,7 +88,7 @@ public class EditAgentSection extends Composite {
 			});
 
 			Button validate = new Button(row, SWT.PUSH);
-			validate.setText(MESSAGE_VALIDATE);
+			validate.setText(Messages.EditAgentSection_MESSAGE_VALIDATE);
 			validate.setLayoutData(gridData);
 			validate.addListener(SWT.Selection, event -> {
 				try {
@@ -106,7 +100,7 @@ public class EditAgentSection extends Composite {
 			});
 
 			Button apply = new Button(row, SWT.PUSH);
-			apply.setText(MESSAGE_APPLY);
+			apply.setText(Messages.EditAgentSection_MESSAGE_APPLY);
 			apply.setLayoutData(gridData);
 			apply.addListener(SWT.Selection, event -> {
 				try {
@@ -172,7 +166,7 @@ public class EditAgentSection extends Composite {
 
 		String message = sb.toString();
 		if (message.isEmpty()) {
-			message = MESSAGE_NO_WARNINGS_OR_ERRORS_FOUND;
+			message = Messages.EditAgentSection_MESSAGE_NO_WARNINGS_OR_ERRORS_FOUND;
 		}
 
 		messageOutput.setText(message);

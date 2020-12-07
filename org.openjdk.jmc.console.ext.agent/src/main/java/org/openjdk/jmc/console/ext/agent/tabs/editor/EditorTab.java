@@ -7,16 +7,16 @@ import org.eclipse.ui.forms.IManagedForm;
 import org.eclipse.ui.forms.widgets.ScrolledForm;
 import org.openjdk.jmc.console.ext.agent.editor.AgentEditor;
 import org.openjdk.jmc.console.ext.agent.editor.AgentFormPage;
+import org.openjdk.jmc.console.ext.agent.messages.internal.Messages;
 import org.openjdk.jmc.rjmx.IConnectionHandle;
 import org.openjdk.jmc.ui.misc.MCLayoutFactory;
 
 public class EditorTab extends AgentFormPage {
-	private static final String ID = "org.openjdk.jmc.console.ext.agent.tabs.editor.EditorTab";
-	private static final String TITLE = "Editor";
+	private static final String ID = "org.openjdk.jmc.console.ext.agent.tabs.editor.EditorTab"; //$NON-NLS-1$
 
 	@Inject
 	public EditorTab(AgentEditor editor) {
-		super(editor, ID, TITLE);
+		super(editor, ID, Messages.EditorTab_TITLE);
 		// TODO Auto-generated constructor stub
 	}
 

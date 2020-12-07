@@ -63,6 +63,7 @@ import org.openjdk.jmc.console.ext.agent.AgentPlugin;
 import org.openjdk.jmc.console.ext.agent.manager.model.IPreset;
 import org.openjdk.jmc.console.ext.agent.manager.model.PresetRepository;
 import org.openjdk.jmc.console.ext.agent.manager.model.PresetRepositoryFactory;
+import org.openjdk.jmc.console.ext.agent.messages.internal.Messages;
 import org.openjdk.jmc.console.ext.agent.tabs.presets.internal.ProbeValidator;
 import org.openjdk.jmc.console.ext.agent.tabs.presets.internal.ValidationResult;
 import org.openjdk.jmc.console.ext.agent.wizards.BaseWizardPage;
@@ -73,14 +74,8 @@ import org.openjdk.jmc.ui.wizards.OnePageWizardDialog;
 import org.xml.sax.SAXException;
 
 public class ActionButtons extends Composite {
-	private static final String LABEL_SAVE_TO_PRESET_BUTTON = "Save to Preset";
-	private static final String LABEL_SAVE_TO_FILE_BUTTON = "Save to File";
-	private static final String LABEL_APPLY_PRESET_BUTTON = "Apply Preset";
-	private static final String LABEL_APPLY_LOCAL_CONFIG_BUTTON = "Apply Local Config";
-	private static final String ERROR_PAGE_TITLE = "Error in Configuration";
 	private static final String FILE_OPEN_FILTER_PATH = "file.open.filter.path"; // $NON-NLS-1$
 	private static final String PRESET_XML_EXTENSION = "*.xml"; // $NON-NLS-1$
-	private static final String MESSAGE_APPLY_LOCAL_CONFIG = "Apply a local configuration";
 
 	private AgentJmxHelper helper;
 	private PresetRepository repository;
@@ -109,10 +104,10 @@ public class ActionButtons extends Composite {
 	}
 
 	private void createButtons(Composite parent) {
-		saveToPresetButton = createButton(parent, LABEL_SAVE_TO_PRESET_BUTTON);
-		saveToFileButton = createButton(parent, LABEL_SAVE_TO_FILE_BUTTON);
-		applyPresetButton = createButton(parent, LABEL_APPLY_PRESET_BUTTON);
-		applyLocalConfigButton = createButton(parent, LABEL_APPLY_LOCAL_CONFIG_BUTTON);
+		saveToPresetButton = createButton(parent, Messages.ActionButtons_LABEL_SAVE_TO_PRESET_BUTTON);
+		saveToFileButton = createButton(parent, Messages.ActionButtons_LABEL_SAVE_TO_FILE_BUTTON);
+		applyPresetButton = createButton(parent, Messages.ActionButtons_LABEL_APPLY_PRESET_BUTTON);
+		applyLocalConfigButton = createButton(parent, Messages.ActionButtons_LABEL_APPLY_LOCAL_CONFIG_BUTTON);
 	}
 
 	private final Button createButton(Composite parent, String text) {
@@ -161,8 +156,8 @@ public class ActionButtons extends Composite {
 	}
 
 	private void onApplyLocalConfig() {
-		String[] path = openFileDialog(MESSAGE_APPLY_LOCAL_CONFIG, new String[] {PRESET_XML_EXTENSION},
-				SWT.OPEN | SWT.SINGLE);
+		String[] path = openFileDialog(Messages.ActionButtons_MESSAGE_APPLY_LOCAL_CONFIG,
+				new String[] {PRESET_XML_EXTENSION}, SWT.OPEN | SWT.SINGLE);
 		if (path != null && path.length != 0) {
 			applyConfig(path[0]);
 		}
@@ -298,7 +293,7 @@ public class ActionButtons extends Composite {
 			byte[] bytes = Files.readAllBytes(Paths.get(path));
 			String validationMessage = validateProbeDefinition(new String(bytes, StandardCharsets.UTF_8));
 			if (!validationMessage.isEmpty()) {
-				DialogToolkit.openConfirmOnUiThread(ERROR_PAGE_TITLE, validationMessage);
+				DialogToolkit.openConfirmOnUiThread(Messages.ActionButtons_ERROR_PAGE_TITLE, validationMessage);
 				return;
 			}
 			helper.defineEventProbes(new String(bytes, StandardCharsets.UTF_8));

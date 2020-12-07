@@ -44,32 +44,20 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.openjdk.jmc.console.ext.agent.manager.model.IEvent;
 import org.openjdk.jmc.console.ext.agent.manager.model.IField;
+import org.openjdk.jmc.console.ext.agent.messages.internal.Messages;
 import org.openjdk.jmc.console.ext.agent.wizards.BaseWizardPage;
 import org.openjdk.jmc.ui.misc.AbstractStructuredContentProvider;
 import org.openjdk.jmc.ui.misc.DialogToolkit;
 import org.openjdk.jmc.ui.wizards.OnePageWizardDialog;
 
 public class EventEditingWizardFieldPage extends BaseWizardPage {
-	private static final String PAGE_NAME = "Agent Event Editing";
-
-	private static final String MESSAGE_EVENT_EDITING_WIZARD_FIELD_PAGE_TITLE = "Add or Remove Event Fields";
-	private static final String MESSAGE_EVENT_EDITING_WIZARD_FIELD_PAGE_DESCRIPTION = "Fields are a subset of Java primary expressions which can be evaluated and recorded when committing an event.";
-	private static final String MESSAGE_UNABLE_TO_SAVE_THE_FIELD = "Unable to add the field";
-
-	private static final String LABEL_NAME = "Name";
-	private static final String LABEL_EXPRESSION = "Expression";
-	private static final String LABEL_DESCRIPTION = "Description";
-
-	private static final String ID_NAME = "name";
-	private static final String ID_EXPRESSION = "expression";
-	private static final String ID_DESCRIPTION = "description";
 
 	private final IEvent event;
 
 	private TableInspector tableInspector;
 
 	protected EventEditingWizardFieldPage(IEvent event) {
-		super(PAGE_NAME);
+		super(Messages.EventEditingWizardFieldPage_PAGE_NAME);
 
 		this.event = event;
 	}
@@ -78,8 +66,8 @@ public class EventEditingWizardFieldPage extends BaseWizardPage {
 	public void createControl(Composite parent) {
 		initializeDialogUnits(parent);
 
-		setTitle(MESSAGE_EVENT_EDITING_WIZARD_FIELD_PAGE_TITLE);
-		setDescription(MESSAGE_EVENT_EDITING_WIZARD_FIELD_PAGE_DESCRIPTION);
+		setTitle(Messages.EventEditingWizardFieldPage_MESSAGE_EVENT_EDITING_WIZARD_FIELD_PAGE_TITLE);
+		setDescription(Messages.EventEditingWizardFieldPage_MESSAGE_EVENT_EDITING_WIZARD_FIELD_PAGE_DESCRIPTION);
 
 		ScrolledComposite sc = new ScrolledComposite(parent, SWT.H_SCROLL | SWT.V_SCROLL);
 		Composite container = new Composite(sc, SWT.NONE);
@@ -106,26 +94,29 @@ public class EventEditingWizardFieldPage extends BaseWizardPage {
 						| TableInspector.EDIT_BUTTON | TableInspector.DUPLICATE_BUTTON | TableInspector.REMOVE_BUTTON) {
 			@Override
 			protected void addColumns() {
-				addColumn(LABEL_NAME, ID_NAME, new FieldTableLabelProvider() {
-					@Override
-					protected String doGetText(IField field) {
-						return field.getName();
-					}
-				});
+				addColumn(Messages.EventEditingWizardFieldPage_LABEL_NAME, Messages.EventEditingWizardFieldPage_ID_NAME,
+						new FieldTableLabelProvider() {
+							@Override
+							protected String doGetText(IField field) {
+								return field.getName();
+							}
+						});
 
-				addColumn(LABEL_EXPRESSION, ID_EXPRESSION, new FieldTableLabelProvider() {
-					@Override
-					protected String doGetText(IField field) {
-						return field.getExpression();
-					}
-				});
+				addColumn(Messages.EventEditingWizardFieldPage_LABEL_EXPRESSION,
+						Messages.EventEditingWizardFieldPage_ID_EXPRESSION, new FieldTableLabelProvider() {
+							@Override
+							protected String doGetText(IField field) {
+								return field.getExpression();
+							}
+						});
 
-				addColumn(LABEL_DESCRIPTION, ID_DESCRIPTION, new FieldTableLabelProvider() {
-					@Override
-					protected String doGetText(IField field) {
-						return field.getDescription();
-					}
-				});
+				addColumn(Messages.EventEditingWizardFieldPage_LABEL_DESCRIPTION,
+						Messages.EventEditingWizardFieldPage_ID_DESCRIPTION, new FieldTableLabelProvider() {
+							@Override
+							protected String doGetText(IField field) {
+								return field.getDescription();
+							}
+						});
 			}
 
 			@Override
@@ -136,7 +127,9 @@ public class EventEditingWizardFieldPage extends BaseWizardPage {
 					try {
 						event.addField(field);
 					} catch (IllegalArgumentException e) {
-						if (DialogToolkit.openConfirmOnUiThread(MESSAGE_UNABLE_TO_SAVE_THE_FIELD, e.getMessage())) {
+						if (DialogToolkit.openConfirmOnUiThread(
+								Messages.EventEditingWizardFieldPage_MESSAGE_UNABLE_TO_SAVE_THE_FIELD,
+								e.getMessage())) {
 							continue;
 						}
 					}
@@ -156,7 +149,9 @@ public class EventEditingWizardFieldPage extends BaseWizardPage {
 					try {
 						event.updateField(original, workingCopy);
 					} catch (IllegalArgumentException e) {
-						if (DialogToolkit.openConfirmOnUiThread(MESSAGE_UNABLE_TO_SAVE_THE_FIELD, e.getMessage())) {
+						if (DialogToolkit.openConfirmOnUiThread(
+								Messages.EventEditingWizardFieldPage_MESSAGE_UNABLE_TO_SAVE_THE_FIELD,
+								e.getMessage())) {
 							continue;
 						}
 					}

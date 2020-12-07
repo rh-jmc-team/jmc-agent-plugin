@@ -53,6 +53,7 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.openjdk.jmc.common.io.IOToolkit;
 import org.openjdk.jmc.console.ext.agent.AgentJmxHelper;
 import org.openjdk.jmc.console.ext.agent.AgentPlugin;
+import org.openjdk.jmc.console.ext.agent.messages.internal.Messages;
 import org.openjdk.jmc.console.ext.agent.tabs.editor.EditorTab;
 import org.openjdk.jmc.console.ext.agent.tabs.liveconfig.LiveConfigTab;
 import org.openjdk.jmc.console.ext.agent.tabs.overview.OverviewTab;
@@ -74,9 +75,6 @@ public class AgentEditor extends FormEditor implements IConnectionListener {
 
 	public static final String EDITOR_ID = "org.openjdk.jmc.console.ext.agent.editor.AgentEditor"; //$NON-NLS-1$
 
-	private static final String CONNECTION_LOST = "Connection Lost";
-	private static final String COULD_NOT_CONNECT = "Could not connect";
-
 	private volatile IConnectionHandle connection;
 
 	private StackLayout stackLayout;
@@ -92,7 +90,7 @@ public class AgentEditor extends FormEditor implements IConnectionListener {
 					for (Object page : pages) {
 						if (page instanceof IFormPage) {
 							IMessageManager mm = ((IFormPage) page).getManagedForm().getMessageManager();
-							mm.addMessage(this, CONNECTION_LOST, null, IMessageProvider.ERROR);
+							mm.addMessage(this, Messages.AgentEditor_CONNECTION_LOST, null, IMessageProvider.ERROR);
 						}
 					}
 				}

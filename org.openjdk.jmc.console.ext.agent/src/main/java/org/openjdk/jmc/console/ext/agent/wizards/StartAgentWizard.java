@@ -45,6 +45,7 @@ import org.eclipse.ui.PlatformUI;
 import org.openjdk.jmc.console.ext.agent.AgentJmxHelper;
 import org.openjdk.jmc.console.ext.agent.editor.AgentEditor;
 import org.openjdk.jmc.console.ext.agent.editor.AgentEditorInput;
+import org.openjdk.jmc.console.ext.agent.messages.internal.Messages;
 import org.openjdk.jmc.ui.common.jvm.JVMDescriptor;
 import org.openjdk.jmc.ui.misc.DialogToolkit;
 
@@ -53,11 +54,6 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 
 public class StartAgentWizard extends Wizard {
-	private static final String MESSAGE_FAILED_TO_START_AGENT = "Failed to start JMC Agent";
-	private static final String MESSAGE_FAILED_TO_OPEN_AGENT_EDITOR = "Failed to open the JMC Agent Editor";
-	private static final String MESSAGE_UNEXPECTED_ERROR_HAS_OCCURRED = "An unexpected has error occurred.";
-	private static final String MESSAGE_INVALID_AGENT_CONFIG = "An invalid configuration is entered.";
-	private static final String MESSAGE_ACCESS_TO_UNSAFE_REQUIRED = "Could not access jdk.internal.misc.Unsafe! Did you run your application with '--add-opens java.base/jdk.internal.misc=ALL-UNNAMED'?";
 
 	private final AgentJmxHelper helper;
 	private final StartAgentWizardPage startAgentWizardPage;
@@ -85,20 +81,21 @@ public class StartAgentWizard extends Wizard {
 			IEditorInput ei = new AgentEditorInput(helper.getServerHandle(), helper.getConnectionHandle(), helper);
 			window.getActivePage().openEditor(ei, AgentEditor.EDITOR_ID, true);
 		} catch (IllegalArgumentException e) {
-			DialogToolkit.showException(window.getShell(), MESSAGE_FAILED_TO_START_AGENT, MESSAGE_INVALID_AGENT_CONFIG,
-					e);
+			DialogToolkit.showException(window.getShell(), Messages.StartAgentWizard_MESSAGE_FAILED_TO_START_AGENT,
+					Messages.StartAgentWizard_MESSAGE_INVALID_AGENT_CONFIG, e);
 			return false;
 		} catch (AttachNotSupportedException | IOException | AgentLoadException e) {
-			DialogToolkit.showException(window.getShell(), MESSAGE_FAILED_TO_START_AGENT,
-					MESSAGE_UNEXPECTED_ERROR_HAS_OCCURRED, e);
+			DialogToolkit.showException(window.getShell(), Messages.StartAgentWizard_MESSAGE_FAILED_TO_START_AGENT,
+					Messages.StartAgentWizard_MESSAGE_UNEXPECTED_ERROR_HAS_OCCURRED, e);
 			return false;
 		} catch (AgentInitializationException e) {
-			DialogToolkit.showException(window.getShell(), MESSAGE_FAILED_TO_START_AGENT,
-					MESSAGE_ACCESS_TO_UNSAFE_REQUIRED, e);
+			DialogToolkit.showException(window.getShell(), Messages.StartAgentWizard_MESSAGE_FAILED_TO_START_AGENT,
+					Messages.StartAgentWizard_MESSAGE_ACCESS_TO_UNSAFE_REQUIRED, e);
 			return false;
 		} catch (PartInitException e) {
-			DialogToolkit.showException(window.getShell(), MESSAGE_FAILED_TO_OPEN_AGENT_EDITOR,
-					MESSAGE_UNEXPECTED_ERROR_HAS_OCCURRED, e);
+			DialogToolkit.showException(window.getShell(),
+					Messages.StartAgentWizard_MESSAGE_FAILED_TO_OPEN_AGENT_EDITOR,
+					Messages.StartAgentWizard_MESSAGE_UNEXPECTED_ERROR_HAS_OCCURRED, e);
 			return false;
 		}
 

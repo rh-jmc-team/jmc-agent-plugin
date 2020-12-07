@@ -33,6 +33,7 @@
  */
 package org.openjdk.jmc.console.ext.agent.manager.model;
 
+import org.openjdk.jmc.console.ext.agent.messages.internal.Messages;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -45,10 +46,6 @@ public class Field extends CapturedValue implements IField {
 
 	private static final String XML_TAG_FIELD = "field"; // $NON-NLS-1$
 	private static final String XML_TAG_EXPRESSION = "expression"; // $NON-NLS-1$
-
-	private static final String ERROR_NAME_CANNOT_BE_EMPTY_OR_NULL = "Name cannot be empty or null.";
-	private static final String ERROR_EXPRESSION_CANNOT_BE_EMPTY_OR_NULL = "Expression cannot be empty or null.";
-	private static final String ERROR_EXPRESSION_HAS_INCORRECT_SYNTAX = "Expression has incorrect syntax.";
 
 	private final Event event;
 
@@ -87,7 +84,7 @@ public class Field extends CapturedValue implements IField {
 	@Override
 	public void setName(String name) {
 		if (name == null || name.isEmpty()) {
-			throw new IllegalArgumentException(ERROR_NAME_CANNOT_BE_EMPTY_OR_NULL);
+			throw new IllegalArgumentException(Messages.Field_ERROR_NAME_CANNOT_BE_EMPTY_OR_NULL);
 		}
 
 		super.setName(name);
@@ -99,12 +96,12 @@ public class Field extends CapturedValue implements IField {
 
 	public void setExpression(String expression) {
 		if (expression == null || expression.isEmpty()) {
-			throw new IllegalArgumentException(ERROR_EXPRESSION_CANNOT_BE_EMPTY_OR_NULL);
+			throw new IllegalArgumentException(Messages.Field_ERROR_EXPRESSION_CANNOT_BE_EMPTY_OR_NULL);
 		}
 
 		expression = expression.trim();
 		if (!expression.matches(EXPRESSION_REGEX)) {
-			throw new IllegalArgumentException(ERROR_EXPRESSION_HAS_INCORRECT_SYNTAX);
+			throw new IllegalArgumentException(Messages.Field_ERROR_EXPRESSION_HAS_INCORRECT_SYNTAX);
 		}
 
 		this.expression = expression;

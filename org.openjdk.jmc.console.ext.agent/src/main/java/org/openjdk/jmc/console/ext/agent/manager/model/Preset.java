@@ -33,6 +33,7 @@
  */
 package org.openjdk.jmc.console.ext.agent.manager.model;
 
+import org.openjdk.jmc.console.ext.agent.messages.internal.Messages;
 import org.openjdk.jmc.console.ext.agent.tabs.presets.internal.ProbeValidator;
 import org.openjdk.jmc.console.ext.agent.tabs.presets.internal.ValidationResult;
 import org.w3c.dom.Document;
@@ -68,10 +69,6 @@ public class Preset implements IPreset {
 	private static final String DEFAULT_FILE_NAME = "new_file.xml"; // $NON-NLS-1$
 	private static final String DEFAULT_CLASS_PREFIX = "__JFREvent"; // $NON-NLS-1$
 	private static final boolean DEFAULT_BOOLEAN_FIELD = false;
-
-	private static final String ERROR_FILE_NAME_CANNOT_BE_EMPTY_OR_NULL = "File name cannot be empty or null.";
-	private static final String ERROR_MUST_HAVE_UNIQUE_ID = "An event with the same id already exists.";
-	private static final String ERROR_MUST_HAVE_UNIQUE_EVENT_CLASS_NAME = "Event must have a unique event name per class";
 
 	private static final String XML_TAG_JFR_AGENT = "jfragent"; // $NON-NLS-1$
 	private static final String XML_TAG_CONFIG = "config"; // $NON-NLS-1$
@@ -274,7 +271,7 @@ public class Preset implements IPreset {
 	@Override
 	public void setFileName(String fileName) {
 		if (fileName == null || fileName.isEmpty()) {
-			throw new IllegalArgumentException(ERROR_FILE_NAME_CANNOT_BE_EMPTY_OR_NULL);
+			throw new IllegalArgumentException(Messages.Preset_ERROR_FILE_NAME_CANNOT_BE_EMPTY_OR_NULL);
 		}
 
 		this.fileName = fileName;
@@ -322,10 +319,10 @@ public class Preset implements IPreset {
 	@Override
 	public void addEvent(IEvent event) {
 		if (containsId(event.getId())) {
-			throw new IllegalArgumentException(ERROR_MUST_HAVE_UNIQUE_ID);
+			throw new IllegalArgumentException(Messages.Preset_ERROR_MUST_HAVE_UNIQUE_ID);
 		}
 		if (containsEventClassName(event)) {
-			throw new IllegalArgumentException(ERROR_MUST_HAVE_UNIQUE_EVENT_CLASS_NAME);
+			throw new IllegalArgumentException(Messages.Preset_ERROR_MUST_HAVE_UNIQUE_EVENT_CLASS_NAME);
 		}
 
 		events.add(event);

@@ -33,6 +33,7 @@
  */
 package org.openjdk.jmc.console.ext.agent.manager.model;
 
+import org.openjdk.jmc.console.ext.agent.messages.internal.Messages;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -42,9 +43,6 @@ public class MethodParameter extends CapturedValue implements IMethodParameter {
 
 	private static final String XML_TAG_PARAMETER = "parameter"; // $NON-NLS-1$
 	private static final String XML_ATTRIBUTE_INDEX = "index"; // $NON-NLS-1$
-
-	private static final String ERROR_INDEX_CANNOT_BE_LESS_THAN_ZERO = "Index cannot be less than zero.";
-	private static final String ERROR_NAME_CANNOT_BE_EMPTY_OR_NULL = "Name cannot be empty or null.";
 
 	private final Event event;
 
@@ -76,7 +74,7 @@ public class MethodParameter extends CapturedValue implements IMethodParameter {
 	@Override
 	public void setName(String name) {
 		if (name == null || name.isEmpty()) {
-			throw new IllegalArgumentException(ERROR_NAME_CANNOT_BE_EMPTY_OR_NULL);
+			throw new IllegalArgumentException(Messages.MethodParameter_ERROR_NAME_CANNOT_BE_EMPTY_OR_NULL);
 		}
 
 		super.setName(name);
@@ -90,7 +88,7 @@ public class MethodParameter extends CapturedValue implements IMethodParameter {
 	@Override
 	public void setIndex(int index) {
 		if (index < 0) {
-			throw new IllegalArgumentException(ERROR_INDEX_CANNOT_BE_LESS_THAN_ZERO);
+			throw new IllegalArgumentException(Messages.MethodParameter_ERROR_INDEX_CANNOT_BE_LESS_THAN_ZERO);
 		}
 
 		this.index = index;

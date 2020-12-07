@@ -43,6 +43,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.openjdk.jmc.console.ext.agent.AgentPlugin;
 import org.openjdk.jmc.console.ext.agent.manager.model.IPreset;
 import org.openjdk.jmc.console.ext.agent.manager.model.PresetRepository;
+import org.openjdk.jmc.console.ext.agent.messages.internal.Messages;
 import org.openjdk.jmc.console.ext.agent.wizards.BaseWizardPage;
 import org.openjdk.jmc.ui.misc.AbstractStructuredContentProvider;
 import org.openjdk.jmc.ui.misc.DialogToolkit;
@@ -52,16 +53,6 @@ import java.io.File;
 import java.io.IOException;
 
 public class PresetManagerPage extends BaseWizardPage {
-	private static final String PAGE_NAME = "Agent Preset Manager";
-
-	private static final String MESSAGE_PRESET_MANAGER_PAGE_TITLE = "JMC Agent Configuration Preset Manager";
-	private static final String MESSAGE_PRESET_MANAGER_PAGE_DESCRIPTION = "Presets for JMC agent are useful to repeatedly apply configurations to a running JMC agent.";
-	private static final String MESSAGE_PRESET_MANAGER_UNABLE_TO_SAVE_THE_PRESET = "Unable to save the preset";
-	private static final String MESSAGE_PRESET_MANAGER_UNABLE_TO_IMPORT_THE_PRESET = "Unable to import the preset";
-	private static final String MESSAGE_PRESET_MANAGER_UNABLE_TO_EXPORT_THE_PRESET = "Unable to export the preset";
-	private static final String MESSAGE_IMPORT_EXTERNAL_PRESET_FILES = "Import external preset files";
-	private static final String MESSAGE_EXPORT_PRESET_TO_A_FILE = "Import the preset to a file";
-	private static final String MESSAGE_EVENTS = "event(s)";
 
 	private static final String ID_PRESET = "preset"; // $NON-NLS-1$
 	private static final String PRESET_XML_EXTENSION = "*.xml"; // $NON-NLS-1$
@@ -71,7 +62,7 @@ public class PresetManagerPage extends BaseWizardPage {
 	private TableInspector tableInspector;
 
 	public PresetManagerPage(PresetRepository repository) {
-		super(PAGE_NAME);
+		super(Messages.PresetManagerPage_PAGE_NAME);
 
 		this.repository = repository;
 	}
@@ -80,8 +71,8 @@ public class PresetManagerPage extends BaseWizardPage {
 	public void createControl(Composite parent) {
 		initializeDialogUnits(parent);
 
-		setTitle(MESSAGE_PRESET_MANAGER_PAGE_TITLE);
-		setDescription(MESSAGE_PRESET_MANAGER_PAGE_DESCRIPTION);
+		setTitle(Messages.PresetManagerPage_MESSAGE_PRESET_MANAGER_PAGE_TITLE);
+		setDescription(Messages.PresetManagerPage_MESSAGE_PRESET_MANAGER_PAGE_DESCRIPTION);
 
 		ScrolledComposite sc = new ScrolledComposite(parent, SWT.H_SCROLL | SWT.V_SCROLL);
 		Composite container = new Composite(sc, SWT.NONE);
@@ -117,7 +108,8 @@ public class PresetManagerPage extends BaseWizardPage {
 						}
 
 						IPreset preset = (IPreset) element;
-						return preset.getFileName() + " - " + preset.getEvents().length + " " + MESSAGE_EVENTS;
+						return preset.getFileName() + " - " + preset.getEvents().length + " "
+								+ Messages.PresetManagerPage_MESSAGE_EVENTS;
 					}
 
 					@Override
@@ -134,7 +126,8 @@ public class PresetManagerPage extends BaseWizardPage {
 					try {
 						repository.addPreset(preset);
 					} catch (IllegalArgumentException | IOException e) {
-						if (DialogToolkit.openConfirmOnUiThread(MESSAGE_PRESET_MANAGER_UNABLE_TO_SAVE_THE_PRESET,
+						if (DialogToolkit.openConfirmOnUiThread(
+								Messages.PresetManagerPage_MESSAGE_PRESET_MANAGER_UNABLE_TO_SAVE_THE_PRESET,
 								e.getLocalizedMessage())) {
 							continue;
 						}
@@ -154,7 +147,8 @@ public class PresetManagerPage extends BaseWizardPage {
 					try {
 						repository.updatePreset(original, workingCopy);
 					} catch (IllegalArgumentException | IOException e) {
-						if (DialogToolkit.openConfirmOnUiThread(MESSAGE_PRESET_MANAGER_UNABLE_TO_SAVE_THE_PRESET,
+						if (DialogToolkit.openConfirmOnUiThread(
+								Messages.PresetManagerPage_MESSAGE_PRESET_MANAGER_UNABLE_TO_SAVE_THE_PRESET,
 								e.getLocalizedMessage())) {
 							continue;
 						}
@@ -174,7 +168,8 @@ public class PresetManagerPage extends BaseWizardPage {
 				try {
 					repository.addPreset(duplicate);
 				} catch (IllegalArgumentException | IOException e) {
-					DialogToolkit.openConfirmOnUiThread(MESSAGE_PRESET_MANAGER_UNABLE_TO_SAVE_THE_PRESET,
+					DialogToolkit.openConfirmOnUiThread(
+							Messages.PresetManagerPage_MESSAGE_PRESET_MANAGER_UNABLE_TO_SAVE_THE_PRESET,
 							e.getLocalizedMessage());
 				}
 
@@ -192,7 +187,7 @@ public class PresetManagerPage extends BaseWizardPage {
 
 			@Override
 			protected void onImportFilesButtonSelected(IStructuredSelection selection) {
-				String[] files = openFileDialog(MESSAGE_IMPORT_EXTERNAL_PRESET_FILES,
+				String[] files = openFileDialog(Messages.PresetManagerPage_MESSAGE_IMPORT_EXTERNAL_PRESET_FILES,
 						new String[] {PRESET_XML_EXTENSION}, SWT.OPEN | SWT.MULTI);
 				if (files != null) {
 					for (String path : files) {
@@ -200,7 +195,8 @@ public class PresetManagerPage extends BaseWizardPage {
 						try {
 							repository.importPreset(file);
 						} catch (IOException | SAXException e) {
-							DialogToolkit.openConfirmOnUiThread(MESSAGE_PRESET_MANAGER_UNABLE_TO_IMPORT_THE_PRESET,
+							DialogToolkit.openConfirmOnUiThread(
+									Messages.PresetManagerPage_MESSAGE_PRESET_MANAGER_UNABLE_TO_IMPORT_THE_PRESET,
 									e.getLocalizedMessage());
 						}
 					}
@@ -211,8 +207,8 @@ public class PresetManagerPage extends BaseWizardPage {
 
 			@Override
 			protected void onExportFileButtonSelected(IStructuredSelection selection) {
-				String[] files = openFileDialog(MESSAGE_EXPORT_PRESET_TO_A_FILE, new String[] {PRESET_XML_EXTENSION},
-						SWT.SAVE | SWT.SINGLE);
+				String[] files = openFileDialog(Messages.PresetManagerPage_MESSAGE_EXPORT_PRESET_TO_A_FILE,
+						new String[] {PRESET_XML_EXTENSION}, SWT.SAVE | SWT.SINGLE);
 				if (files == null || files.length == 0) {
 					return;
 				}
@@ -221,7 +217,8 @@ public class PresetManagerPage extends BaseWizardPage {
 				try {
 					repository.exportPreset((IPreset) selection.getFirstElement(), file);
 				} catch (IOException e) {
-					DialogToolkit.openConfirmOnUiThread(MESSAGE_PRESET_MANAGER_UNABLE_TO_EXPORT_THE_PRESET,
+					DialogToolkit.openConfirmOnUiThread(
+							Messages.PresetManagerPage_MESSAGE_PRESET_MANAGER_UNABLE_TO_EXPORT_THE_PRESET,
 							e.getLocalizedMessage());
 				}
 			}

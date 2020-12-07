@@ -63,7 +63,7 @@ import org.openjdk.jmc.ui.misc.MCSectionPart;
 import org.openjdk.jmc.ui.misc.TreeStructureContentProvider;
 
 public class EventTreeSection extends MCSectionPart {
-	private static final String EVENTS_TREE_NAME = "AgentUi.EventsTree";
+	private static final String EVENTS_TREE_NAME = "AgentUi.EventsTree"; //$NON-NLS-1$
 
 	private final TreeViewer viewer;
 	private AgentJmxHelper agentJmxHelper;

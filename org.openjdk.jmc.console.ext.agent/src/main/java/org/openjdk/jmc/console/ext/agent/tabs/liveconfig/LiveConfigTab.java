@@ -48,12 +48,12 @@ import org.openjdk.jmc.console.ext.agent.editor.AgentEditor;
 import org.openjdk.jmc.console.ext.agent.editor.AgentFormPage;
 import org.openjdk.jmc.console.ext.agent.manager.model.PresetRepository;
 import org.openjdk.jmc.console.ext.agent.manager.model.PresetRepositoryFactory;
+import org.openjdk.jmc.console.ext.agent.messages.internal.Messages;
 import org.openjdk.jmc.rjmx.IConnectionHandle;
 import org.openjdk.jmc.ui.misc.MCLayoutFactory;
 
 public class LiveConfigTab extends AgentFormPage {
-	private static final String ID = "org.openjdk.jmc.console.ext.agent.tabs.liveconfig.LiveConfigTab";
-	private static final String TITLE = "Live Config";
+	private static final String ID = "org.openjdk.jmc.console.ext.agent.tabs.liveconfig.LiveConfigTab"; //$NON-NLS-1$
 
 	private SashForm sashForm;
 	private EventTreeSection eventTree;
@@ -61,7 +61,7 @@ public class LiveConfigTab extends AgentFormPage {
 	private final PresetRepository presetRepository = PresetRepositoryFactory.createSingleton();
 
 	public LiveConfigTab(AgentEditor editor) {
-		super(editor, ID, TITLE);
+		super(editor, ID, Messages.LiveConfigTab_TITLE);
 	}
 
 	@Inject
