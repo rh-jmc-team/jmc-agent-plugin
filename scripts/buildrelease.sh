@@ -10,7 +10,7 @@ cp -r org.openjdk.jmc* jmc/application
 
 echo "======== Applying patch ================================="
 cd jmc
-patch -p0 < ../scripts/diff.patch
+git apply ../scripts/diff.patch
 cd ..
 
 echo "======== Building p2 repo ==============================="
