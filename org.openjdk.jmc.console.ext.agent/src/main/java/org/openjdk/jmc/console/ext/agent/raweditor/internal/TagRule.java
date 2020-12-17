@@ -1,4 +1,4 @@
-package org.openjdk.jmc.console.ext.agent.tabs.editor.internal;
+package org.openjdk.jmc.console.ext.agent.raweditor.internal;
 
 import org.eclipse.jface.text.rules.ICharacterScanner;
 import org.eclipse.jface.text.rules.IToken;

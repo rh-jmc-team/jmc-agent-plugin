@@ -1,4 +1,4 @@
-package org.openjdk.jmc.console.ext.agent.tabs.editor.internal;
+package org.openjdk.jmc.console.ext.agent.raweditor.internal;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.text.BadLocationException;

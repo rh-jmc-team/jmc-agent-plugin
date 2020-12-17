@@ -1,4 +1,4 @@
-package org.openjdk.jmc.console.ext.agent.tabs.presets.internal;
+package org.openjdk.jmc.console.ext.agent.utils;
 
 import java.io.IOException;
 

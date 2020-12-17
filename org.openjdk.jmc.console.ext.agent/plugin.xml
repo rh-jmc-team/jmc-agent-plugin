@@ -66,11 +66,11 @@
     
     <extension point="org.eclipse.ui.editors">
       	<editor
-            id="org.openjdk.jmc.console.ext.agent.tabs.editor.internal.XmlEditor"
+            id="org.openjdk.jmc.console.ext.agent.tabs.raweditor.RawEditor"
             name="Agent XML Editor"
             icon="icons/agent-16.png"
             extensions="xml"
-            class="org.openjdk.jmc.console.ext.agent.tabs.editor.internal.XmlEditor"
+            class="org.openjdk.jmc.console.ext.agent.tabs.raweditor.RawEditor"
             contributorClass="org.eclipse.ui.texteditor.BasicTextEditorActionContributor">
       	</editor>
    </extension>

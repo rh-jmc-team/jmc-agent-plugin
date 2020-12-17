@@ -1,4 +1,4 @@
-package org.openjdk.jmc.console.ext.agent.tabs.editor.internal;
+package org.openjdk.jmc.console.ext.agent.raweditor.internal;
 
 import org.eclipse.core.resources.IStorage;
 import org.eclipse.core.runtime.CoreException;
@@ -14,8 +14,6 @@ import org.eclipse.ui.editors.text.ILocationProvider;
 import org.eclipse.ui.editors.text.TextEditor;
 
 public class XmlEditor extends TextEditor {
-	public static final String EDITOR_ID = "org.openjdk.jmc.console.ext.agent.tabs.editor.internal.XmlEditor";
-
 	private ColorManager colorManager;
 
 	public XmlEditor() {

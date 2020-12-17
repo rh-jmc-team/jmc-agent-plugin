@@ -33,8 +33,8 @@
  */
 package org.openjdk.jmc.console.ext.agent.manager.model;
 
-import org.openjdk.jmc.console.ext.agent.tabs.presets.internal.ProbeValidator;
-import org.openjdk.jmc.console.ext.agent.tabs.presets.internal.ValidationResult;
+import org.openjdk.jmc.console.ext.agent.utils.ProbeValidator;
+import org.openjdk.jmc.console.ext.agent.utils.ValidationResult;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
