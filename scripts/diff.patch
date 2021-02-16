@@ -92,10 +92,10 @@ index a2d52be..08462cc 100644
  		<module>tests</module>
  		<module>coverage</module>
 diff --git a/configuration/spotbugs/spotbugs-exclude.xml b/configuration/spotbugs/spotbugs-exclude.xml
-index 97a251c..262e81c 100644
+index 97a251c..87c2e2b 100644
 --- a/configuration/spotbugs/spotbugs-exclude.xml
 +++ b/configuration/spotbugs/spotbugs-exclude.xml
-@@ -32,6 +32,90 @@
+@@ -32,6 +32,102 @@
     WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  -->
  <FindBugsFilter>
@@ -178,15 +178,27 @@ index 97a251c..262e81c 100644
 +		<Method name="openFileDialog"/>
 +		<Bug pattern="PZLA_PREFER_ZERO_LENGTH_ARRAYS" />
 +	</Match>
-+        <Match>
++    <Match>
 +		<Class name="org.openjdk.jmc.console.ext.agent.manager.model.PresetRepositoryFactory" />
 +		<Method name="createSingleton"/>
 +		<Bug pattern="DC_DOUBLECHECK" />
-+        </Match>
++    </Match>
++    <!-- Ignore file creation return value. If the file already exists we wouldn't have made this call. -->
++    <Match>
++    	<Class name="org.openjdk.jmc.console.ext.agent.raweditor.internal.XmlDocumentProvider" />
++    	<Method name="doSaveDocument" />
++    	<Bug pattern="RV_RETURN_VALUE_IGNORED_BAD_PRACTICE" />
++    </Match>
++    <!-- This is being caused by a switch on an enum -->
++    <Match>
++    	<Class name="org.openjdk.jmc.console.ext.agent.editor.AgentEditorUi" />
++    	<Method name="bindAgentEditorActions" />
++    	<Bug pattern="VO_VOLATILE_REFERENCE_TO_ARRAY" />
++    </Match>
      <!-- Skip I18n -->
      <Match>
          <Bug pattern="DM_DEFAULT_ENCODING"/>
-@@ -1138,4 +1222,4 @@
+@@ -1138,4 +1234,4 @@
  		<Class name="org.openjdk.jmc.rjmx.subscription.internal.EvilMethodsClass"/>
  	</Match>
  		
