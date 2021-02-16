@@ -1,5 +1,5 @@
 diff --git a/application/org.openjdk.jmc.console.ext.agent/pom.xml b/application/org.openjdk.jmc.console.ext.agent/pom.xml
-index 4f39161a..8d4f7d8a 100644
+index f4f39ff..c9579d2 100644
 --- a/application/org.openjdk.jmc.console.ext.agent/pom.xml
 +++ b/application/org.openjdk.jmc.console.ext.agent/pom.xml
 @@ -39,9 +39,7 @@
@@ -10,7 +10,7 @@ index 4f39161a..8d4f7d8a 100644
 -		<!--TODO: replace this with above when merging to JMC repo-->
 -		<artifactId>missioncontrol.application.jmc-agent-plugin</artifactId>
 +		<artifactId>missioncontrol.application</artifactId>
- 		<version>8.0.0-SNAPSHOT</version>
+ 		<version>8.1.0-SNAPSHOT</version>
  	</parent>
  
 @@ -53,12 +51,7 @@
@@ -28,7 +28,7 @@ index 4f39161a..8d4f7d8a 100644
  
  	<build>
 diff --git a/application/org.openjdk.jmc.feature.console.ext.agent/pom.xml b/application/org.openjdk.jmc.feature.console.ext.agent/pom.xml
-index bb080eb8..1a74fd51 100644
+index 4f9ae6e..4f72504 100644
 --- a/application/org.openjdk.jmc.feature.console.ext.agent/pom.xml
 +++ b/application/org.openjdk.jmc.feature.console.ext.agent/pom.xml
 @@ -37,9 +37,7 @@
@@ -39,7 +39,7 @@ index bb080eb8..1a74fd51 100644
 -		<!--TODO: replace this with above when merging to JMC repo-->
 -		<artifactId>missioncontrol.application.jmc-agent-plugin</artifactId>
 +		<artifactId>missioncontrol.application</artifactId>
- 		<version>8.0.0-SNAPSHOT</version>
+ 		<version>8.1.0-SNAPSHOT</version>
  	</parent>
  	
 @@ -48,8 +46,6 @@
@@ -53,7 +53,7 @@ index bb080eb8..1a74fd51 100644
  	</properties>
  </project>
 diff --git a/application/org.openjdk.jmc.feature.rcp/feature.xml b/application/org.openjdk.jmc.feature.rcp/feature.xml
-index af0c2f2f..a7af3c8a 100644
+index ee1992f..bf35ec4 100644
 --- a/application/org.openjdk.jmc.feature.rcp/feature.xml
 +++ b/application/org.openjdk.jmc.feature.rcp/feature.xml
 @@ -71,6 +71,10 @@
@@ -68,31 +68,27 @@ index af0c2f2f..a7af3c8a 100644
        <import feature="org.eclipse.rcp" version="3.8.0" match="greaterOrEqual"/>
        <import feature="org.eclipse.help" version="1.4.0" match="greaterOrEqual"/>
 diff --git a/application/pom.xml b/application/pom.xml
-index bccc1036..0d89116b 100644
+index a2d52be..08462cc 100644
 --- a/application/pom.xml
 +++ b/application/pom.xml
-@@ -81,7 +81,8 @@
- 		<module>org.openjdk.jmc.feature.pde</module>
+@@ -82,6 +82,7 @@
  		<module>org.openjdk.jmc.feature.rcp</module>
  		<module>org.openjdk.jmc.feature.rcp.update</module>
--		<module>org.openjdk.jmc.feature.twitter</module>
-+        <module>org.openjdk.jmc.feature.twitter</module>
-+        <module>org.openjdk.jmc.feature.console.ext.agent</module>
+ 		<module>org.openjdk.jmc.feature.twitter</module>
++	        <module>org.openjdk.jmc.feature.console.ext.agent</module>
  		<module>org.openjdk.jmc.flightrecorder.configuration</module>
  		<module>org.openjdk.jmc.flightrecorder.controlpanel.ui</module>
  		<module>org.openjdk.jmc.flightrecorder.controlpanel.ui.configuration</module>
-@@ -113,7 +114,8 @@
- 		<module>org.openjdk.jmc.ui</module>
+@@ -114,6 +115,7 @@
  		<module>org.openjdk.jmc.ui.common</module>
  		<module>org.openjdk.jmc.updatesite.ide</module>
--		<module>org.openjdk.jmc.updatesite.rcp</module>
-+        <module>org.openjdk.jmc.updatesite.rcp</module>
-+        <module>org.openjdk.jmc.console.ext.agent</module>
+ 		<module>org.openjdk.jmc.updatesite.rcp</module>
++		<module>org.openjdk.jmc.console.ext.agent</module>
  		<module>l10n</module>
  		<module>tests</module>
  		<module>coverage</module>
 diff --git a/configuration/spotbugs/spotbugs-exclude.xml b/configuration/spotbugs/spotbugs-exclude.xml
-index 97a251c4..be74fbca 100644
+index 97a251c..262e81c 100644
 --- a/configuration/spotbugs/spotbugs-exclude.xml
 +++ b/configuration/spotbugs/spotbugs-exclude.xml
 @@ -32,6 +32,90 @@
@@ -178,11 +174,18 @@ index 97a251c4..be74fbca 100644
 +		<Method name="openFileDialog"/>
 +		<Bug pattern="PZLA_PREFER_ZERO_LENGTH_ARRAYS" />
 +	</Match>
-+	<Match>
++        <Match>
 +		<Class name="org.openjdk.jmc.console.ext.agent.manager.model.PresetRepositoryFactory" />
 +		<Method name="createSingleton"/>
 +		<Bug pattern="DC_DOUBLECHECK" />
-+	</Match>
++        </Match>
      <!-- Skip I18n -->
      <Match>
          <Bug pattern="DM_DEFAULT_ENCODING"/>
+@@ -1138,4 +1222,4 @@
+ 		<Class name="org.openjdk.jmc.rjmx.subscription.internal.EvilMethodsClass"/>
+ 	</Match>
+ 		
+-</FindBugsFilter>
+\ No newline at end of file
++</FindBugsFilter>
