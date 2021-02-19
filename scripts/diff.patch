@@ -1,5 +1,5 @@
 diff --git a/application/org.openjdk.jmc.console.ext.agent/pom.xml b/application/org.openjdk.jmc.console.ext.agent/pom.xml
-index f4f39ff..d2b5d24 100644
+index 4f39161..d2b5d24 100644
 --- a/application/org.openjdk.jmc.console.ext.agent/pom.xml
 +++ b/application/org.openjdk.jmc.console.ext.agent/pom.xml
 @@ -39,10 +39,8 @@
@@ -9,7 +9,7 @@ index f4f39ff..d2b5d24 100644
 -		<!--artifactId>missioncontrol.application</artifactId-->
 -		<!--TODO: replace this with above when merging to JMC repo-->
 -		<artifactId>missioncontrol.application.jmc-agent-plugin</artifactId>
--		<version>8.1.0-SNAPSHOT</version>
+-		<version>8.0.0-SNAPSHOT</version>
 +		<artifactId>missioncontrol.application</artifactId>
 +		<version>${revision}${changelist}</version>
  	</parent>
@@ -30,7 +30,7 @@ index f4f39ff..d2b5d24 100644
  
  	<build>
 diff --git a/application/org.openjdk.jmc.feature.console.ext.agent/pom.xml b/application/org.openjdk.jmc.feature.console.ext.agent/pom.xml
-index 4f9ae6e..b13eb10 100644
+index bb080eb..b13eb10 100644
 --- a/application/org.openjdk.jmc.feature.console.ext.agent/pom.xml
 +++ b/application/org.openjdk.jmc.feature.console.ext.agent/pom.xml
 @@ -37,10 +37,8 @@
@@ -40,7 +40,7 @@ index 4f9ae6e..b13eb10 100644
 -		<!--artifactId>missioncontrol.application</artifactId-->
 -		<!--TODO: replace this with above when merging to JMC repo-->
 -		<artifactId>missioncontrol.application.jmc-agent-plugin</artifactId>
--		<version>8.1.0-SNAPSHOT</version>
+-		<version>8.0.0-SNAPSHOT</version>
 +		<artifactId>missioncontrol.application</artifactId>
 +		<version>${revision}${changelist}</version>
  	</parent>
@@ -57,29 +57,29 @@ index 4f9ae6e..b13eb10 100644
  	</properties>
  </project>
 diff --git a/application/org.openjdk.jmc.feature.rcp/feature.xml b/application/org.openjdk.jmc.feature.rcp/feature.xml
-index ee1992f..bf35ec4 100644
+index ee1992f..7b00008 100644
 --- a/application/org.openjdk.jmc.feature.rcp/feature.xml
 +++ b/application/org.openjdk.jmc.feature.rcp/feature.xml
-@@ -71,6 +71,10 @@
-          id="org.openjdk.jmc.feature.joverflow"
-          version="0.0.0"/>
+@@ -69,6 +69,10 @@
  
+    <includes
+          id="org.openjdk.jmc.feature.joverflow"
++	   version="0.0.0"/>
++
 +   <includes
 +         id="org.openjdk.jmc.feature.console.ext.agent"
-+         version="0.0.0"/>
-+
+          version="0.0.0"/>
+ 
     <requires>
-       <import feature="org.eclipse.rcp" version="3.8.0" match="greaterOrEqual"/>
-       <import feature="org.eclipse.help" version="1.4.0" match="greaterOrEqual"/>
 diff --git a/application/pom.xml b/application/pom.xml
-index a2d52be..08462cc 100644
+index a2d52be..4d0015e 100644
 --- a/application/pom.xml
 +++ b/application/pom.xml
 @@ -82,6 +82,7 @@
  		<module>org.openjdk.jmc.feature.rcp</module>
  		<module>org.openjdk.jmc.feature.rcp.update</module>
  		<module>org.openjdk.jmc.feature.twitter</module>
-+	        <module>org.openjdk.jmc.feature.console.ext.agent</module>
++		<module>org.openjdk.jmc.feature.console.ext.agent</module>
  		<module>org.openjdk.jmc.flightrecorder.configuration</module>
  		<module>org.openjdk.jmc.flightrecorder.controlpanel.ui</module>
  		<module>org.openjdk.jmc.flightrecorder.controlpanel.ui.configuration</module>
@@ -92,27 +92,23 @@ index a2d52be..08462cc 100644
  		<module>tests</module>
  		<module>coverage</module>
 diff --git a/configuration/spotbugs/spotbugs-exclude.xml b/configuration/spotbugs/spotbugs-exclude.xml
-index 97a251c..87c2e2b 100644
+index 97a251c..bc50f52 100644
 --- a/configuration/spotbugs/spotbugs-exclude.xml
 +++ b/configuration/spotbugs/spotbugs-exclude.xml
-@@ -32,6 +32,102 @@
+@@ -32,6 +32,109 @@
     WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  -->
  <FindBugsFilter>
-+    <!-- copied from jmc-agent-plugin -->
-+    <Match>
++	<!-- copied from jmc-agent-plugin -->
++	<Match>
 +		<Class name="org.openjdk.jmc.console.ext.agent.AgentJmxHelper"/>
 +		<Method name="retrieveCurrentTransforms"/>
 +		<Bug pattern="PZLA_PREFER_ZERO_LENGTH_ARRAYS"/>
 +	</Match>
 +	<Match>
-+		<Class name="org.openjdk.jmc.console.ext.agent.editor.AgentEditor"/>
++		<Class name="org.openjdk.jmc.console.ext.agent.editor.AgentEditorBak"/>
 +		<Method name="doAddPages"/>
 +		<Bug pattern="REC_CATCH_EXCEPTION"/>
-+	</Match>
-+	<Match>
-+		<Class name="org.openjdk.jmc.console.ext.agent.editor.AgentEditor"/>
-+		<Bug pattern="UWF_FIELD_NOT_INITIALIZED_IN_CONSTRUCTOR"/>
 +	</Match>
 +	<Match>
 +		<Class name="org.openjdk.jmc.console.ext.agent.editor.AgentEditorUi"/>
@@ -124,12 +120,12 @@ index 97a251c..87c2e2b 100644
 +		<Bug pattern="UWF_UNWRITTEN_FIELD"/>
 +	</Match>
 +	<Match>
-+		<Class name="org.openjdk.jmc.console.ext.agent.tabs.editor.internal.XmlDocumentProvider"/>
++		<Class name="org.openjdk.jmc.console.ext.agent.raweditor.internal.XmlDocumentProvider"/>
 +		<Method name="doSaveDocument"/>
 +		<Bug pattern="RV_RETURN_VALUE_IGNORED_BAD_PRACTICE"/>
 +	</Match>
 +	<Match>
-+		<Class name="org.openjdk.jmc.console.ext.agent.tabs.editor.internal.XmlDocumentProvider"/>
++		<Class name="org.openjdk.jmc.console.ext.agent.raweditor.internal.XmlDocumentProvider"/>
 +		<Method name="doSaveDocument"/>
 +		<Bug pattern="DM_DEFAULT_ENCODING"/>
 +	</Match>
@@ -155,17 +151,32 @@ index 97a251c..87c2e2b 100644
 +		<Bug pattern="UUF_UNUSED_FIELD"/>
 +	</Match>
 +	<Match>
-+		<Class name="org.openjdk.jmc.console.ext.agent.tabs.editor.internal.NonRuleBasedDamagerRepairer"/>
++		<Class name="org.openjdk.jmc.console.ext.agent.wizards.BaseWizardPage" />
++		<Method name="openFileDialog"/>
++		<Bug pattern="PZLA_PREFER_ZERO_LENGTH_ARRAYS" />
++	</Match>
++	<Match>
++		<Class name="org.openjdk.jmc.console.ext.agent.manager.model.PresetRepositoryFactory" />
++		<Method name="createSingleton"/>
++		<Bug pattern="DC_DOUBLECHECK" />
++	</Match>
++	<!-- This is a false positive. Eclipse handles initialization of critical components elsewhere -->
++    	<Match>
++    		<Class name="org.openjdk.jmc.console.ext.agent.editor.AgentEditor" />
++    		<Bug pattern="UWF_FIELD_NOT_INITIALIZED_IN_CONSTRUCTOR" />
++   	</Match>
++    	<Match>
++		<Class name="org.openjdk.jmc.console.ext.agent.raweditor.internal.NonRuleBasedDamagerRepairer"/>
 +		<Method name="endOfLineOf"/>
 +		<Bug pattern="UWF_FIELD_NOT_INITIALIZED_IN_CONSTRUCTOR"/>
 +	</Match>
 +	<Match>
-+		<Class name="org.openjdk.jmc.console.ext.agent.tabs.editor.internal.NonRuleBasedDamagerRepairer"/>
++		<Class name="org.openjdk.jmc.console.ext.agent.raweditor.internal.NonRuleBasedDamagerRepairer"/>
 +		<Method name="getDamageRegion"/>
 +		<Bug pattern="UWF_FIELD_NOT_INITIALIZED_IN_CONSTRUCTOR"/>
 +	</Match>
 +	<Match>
-+		<Class name="org.openjdk.jmc.console.ext.agent.tabs.editor.internal.XmlDoubleClickStrategy"/>
++		<Class name="org.openjdk.jmc.console.ext.agent.raweditor.internal.XmlDoubleClickStrategy"/>
 +		<Bug pattern="UWF_FIELD_NOT_INITIALIZED_IN_CONSTRUCTOR"/>
 +	</Match>
 +	<Match>
@@ -174,31 +185,27 @@ index 97a251c..87c2e2b 100644
 +		<Bug pattern="UWF_FIELD_NOT_INITIALIZED_IN_CONSTRUCTOR"/>
 +	</Match>
 +	<Match>
-+		<Class name="org.openjdk.jmc.console.ext.agent.wizards.BaseWizardPage" />
-+		<Method name="openFileDialog"/>
-+		<Bug pattern="PZLA_PREFER_ZERO_LENGTH_ARRAYS" />
++		<Class name="org.openjdk.jmc.console.ext.agent.editor.AgentEditorBak"/>
++		<Bug pattern="UWF_FIELD_NOT_INITIALIZED_IN_CONSTRUCTOR"/>
 +	</Match>
++    <!-- There is a blanket exclude on these types of bugs in JMC.
++     in UI classes the memory overhead is minimal and reworking it isn't really worth it -->
 +    <Match>
-+		<Class name="org.openjdk.jmc.console.ext.agent.manager.model.PresetRepositoryFactory" />
-+		<Method name="createSingleton"/>
-+		<Bug pattern="DC_DOUBLECHECK" />
++    	<Class name="org.openjdk.jmc.console.ext.agent.editor.sections.EventDetailSection" />
++    	<Bug pattern="SIC_INNER_SHOULD_BE_STATIC_ANON" />
 +    </Match>
-+    <!-- Ignore file creation return value. If the file already exists we wouldn't have made this call. -->
 +    <Match>
-+    	<Class name="org.openjdk.jmc.console.ext.agent.raweditor.internal.XmlDocumentProvider" />
-+    	<Method name="doSaveDocument" />
-+    	<Bug pattern="RV_RETURN_VALUE_IGNORED_BAD_PRACTICE" />
++    	<Class name="org.openjdk.jmc.console.ext.agent.editor.sections.EventListSection" />
++    	<Bug pattern="SIC_INNER_SHOULD_BE_STATIC_ANON" />
 +    </Match>
-+    <!-- This is being caused by a switch on an enum -->
 +    <Match>
-+    	<Class name="org.openjdk.jmc.console.ext.agent.editor.AgentEditorUi" />
-+    	<Method name="bindAgentEditorActions" />
-+    	<Bug pattern="VO_VOLATILE_REFERENCE_TO_ARRAY" />
++    	<Class name="org.openjdk.jmc.console.ext.agent.editor.sections.GlobalConfigSection" />
++    	<Bug pattern="SIC_INNER_SHOULD_BE_STATIC_ANON" />
 +    </Match>
      <!-- Skip I18n -->
      <Match>
          <Bug pattern="DM_DEFAULT_ENCODING"/>
-@@ -1138,4 +1234,4 @@
+@@ -1138,4 +1241,4 @@
  		<Class name="org.openjdk.jmc.rjmx.subscription.internal.EvilMethodsClass"/>
  	</Match>
  		

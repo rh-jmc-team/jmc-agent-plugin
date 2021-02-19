@@ -42,7 +42,7 @@
 		<!--artifactId>missioncontrol.application</artifactId-->
 		<!--TODO: replace this with above when merging to JMC repo-->
 		<artifactId>missioncontrol.application.jmc-agent-plugin</artifactId>
-		<version>8.1.0-SNAPSHOT</version>
+		<version>8.0.0-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>org.openjdk.jmc.console.ext.agent</artifactId>

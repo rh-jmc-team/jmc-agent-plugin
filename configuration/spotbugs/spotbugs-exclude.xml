@@ -44,10 +44,6 @@
 		<Bug pattern="REC_CATCH_EXCEPTION"/>
 	</Match>
 	<Match>
-		<Class name="org.openjdk.jmc.console.ext.agent.editor.AgentEditorBak"/>
-		<Bug pattern="UWF_FIELD_NOT_INITIALIZED_IN_CONSTRUCTOR"/>
-	</Match>
-	<Match>
 		<Class name="org.openjdk.jmc.console.ext.agent.editor.AgentEditorUi"/>
 		<Method name="refresh"/>
 		<Bug pattern="RV_RETURN_VALUE_IGNORED_BAD_PRACTICE"/>
@@ -88,6 +84,21 @@
 		<Bug pattern="UUF_UNUSED_FIELD"/>
 	</Match>
 	<Match>
+		<Class name="org.openjdk.jmc.console.ext.agent.wizards.BaseWizardPage" />
+		<Method name="openFileDialog"/>
+		<Bug pattern="PZLA_PREFER_ZERO_LENGTH_ARRAYS" />
+	</Match>
+	<Match>
+		<Class name="org.openjdk.jmc.console.ext.agent.manager.model.PresetRepositoryFactory" />
+		<Method name="createSingleton"/>
+		<Bug pattern="DC_DOUBLECHECK" />
+	</Match>
+	<!-- This is a false positive. Eclipse handles initialization of critical components elsewhere -->
+    <Match>
+    	<Class name="org.openjdk.jmc.console.ext.agent.editor.AgentEditor" />
+    	<Bug pattern="UWF_FIELD_NOT_INITIALIZED_IN_CONSTRUCTOR" />
+    </Match>
+    	<Match>
 		<Class name="org.openjdk.jmc.console.ext.agent.raweditor.internal.NonRuleBasedDamagerRepairer"/>
 		<Method name="endOfLineOf"/>
 		<Bug pattern="UWF_FIELD_NOT_INITIALIZED_IN_CONSTRUCTOR"/>
@@ -107,13 +118,21 @@
 		<Bug pattern="UWF_FIELD_NOT_INITIALIZED_IN_CONSTRUCTOR"/>
 	</Match>
 	<Match>
-		<Class name="org.openjdk.jmc.console.ext.agent.wizards.BaseWizardPage" />
-		<Method name="openFileDialog"/>
-		<Bug pattern="PZLA_PREFER_ZERO_LENGTH_ARRAYS" />
+		<Class name="org.openjdk.jmc.console.ext.agent.editor.AgentEditorBak"/>
+		<Bug pattern="UWF_FIELD_NOT_INITIALIZED_IN_CONSTRUCTOR"/>
 	</Match>
-	<Match>
-		<Class name="org.openjdk.jmc.console.ext.agent.manager.model.PresetRepositoryFactory" />
-		<Method name="createSingleton"/>
-		<Bug pattern="DC_DOUBLECHECK" />
-	</Match>
+    <!-- There is a blanket exclude on these types of bugs in JMC.
+     in UI classes the memory overhead is minimal and reworking it isn't really worth it -->
+    <Match>
+    	<Class name="org.openjdk.jmc.console.ext.agent.editor.sections.EventDetailSection" />
+    	<Bug pattern="SIC_INNER_SHOULD_BE_STATIC_ANON" />
+    </Match>
+    <Match>
+    	<Class name="org.openjdk.jmc.console.ext.agent.editor.sections.EventListSection" />
+    	<Bug pattern="SIC_INNER_SHOULD_BE_STATIC_ANON" />
+    </Match>
+    <Match>
+    	<Class name="org.openjdk.jmc.console.ext.agent.editor.sections.GlobalConfigSection" />
+    	<Bug pattern="SIC_INNER_SHOULD_BE_STATIC_ANON" />
+    </Match>
 </FindBugsFilter>
