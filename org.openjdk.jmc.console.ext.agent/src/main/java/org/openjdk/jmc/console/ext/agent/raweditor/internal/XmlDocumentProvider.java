@@ -39,7 +39,7 @@ public class XmlDocumentProvider extends StorageDocumentProvider {
 		if (!out.exists()) {
 			try {
 				out.createNewFile();
-			} catch (IOException e) {
+			} catch (IOException | SecurityException e) {
 				IStatus s = new Status(IStatus.ERROR, EditorsUI.PLUGIN_ID, IStatus.OK, e.getMessage(), e);
 				throw new CoreException(s);
 			}
