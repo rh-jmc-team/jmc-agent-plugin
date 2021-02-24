@@ -48,6 +48,7 @@ import org.openjdk.jmc.console.ext.agent.AgentJmxHelper;
 import org.openjdk.jmc.console.ext.agent.AgentPlugin;
 import org.openjdk.jmc.console.ext.agent.editor.AgentEditor;
 import org.openjdk.jmc.console.ext.agent.editor.AgentEditorInput;
+import org.openjdk.jmc.console.ext.agent.messages.internal.Messages;
 import org.openjdk.jmc.console.ext.agent.wizards.StartAgentWizard;
 import org.openjdk.jmc.rjmx.ConnectionException;
 import org.openjdk.jmc.rjmx.IConnectionHandle;
@@ -64,12 +65,7 @@ import java.util.Objects;
 // TODO: Export IActionFactory to this plug-in and remove @SuppressWarnings once it's official in JMC   
 @SuppressWarnings("restriction")
 public class AgentEditorOpener implements IActionFactory {
-	private final static String JOB_NAME = "Connecting to RJMX service";
-	private final static String MESSAGE_COULD_NOT_CONNECT = "Could not connect";
-	private final static String MESSAGE_STARTING_AGENT_ON_REMOTE_JVM_NOT_SUPPORTED = "Starting an agent on remote JVM is not supported";
-	private final static String MESSAGE_START_AGENT_MANUALLY = "Start the agent manually and try again";
-	private final static String MESSAGE_FAILED_TO_OPEN_AGENT_EDITOR = "Failed to open the JMC Agent Editor";
-
+	
 	@Override
 	public Executable createAction(IServerHandle serverHandle) {
 		return () -> new ConnectJob(serverHandle).schedule();
@@ -82,7 +78,7 @@ public class AgentEditorOpener implements IActionFactory {
 		private AgentJmxHelper helper;
 
 		private ConnectJob(IServerHandle serverHandle) {
-			super(JOB_NAME);
+			super(Messages.AgentEditorOpener_JOB_NAME);
 
 			this.serverHandle = Objects.requireNonNull(serverHandle);
 		}
@@ -101,7 +97,7 @@ public class AgentEditorOpener implements IActionFactory {
 			} catch (ConnectionException e) {
 				// FIXME: Show stacktrace? (Need to show our own ExceptionDialog in that case, or maybe create our own DetailsAreaProvider, see WorkbenchStatusDialogManager.setDetailsAreaProvider)
 				return new Status(IStatus.ERROR, AgentPlugin.PLUGIN_ID, IStatus.ERROR,
-						NLS.bind(MESSAGE_COULD_NOT_CONNECT, serverHandle.getServerDescriptor().getDisplayName(),
+						NLS.bind(Messages.AgentEditorOpener_MESSAGE_COULD_NOT_CONNECT, serverHandle.getServerDescriptor().getDisplayName(),
 								e.getMessage()),
 						e);
 			}
@@ -124,8 +120,9 @@ public class AgentEditorOpener implements IActionFactory {
 			if (!helper.isMXBeanRegistered() && !helper.isLocalJvm()) {
 				DisplayToolkit.safeAsyncExec(Display.getDefault(), () -> {
 					IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-					DialogToolkit.showError(window.getShell(), MESSAGE_STARTING_AGENT_ON_REMOTE_JVM_NOT_SUPPORTED,
-							MESSAGE_START_AGENT_MANUALLY);
+					DialogToolkit.showError(window.getShell(), 
+							Messages.AgentEditorOpener_MESSAGE_STARTING_AGENT_ON_REMOTE_JVM_NOT_SUPPORTED,
+							Messages.AgentEditorOpener_MESSAGE_START_AGENT_MANUALLY);
 				});
 				return Status.OK_STATUS;
 			}
@@ -137,7 +134,7 @@ public class AgentEditorOpener implements IActionFactory {
 					IEditorInput ei = new AgentEditorInput(serverHandle, helper.getConnectionHandle(), helper);
 					window.getActivePage().openEditor(ei, AgentEditor.EDITOR_ID, true);
 				} catch (PartInitException e) {
-					DialogToolkit.showException(window.getShell(), MESSAGE_FAILED_TO_OPEN_AGENT_EDITOR, e);
+					DialogToolkit.showException(window.getShell(), Messages.AgentEditorOpener_MESSAGE_FAILED_TO_OPEN_AGENT_EDITOR, e);
 				}
 			});
 

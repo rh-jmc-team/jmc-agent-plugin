@@ -22,6 +22,7 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Widget;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
+import org.openjdk.jmc.console.ext.agent.messages.internal.Messages;
 import org.openjdk.jmc.flightrecorder.ui.FlightRecorderUI;
 import org.openjdk.jmc.ui.column.ColumnBuilder;
 import org.openjdk.jmc.ui.column.ColumnManager;
@@ -39,8 +40,6 @@ import java.util.List;
 import java.util.Map;
 
 public abstract class BaseWizardPage extends WizardPage {
-
-	private static final String MESSAGE_UNEXPECTED_ERROR_HAS_OCCURRED = "An unexpected has error occurred.";
 
 	private static final String FILE_OPEN_FILTER_PATH = "file.open.filter.path"; // $NON-NLS-1$
 
@@ -209,7 +208,8 @@ public abstract class BaseWizardPage extends WizardPage {
 			setErrorMessage(e.getLocalizedMessage());
 		} catch (Exception e) {
 			IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-			DialogToolkit.showException(window.getShell(), MESSAGE_UNEXPECTED_ERROR_HAS_OCCURRED, e);
+			DialogToolkit.showException(window.getShell(), 
+					Messages.BaseWizardPage_MESSAGE_UNEXPECTED_ERROR_HAS_OCCURRED, e);
 		}
 
 		setPageComplete(exceptions.isEmpty());
