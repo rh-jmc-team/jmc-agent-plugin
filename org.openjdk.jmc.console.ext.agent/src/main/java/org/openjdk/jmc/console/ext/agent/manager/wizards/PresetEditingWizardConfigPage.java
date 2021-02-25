@@ -42,23 +42,11 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Text;
+import org.openjdk.jmc.console.ext.agent.messages.internal.Messages;
 import org.openjdk.jmc.console.ext.agent.manager.model.IPreset;
 import org.openjdk.jmc.console.ext.agent.wizards.BaseWizardPage;
 
 public class PresetEditingWizardConfigPage extends BaseWizardPage {
-	private static final String PAGE_NAME = "Agent Preset Editing";
-
-	private static final String MESSAGE_PRESET_EDITING_WIZARD_CONFIG_PAGE_TITLE = "Edit Preset Global Configurations";
-	private static final String MESSAGE_PRESET_EDITING_WIZARD_CONFIG_PAGE_DESCRIPTION = "Global configurations are defaults which applies to any event missing a per-even configuration.";
-
-	private static final String LABEL_FILE_NAME = "File Name: ";
-	private static final String LABEL_CLASS_PREFIX = "Class Prefix: ";
-	private static final String LABEL_ALLOW_TO_STRING = "Allow toString";
-	private static final String LABEL_ALLOW_CONVERTER = "Allow Converter";
-
-	private static final String MESSAGE_NAME_OF_THE_SAVED_XML = "Name of the saved XML on file system";
-	private static final String MESSAGE_PREFIX_ADDED_TO_GENERATED_EVENT_CLASSES = "Prefix added to generated event classes";
-
 	private final IPreset preset;
 
 	private Text fileNameText;
@@ -67,7 +55,7 @@ public class PresetEditingWizardConfigPage extends BaseWizardPage {
 	private Button allowConverterButton;
 
 	protected PresetEditingWizardConfigPage(IPreset preset) {
-		super(PAGE_NAME);
+		super(Messages.PresetEditingWizardConfigPage_PAGE_NAME);
 
 		this.preset = preset;
 	}
@@ -76,8 +64,8 @@ public class PresetEditingWizardConfigPage extends BaseWizardPage {
 	public void createControl(Composite parent) {
 		initializeDialogUnits(parent);
 
-		setTitle(MESSAGE_PRESET_EDITING_WIZARD_CONFIG_PAGE_TITLE);
-		setDescription(MESSAGE_PRESET_EDITING_WIZARD_CONFIG_PAGE_DESCRIPTION);
+		setTitle(Messages.PresetEditingWizardConfigPage_MESSAGE_PRESET_EDITING_WIZARD_CONFIG_PAGE_TITLE);
+		setDescription(Messages.PresetEditingWizardConfigPage_MESSAGE_PRESET_EDITING_WIZARD_CONFIG_PAGE_DESCRIPTION);
 
 		ScrolledComposite sc = new ScrolledComposite(parent, SWT.H_SCROLL | SWT.V_SCROLL);
 		Composite container = new Composite(sc, SWT.NONE);
@@ -105,7 +93,8 @@ public class PresetEditingWizardConfigPage extends BaseWizardPage {
 		layout.horizontalSpacing = 8;
 		container.setLayout(layout);
 
-		fileNameText = createTextInput(container, cols, LABEL_FILE_NAME, MESSAGE_NAME_OF_THE_SAVED_XML);
+		fileNameText = createTextInput(container, cols, Messages.PresetEditingWizardConfigPage_LABEL_FILE_NAME,
+				Messages.PresetEditingWizardConfigPage_MESSAGE_NAME_OF_THE_SAVED_XML);
 
 		return container;
 	}
@@ -117,10 +106,12 @@ public class PresetEditingWizardConfigPage extends BaseWizardPage {
 		layout.horizontalSpacing = 8;
 		container.setLayout(layout);
 
-		classPrefixText = createTextInput(container, cols, LABEL_CLASS_PREFIX,
-				MESSAGE_PREFIX_ADDED_TO_GENERATED_EVENT_CLASSES);
-		allowToStringButton = createCheckboxInput(parent, cols, LABEL_ALLOW_TO_STRING);
-		allowConverterButton = createCheckboxInput(parent, cols, LABEL_ALLOW_CONVERTER);
+		classPrefixText = createTextInput(container, cols, Messages.PresetEditingWizardConfigPage_LABEL_CLASS_PREFIX,
+				Messages.PresetEditingWizardConfigPage_MESSAGE_PREFIX_ADDED_TO_GENERATED_EVENT_CLASSES);
+		allowToStringButton = createCheckboxInput(parent, cols,
+				Messages.PresetEditingWizardConfigPage_LABEL_ALLOW_TO_STRING);
+		allowConverterButton = createCheckboxInput(parent, cols,
+				Messages.PresetEditingWizardConfigPage_LABEL_ALLOW_CONVERTER);
 
 		return container;
 	}

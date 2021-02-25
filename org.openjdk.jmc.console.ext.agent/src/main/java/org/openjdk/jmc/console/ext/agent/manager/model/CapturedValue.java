@@ -33,6 +33,7 @@
  */
 package org.openjdk.jmc.console.ext.agent.manager.model;
 
+import org.openjdk.jmc.console.ext.agent.messages.internal.Messages;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -46,9 +47,6 @@ class CapturedValue implements ICapturedValue {
 	private static final String DEFAULT_STRING_FIELD = ""; // $NON-NLS-1$
 	private static final Object DEFAULT_OBJECT_TYPE = null;
 	private static final String CONVERTER_REGEX = "([a-zA-Z_$][a-zA-Z0-9_$]*\\.)*([a-zA-Z_$][a-zA-Z0-9_$]*)"; // $NON-NLS-1$
-
-	private static final String ERROR_RELATION_KEY_HAS_INCORRECT_SYNTAX = "Relation key has incorrect syntax.";
-	private static final String ERROR_CONVERTER_HAS_INCORRECT_SYNTAX = "Converter has incorrect syntax.";
 
 	private static final String XML_TAG_CAPTURED_VALUE = "capturedvalue"; // $NON-NLS-1$
 	private static final String XML_TAG_NAME = "name"; // $NON-NLS-1$
@@ -180,7 +178,7 @@ class CapturedValue implements ICapturedValue {
 			try {
 				new URI(relationKey);
 			} catch (URISyntaxException e) {
-				throw new IllegalArgumentException(ERROR_RELATION_KEY_HAS_INCORRECT_SYNTAX);
+				throw new IllegalArgumentException(Messages.CapturedValue_ERROR_RELATION_KEY_HAS_INCORRECT_SYNTAX);
 			}
 		}
 
@@ -197,7 +195,7 @@ class CapturedValue implements ICapturedValue {
 		if (converter != null && !converter.isEmpty()) {
 			converter = converter.trim();
 			if (!converter.matches(CONVERTER_REGEX)) {
-				throw new IllegalArgumentException(ERROR_CONVERTER_HAS_INCORRECT_SYNTAX);
+				throw new IllegalArgumentException(Messages.CapturedValue_ERROR_CONVERTER_HAS_INCORRECT_SYNTAX);
 			}
 		}
 

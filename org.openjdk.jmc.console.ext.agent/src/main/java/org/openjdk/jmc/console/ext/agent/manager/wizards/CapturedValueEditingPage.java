@@ -11,6 +11,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Text;
+import org.openjdk.jmc.console.ext.agent.messages.internal.Messages;
 import org.openjdk.jmc.console.ext.agent.manager.model.ICapturedValue;
 import org.openjdk.jmc.console.ext.agent.manager.model.ICapturedValue.ContentType;
 import org.openjdk.jmc.console.ext.agent.manager.model.IEvent;
@@ -23,28 +24,6 @@ import java.util.Locale;
 import java.util.stream.Stream;
 
 public class CapturedValueEditingPage extends BaseWizardPage {
-	private static final String PAGE_NAME = "Agent Captured Value Editing";
-
-	private static final String MESSAGE_PARAMETER_OR_RETURN_VALUE_EDITING_PAGE_TITLE = "Edit a Parameter or Return Value";
-	private static final String MESSAGE_PARAMETER_OR_RETURN_VALUE_EDITING_PAGE_DESCRIPTION = "Define a capturing of a method parameter or a return value.";
-	private static final String MESSAGE_FIELD_EDITING_PAGE_TITLE = "Edit a Parameter or Return Value Capturing";
-	private static final String MESSAGE_FIELD_EDITING_PAGE_DESCRIPTION = "Define a custom expression evaluation and capture its result.";
-
-	private static final String LABEL_NAME = "Name: ";
-	private static final String LABEL_INDEX = "Index: ";
-	private static final String LABEL_IS_RETURN_VALUE = "This is a return value";
-	private static final String LABEL_EXPRESSION = "Expression: ";
-	private static final String LABEL_DESCRIPTION = "Description: ";
-	private static final String LABEL_CONTENT_TYPE = "Content Type: ";
-	private static final String LABEL_CLEAR = "Clear";
-	private static final String LABEL_RELATIONAL_KEY = "Relational Key: ";
-	private static final String LABEL_CONVERTER = "Converter: ";
-
-	private static final String MESSAGE_NAME_OF_THE_CAPTURING = "Name of this capturing";
-	private static final String MESSAGE_JAVA_PRIMARY_EXPRESSION_TO_BE_EVALUATED = "Java primary expression to be evaluated";
-	private static final String MESSAGE_OPTIONAL_DESCRIPTION_OF_THIS_CAPTURING = "(Optional) Description of this capturing";
-	private static final String MESSAGE_RELATIONAL_KEY_DESCRIPTION = "(Optional) Unique URI signifying a relationship";
-	private static final String MESSAGE_CONVERTER_DESCRIPTION = "(Optional) fully qualified class name of a value converter";
 
 	private final IEvent event;
 	private ICapturedValue capturedValue;
@@ -60,7 +39,7 @@ public class CapturedValueEditingPage extends BaseWizardPage {
 	private Text converterText;
 
 	public CapturedValueEditingPage(IEvent event, ICapturedValue capturedValue) {
-		super(PAGE_NAME);
+		super(Messages.CapturedValueEditingPage_PAGE_NAME);
 
 		this.event = event;
 		this.capturedValue = capturedValue;
@@ -71,11 +50,12 @@ public class CapturedValueEditingPage extends BaseWizardPage {
 		initializeDialogUnits(parent);
 
 		if (capturedValue instanceof IMethodParameter || capturedValue instanceof IMethodReturnValue) {
-			setTitle(MESSAGE_PARAMETER_OR_RETURN_VALUE_EDITING_PAGE_TITLE);
-			setDescription(MESSAGE_PARAMETER_OR_RETURN_VALUE_EDITING_PAGE_DESCRIPTION);
+			setTitle(Messages.CapturedValueEditingPage_MESSAGE_PARAMETER_OR_RETURN_VALUE_EDITING_PAGE_TITLE);
+			setDescription(
+					Messages.CapturedValueEditingPage_MESSAGE_PARAMETER_OR_RETURN_VALUE_EDITING_PAGE_DESCRIPTION);
 		} else if (capturedValue instanceof IField) {
-			setTitle(MESSAGE_FIELD_EDITING_PAGE_TITLE);
-			setDescription(MESSAGE_FIELD_EDITING_PAGE_DESCRIPTION);
+			setTitle(Messages.CapturedValueEditingPage_MESSAGE_FIELD_EDITING_PAGE_TITLE);
+			setDescription(Messages.CapturedValueEditingPage_MESSAGE_FIELD_EDITING_PAGE_DESCRIPTION);
 		} else {
 			throw new IllegalStateException(
 					"captured value must be a an IMethodParameter, IMethodReturnValue or IFeild"); // $NON-NLS-1$
@@ -108,17 +88,18 @@ public class CapturedValueEditingPage extends BaseWizardPage {
 		layout.horizontalSpacing = 8;
 		container.setLayout(layout);
 
-		nameText = createTextInput(container, cols, LABEL_NAME, MESSAGE_NAME_OF_THE_CAPTURING);
+		nameText = createTextInput(container, cols, Messages.CapturedValueEditingPage_LABEL_NAME,
+				Messages.CapturedValueEditingPage_MESSAGE_NAME_OF_THE_CAPTURING);
 		if (capturedValue instanceof IField) {
-			expressionText = createTextInput(container, cols, LABEL_EXPRESSION,
-					MESSAGE_JAVA_PRIMARY_EXPRESSION_TO_BE_EVALUATED);
+			expressionText = createTextInput(container, cols, Messages.CapturedValueEditingPage_LABEL_EXPRESSION,
+					Messages.CapturedValueEditingPage_MESSAGE_JAVA_PRIMARY_EXPRESSION_TO_BE_EVALUATED);
 		} else {
-			indexSpinner = createSpinnerInput(container, 3, LABEL_INDEX);
-			isReturnValueButton = createCheckbox(container, LABEL_IS_RETURN_VALUE);
+			indexSpinner = createSpinnerInput(container, 3, Messages.CapturedValueEditingPage_LABEL_INDEX);
+			isReturnValueButton = createCheckbox(container, Messages.CapturedValueEditingPage_LABEL_IS_RETURN_VALUE);
 			isReturnValueButton.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 2, 0));
 		}
-		descriptionText = createMultiTextInput(container, cols, LABEL_DESCRIPTION,
-				MESSAGE_OPTIONAL_DESCRIPTION_OF_THIS_CAPTURING);
+		descriptionText = createMultiTextInput(container, cols, Messages.CapturedValueEditingPage_LABEL_DESCRIPTION,
+				Messages.CapturedValueEditingPage_MESSAGE_OPTIONAL_DESCRIPTION_OF_THIS_CAPTURING);
 
 		return container;
 	}
@@ -130,14 +111,16 @@ public class CapturedValueEditingPage extends BaseWizardPage {
 		layout.horizontalSpacing = 8;
 		container.setLayout(layout);
 
-		contentTypeCombo = createComboInput(container, cols - 2, LABEL_CONTENT_TYPE,
+		contentTypeCombo = createComboInput(container, cols - 2, Messages.CapturedValueEditingPage_LABEL_CONTENT_TYPE,
 				Stream.of(ContentType.values()).map(ContentType::toString).toArray(String[]::new));
-		contentTypeClearButton = createButton(container, LABEL_CLEAR);
+		contentTypeClearButton = createButton(container, Messages.CapturedValueEditingPage_LABEL_CLEAR);
 		contentTypeClearButton.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 2, 0));
 
-		relationalKeyText = createTextInput(container, cols, LABEL_RELATIONAL_KEY, MESSAGE_RELATIONAL_KEY_DESCRIPTION);
+		relationalKeyText = createTextInput(container, cols, Messages.CapturedValueEditingPage_LABEL_RELATIONAL_KEY,
+				Messages.CapturedValueEditingPage_MESSAGE_RELATIONAL_KEY_DESCRIPTION);
 
-		converterText = createTextInput(container, cols, LABEL_CONVERTER, MESSAGE_CONVERTER_DESCRIPTION);
+		converterText = createTextInput(container, cols, Messages.CapturedValueEditingPage_LABEL_CONVERTER,
+				Messages.CapturedValueEditingPage_MESSAGE_CONVERTER_DESCRIPTION);
 
 		return container;
 	}

@@ -15,6 +15,7 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.forms.widgets.Form;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.part.EditorPart;
+import org.openjdk.jmc.console.ext.agent.messages.internal.Messages;
 import org.openjdk.jmc.flightrecorder.ui.FlightRecorderUI;
 import org.openjdk.jmc.rjmx.IConnectionHandle;
 import org.openjdk.jmc.rjmx.IConnectionListener;
@@ -26,9 +27,6 @@ import java.util.stream.Stream;
 
 public class AgentEditor extends EditorPart implements IConnectionListener {
 	public static final String EDITOR_ID = "org.openjdk.jmc.console.ext.agent.editor.AgentEditor"; //$NON-NLS-1$
-
-	private static final String AGENT_EDITOR_TITLE = "Agent Live Config";
-	private static final String CONNECTION_LOST = "Connection Lost";
 
 	private Composite parentComposite;
 	private FormToolkit formToolkit;
@@ -44,7 +42,7 @@ public class AgentEditor extends EditorPart implements IConnectionListener {
 		}
 
 		if (!connection.isConnected() && form != null) {
-			form.setMessage(CONNECTION_LOST, IMessageProvider.ERROR);
+			form.setMessage(Messages.AgentEditor_CONNECTION_LOST, IMessageProvider.ERROR);
 		}
 	}
 
@@ -125,7 +123,7 @@ public class AgentEditor extends EditorPart implements IConnectionListener {
 
 	private void createAgentEditorUi(Composite parent) {
 		form = formToolkit.createForm(parent);
-		form.setText(AGENT_EDITOR_TITLE);
+		form.setText(Messages.AgentEditor_AGENT_EDITOR_TITLE);
 		form.setImage(getTitleImage());
 		formToolkit.decorateFormHeading(form);
 

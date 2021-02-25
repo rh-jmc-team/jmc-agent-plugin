@@ -52,11 +52,11 @@ import java.util.Set;
 import java.util.logging.Level;
 
 public final class AgentJmxHelper {
-	private final static String AGENT_OBJECT_NAME = "org.openjdk.jmc.jfr.agent:type=AgentController";
-	private final static String DEFINE_EVENT_PROBES = "defineEventProbes";
-	private final static String RETRIEVE_EVENT_PROBES = "retrieveEventProbes";
-	private final static String RETRIEVE_CURRENT_TRANSFORMS = "retrieveCurrentTransforms";
-	private final static String CONNECTION_USAGE = "Agent MBean";
+	private final static String AGENT_OBJECT_NAME = "org.openjdk.jmc.jfr.agent:type=AgentController"; //$NON-NLS-1$
+	private final static String DEFINE_EVENT_PROBES = "defineEventProbes"; //$NON-NLS-1$
+	private final static String RETRIEVE_EVENT_PROBES = "retrieveEventProbes"; //$NON-NLS-1$
+	private final static String RETRIEVE_CURRENT_TRANSFORMS = "retrieveCurrentTransforms"; //$NON-NLS-1$
+	private final static String CONNECTION_USAGE = "Agent MBean"; //$NON-NLS-1$
 
 	private final IServerHandle serverHandle;
 	private final IConnectionHandle connectionHandle;
