@@ -122,7 +122,7 @@ public class AgentEditorOpener implements IActionFactory {
 						public void createButtonsForButtonBar(Composite parent) {
 							super.createButtonsForButtonBar(parent);
 							Button finishButton = getButton(IDialogConstants.FINISH_ID);
-							finishButton.setText(StartAgentWizard.WIZARD_FINISH_BUTTON_TEXT);
+							finishButton.setText(Messages.StartAgentWizard_WIZARD_FINISH_BUTTON_TEXT);
 						}
 					};
 					dialog.setHelpAvailable(true);
