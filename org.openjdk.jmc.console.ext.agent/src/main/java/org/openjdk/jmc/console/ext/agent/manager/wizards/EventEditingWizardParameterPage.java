@@ -75,7 +75,8 @@ public class EventEditingWizardParameterPage extends BaseWizardPage {
 		initializeDialogUnits(parent);
 
 		setTitle(Messages.EventEditingWizardParameterPage_MESSAGE_EVENT_EDITING_WIZARD_PARAMETER_PAGE_TITLE);
-		setDescription(Messages.EventEditingWizardParameterPage_MESSAGE_EVENT_EDITING_WIZARD_PARAMETER_PAGE_DESCRIPTION);
+		setDescription(
+				Messages.EventEditingWizardParameterPage_MESSAGE_EVENT_EDITING_WIZARD_PARAMETER_PAGE_DESCRIPTION);
 
 		ScrolledComposite sc = new ScrolledComposite(parent, SWT.H_SCROLL | SWT.V_SCROLL);
 		Composite container = new Composite(sc, SWT.NONE);
@@ -103,36 +104,36 @@ public class EventEditingWizardParameterPage extends BaseWizardPage {
 			protected void addColumns() {
 				addColumn(Messages.EventEditingWizardParameterPage_LABEL_INDEX,
 						Messages.EventEditingWizardParameterPage_ID_INDEX, new ParameterTableLabelProvider() {
-					@Override
-					protected String doGetText(ICapturedValue parameter) {
-						if (parameter instanceof IMethodReturnValue) {
-							return Messages.EventEditingWizardParameterPage_MESSAGE_RETURN_VALUE;
-						}
+							@Override
+							protected String doGetText(ICapturedValue parameter) {
+								if (parameter instanceof IMethodReturnValue) {
+									return Messages.EventEditingWizardParameterPage_MESSAGE_RETURN_VALUE;
+								}
 
-						if (parameter instanceof IMethodParameter) {
-							return ((IMethodParameter) parameter).getIndex() + "";
-						}
+								if (parameter instanceof IMethodParameter) {
+									return ((IMethodParameter) parameter).getIndex() + "";
+								}
 
-						throw new IllegalArgumentException(
-								"element must be a an IMethodParameter or IMethodReturnValue"); // $NON-NLS-1$
-					}
-				});
+								throw new IllegalArgumentException(
+										"element must be a an IMethodParameter or IMethodReturnValue"); // $NON-NLS-1$
+							}
+						});
 
 				addColumn(Messages.EventEditingWizardParameterPage_LABEL_NAME,
 						Messages.EventEditingWizardParameterPage_ID_NAME, new ParameterTableLabelProvider() {
-					@Override
-					protected String doGetText(ICapturedValue parameter) {
-						return parameter.getName();
-					}
-				});
+							@Override
+							protected String doGetText(ICapturedValue parameter) {
+								return parameter.getName();
+							}
+						});
 
-				addColumn(Messages.EventEditingWizardParameterPage_LABEL_DESCRIPTION, 
+				addColumn(Messages.EventEditingWizardParameterPage_LABEL_DESCRIPTION,
 						Messages.EventEditingWizardParameterPage_ID_DESCRIPTION, new ParameterTableLabelProvider() {
-					@Override
-					protected String doGetText(ICapturedValue parameter) {
-						return parameter.getDescription();
-					}
-				});
+							@Override
+							protected String doGetText(ICapturedValue parameter) {
+								return parameter.getDescription();
+							}
+						});
 			}
 
 			@Override

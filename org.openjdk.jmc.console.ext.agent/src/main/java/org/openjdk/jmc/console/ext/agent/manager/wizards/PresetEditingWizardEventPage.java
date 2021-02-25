@@ -91,21 +91,21 @@ public class PresetEditingWizardEventPage extends BaseWizardPage {
 						| TableInspector.EDIT_BUTTON | TableInspector.DUPLICATE_BUTTON | TableInspector.REMOVE_BUTTON) {
 			@Override
 			protected void addColumns() {
-				addColumn(Messages.PresetEditingWizardEventPage_LABEL_ID_COLUMN, 
+				addColumn(Messages.PresetEditingWizardEventPage_LABEL_ID_COLUMN,
 						Messages.PresetEditingWizardEventPage_ID_ID_COLUMN, new EventTableLabelProvider() {
-					@Override
-					protected String doGetText(IEvent event) {
-						return event.getId();
-					}
-				});
+							@Override
+							protected String doGetText(IEvent event) {
+								return event.getId();
+							}
+						});
 
-				addColumn(Messages.PresetEditingWizardEventPage_LABEL_NAME_COLUMN, 
+				addColumn(Messages.PresetEditingWizardEventPage_LABEL_NAME_COLUMN,
 						Messages.PresetEditingWizardEventPage_ID_NAME_COLUMN, new EventTableLabelProvider() {
-					@Override
-					protected String doGetText(IEvent event) {
-						return event.getName();
-					}
-				});
+							@Override
+							protected String doGetText(IEvent event) {
+								return event.getName();
+							}
+						});
 			}
 
 			@Override
@@ -116,7 +116,8 @@ public class PresetEditingWizardEventPage extends BaseWizardPage {
 						preset.addEvent(event);
 					} catch (IllegalArgumentException e) {
 						if (DialogToolkit.openConfirmOnUiThread(
-								Messages.PresetEditingWizardEventPage_MESSAGE_UNABLE_TO_SAVE_THE_PRESET, e.getMessage())) {
+								Messages.PresetEditingWizardEventPage_MESSAGE_UNABLE_TO_SAVE_THE_PRESET,
+								e.getMessage())) {
 							continue;
 						}
 					}
@@ -136,7 +137,8 @@ public class PresetEditingWizardEventPage extends BaseWizardPage {
 						preset.updateEvent(original, workingCopy);
 					} catch (IllegalArgumentException e) {
 						if (DialogToolkit.openConfirmOnUiThread(
-								Messages.PresetEditingWizardEventPage_MESSAGE_UNABLE_TO_SAVE_THE_PRESET, e.getMessage())) {
+								Messages.PresetEditingWizardEventPage_MESSAGE_UNABLE_TO_SAVE_THE_PRESET,
+								e.getMessage())) {
 							continue;
 						}
 					}

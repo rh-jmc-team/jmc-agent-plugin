@@ -51,7 +51,8 @@ public class CapturedValueEditingPage extends BaseWizardPage {
 
 		if (capturedValue instanceof IMethodParameter || capturedValue instanceof IMethodReturnValue) {
 			setTitle(Messages.CapturedValueEditingPage_MESSAGE_PARAMETER_OR_RETURN_VALUE_EDITING_PAGE_TITLE);
-			setDescription(Messages.CapturedValueEditingPage_MESSAGE_PARAMETER_OR_RETURN_VALUE_EDITING_PAGE_DESCRIPTION);
+			setDescription(
+					Messages.CapturedValueEditingPage_MESSAGE_PARAMETER_OR_RETURN_VALUE_EDITING_PAGE_DESCRIPTION);
 		} else if (capturedValue instanceof IField) {
 			setTitle(Messages.CapturedValueEditingPage_MESSAGE_FIELD_EDITING_PAGE_TITLE);
 			setDescription(Messages.CapturedValueEditingPage_MESSAGE_FIELD_EDITING_PAGE_DESCRIPTION);
@@ -87,22 +88,17 @@ public class CapturedValueEditingPage extends BaseWizardPage {
 		layout.horizontalSpacing = 8;
 		container.setLayout(layout);
 
-		nameText = createTextInput(container, cols,
-				Messages.CapturedValueEditingPage_LABEL_NAME,
+		nameText = createTextInput(container, cols, Messages.CapturedValueEditingPage_LABEL_NAME,
 				Messages.CapturedValueEditingPage_MESSAGE_NAME_OF_THE_CAPTURING);
 		if (capturedValue instanceof IField) {
-			expressionText = createTextInput(container, cols, 
-					Messages.CapturedValueEditingPage_LABEL_EXPRESSION,
+			expressionText = createTextInput(container, cols, Messages.CapturedValueEditingPage_LABEL_EXPRESSION,
 					Messages.CapturedValueEditingPage_MESSAGE_JAVA_PRIMARY_EXPRESSION_TO_BE_EVALUATED);
 		} else {
-			indexSpinner = createSpinnerInput(container, 3, 
-					Messages.CapturedValueEditingPage_LABEL_INDEX);
-			isReturnValueButton = createCheckbox(container, 
-					Messages.CapturedValueEditingPage_LABEL_IS_RETURN_VALUE);
+			indexSpinner = createSpinnerInput(container, 3, Messages.CapturedValueEditingPage_LABEL_INDEX);
+			isReturnValueButton = createCheckbox(container, Messages.CapturedValueEditingPage_LABEL_IS_RETURN_VALUE);
 			isReturnValueButton.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 2, 0));
 		}
-		descriptionText = createMultiTextInput(container, cols, 
-				Messages.CapturedValueEditingPage_LABEL_DESCRIPTION,
+		descriptionText = createMultiTextInput(container, cols, Messages.CapturedValueEditingPage_LABEL_DESCRIPTION,
 				Messages.CapturedValueEditingPage_MESSAGE_OPTIONAL_DESCRIPTION_OF_THIS_CAPTURING);
 
 		return container;
@@ -115,19 +111,15 @@ public class CapturedValueEditingPage extends BaseWizardPage {
 		layout.horizontalSpacing = 8;
 		container.setLayout(layout);
 
-		contentTypeCombo = createComboInput(container, cols - 2, 
-				Messages.CapturedValueEditingPage_LABEL_CONTENT_TYPE,
+		contentTypeCombo = createComboInput(container, cols - 2, Messages.CapturedValueEditingPage_LABEL_CONTENT_TYPE,
 				Stream.of(ContentType.values()).map(ContentType::toString).toArray(String[]::new));
-		contentTypeClearButton = createButton(container, 
-				Messages.CapturedValueEditingPage_LABEL_CLEAR);
+		contentTypeClearButton = createButton(container, Messages.CapturedValueEditingPage_LABEL_CLEAR);
 		contentTypeClearButton.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 2, 0));
 
-		relationalKeyText = createTextInput(container, cols, 
-				Messages.CapturedValueEditingPage_LABEL_RELATIONAL_KEY,
+		relationalKeyText = createTextInput(container, cols, Messages.CapturedValueEditingPage_LABEL_RELATIONAL_KEY,
 				Messages.CapturedValueEditingPage_MESSAGE_RELATIONAL_KEY_DESCRIPTION);
 
-		converterText = createTextInput(container, cols, 
-				Messages.CapturedValueEditingPage_LABEL_CONVERTER,
+		converterText = createTextInput(container, cols, Messages.CapturedValueEditingPage_LABEL_CONVERTER,
 				Messages.CapturedValueEditingPage_MESSAGE_CONVERTER_DESCRIPTION);
 
 		return container;

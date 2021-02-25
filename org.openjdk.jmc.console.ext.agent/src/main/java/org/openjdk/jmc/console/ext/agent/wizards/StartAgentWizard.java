@@ -54,7 +54,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 
 public class StartAgentWizard extends Wizard {
-	
+
 	private final AgentJmxHelper helper;
 	private final StartAgentWizardPage startAgentWizardPage;
 
@@ -81,19 +81,15 @@ public class StartAgentWizard extends Wizard {
 			IEditorInput ei = new AgentEditorInput(helper.getServerHandle(), helper.getConnectionHandle(), helper);
 			window.getActivePage().openEditor(ei, AgentEditor.EDITOR_ID, true);
 		} catch (IllegalArgumentException e) {
-			DialogToolkit.showException(window.getShell(), 
-					Messages.StartAgentWizard_MESSAGE_FAILED_TO_START_AGENT,
-					Messages.StartAgentWizard_MESSAGE_INVALID_AGENT_CONFIG,
-					e);
+			DialogToolkit.showException(window.getShell(), Messages.StartAgentWizard_MESSAGE_FAILED_TO_START_AGENT,
+					Messages.StartAgentWizard_MESSAGE_INVALID_AGENT_CONFIG, e);
 			return false;
 		} catch (AttachNotSupportedException | IOException | AgentLoadException e) {
-			DialogToolkit.showException(window.getShell(),
-					Messages.StartAgentWizard_MESSAGE_FAILED_TO_START_AGENT,
+			DialogToolkit.showException(window.getShell(), Messages.StartAgentWizard_MESSAGE_FAILED_TO_START_AGENT,
 					Messages.StartAgentWizard_MESSAGE_UNEXPECTED_ERROR_HAS_OCCURRED, e);
 			return false;
 		} catch (AgentInitializationException e) {
-			DialogToolkit.showException(window.getShell(),
-					Messages.StartAgentWizard_MESSAGE_FAILED_TO_START_AGENT,
+			DialogToolkit.showException(window.getShell(), Messages.StartAgentWizard_MESSAGE_FAILED_TO_START_AGENT,
 					Messages.StartAgentWizard_MESSAGE_ACCESS_TO_UNSAFE_REQUIRED, e);
 			return false;
 		} catch (PartInitException e) {

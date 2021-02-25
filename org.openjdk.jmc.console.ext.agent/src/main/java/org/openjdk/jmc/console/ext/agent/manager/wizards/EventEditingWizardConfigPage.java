@@ -115,14 +115,11 @@ public class EventEditingWizardConfigPage extends BaseWizardPage {
 		layout.horizontalSpacing = 8;
 		container.setLayout(layout);
 
-		idText = createTextInput(container, cols, 
-				Messages.EventEditingWizardConfigPage_LABEL_ID, 
+		idText = createTextInput(container, cols, Messages.EventEditingWizardConfigPage_LABEL_ID,
 				Messages.EventEditingWizardConfigPage_MESSAGE_EVENT_ID);
-		nameText = createTextInput(container, cols, 
-				Messages.EventEditingWizardConfigPage_LABEL_NAME, 
+		nameText = createTextInput(container, cols, Messages.EventEditingWizardConfigPage_LABEL_NAME,
 				Messages.EventEditingWizardConfigPage_MESSAGE_NAME_OF_THE_EVENT);
-		descriptionText = createMultiTextInput(container, cols, 
-				Messages.EventEditingWizardConfigPage_LABEL_DESCRIPTION,
+		descriptionText = createMultiTextInput(container, cols, Messages.EventEditingWizardConfigPage_LABEL_DESCRIPTION,
 				Messages.EventEditingWizardConfigPage_MESSAGE_OPTIONAL_DESCRIPTION_OF_THIS_EVENT);
 
 		return container;
@@ -135,13 +132,11 @@ public class EventEditingWizardConfigPage extends BaseWizardPage {
 		layout.horizontalSpacing = 8;
 		container.setLayout(layout);
 
-		classText = createTextInput(container, cols, 
-				Messages.EventEditingWizardConfigPage_LABEL_CLASS, 
+		classText = createTextInput(container, cols, Messages.EventEditingWizardConfigPage_LABEL_CLASS,
 				Messages.EventEditingWizardConfigPage_MESSAGE_FULLY_QUALIFIED_CLASS_NAME);
-		Text[] receivers = createMultiInputTextInput(container, cols, 
+		Text[] receivers = createMultiInputTextInput(container, cols,
 				Messages.EventEditingWizardConfigPage_LABEL_METHOD,
-				new String[] {
-						Messages.EventEditingWizardConfigPage_MESSAGE_METHOD_NAME, 
+				new String[] {Messages.EventEditingWizardConfigPage_MESSAGE_METHOD_NAME,
 						Messages.EventEditingWizardConfigPage_MESSAGE_METHOD_DESCRIPTOR});
 
 		methodNameText = receivers[0];
@@ -157,19 +152,16 @@ public class EventEditingWizardConfigPage extends BaseWizardPage {
 		layout.horizontalSpacing = 8;
 		container.setLayout(layout);
 
-		pathText = createTextInput(container, cols, 
-				Messages.EventEditingWizardConfigPage_LABEL_PATH, 
+		pathText = createTextInput(container, cols, Messages.EventEditingWizardConfigPage_LABEL_PATH,
 				Messages.EventEditingWizardConfigPage_MESSAGE_PATH_TO_EVENT);
-		locationCombo = createComboInput(container, cols - 2, 
-				Messages.EventEditingWizardConfigPage_LABEL_LOCATION,
+		locationCombo = createComboInput(container, cols - 2, Messages.EventEditingWizardConfigPage_LABEL_LOCATION,
 				Stream.of(Location.values()).map(Location::toString).toArray(String[]::new));
-		locationClearButton = createButton(container, 
-				Messages.EventEditingWizardConfigPage_LABEL_CLEAR);
+		locationClearButton = createButton(container, Messages.EventEditingWizardConfigPage_LABEL_CLEAR);
 		locationClearButton.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 2, 0));
 
-		recordExceptionsButton = createCheckboxInput(container, cols, 
+		recordExceptionsButton = createCheckboxInput(container, cols,
 				Messages.EventEditingWizardConfigPage_LABEL_RECORD_EXCEPTIONS);
-		recordStackTraceButton = createCheckboxInput(container, cols, 
+		recordStackTraceButton = createCheckboxInput(container, cols,
 				Messages.EventEditingWizardConfigPage_LABEL_RECORD_STACK_TRACE);
 
 		return container;

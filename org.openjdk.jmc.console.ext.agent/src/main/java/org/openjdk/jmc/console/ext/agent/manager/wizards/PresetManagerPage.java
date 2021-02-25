@@ -108,8 +108,8 @@ public class PresetManagerPage extends BaseWizardPage {
 						}
 
 						IPreset preset = (IPreset) element;
-						return preset.getFileName() + " - " + preset.getEvents().length + " " +
-							Messages.PresetManagerPage_MESSAGE_EVENTS;
+						return preset.getFileName() + " - " + preset.getEvents().length + " "
+								+ Messages.PresetManagerPage_MESSAGE_EVENTS;
 					}
 
 					@Override
@@ -207,9 +207,8 @@ public class PresetManagerPage extends BaseWizardPage {
 
 			@Override
 			protected void onExportFileButtonSelected(IStructuredSelection selection) {
-				String[] files = openFileDialog(
-						Messages.PresetManagerPage_MESSAGE_EXPORT_PRESET_TO_A_FILE, new String[] {PRESET_XML_EXTENSION},
-						SWT.SAVE | SWT.SINGLE);
+				String[] files = openFileDialog(Messages.PresetManagerPage_MESSAGE_EXPORT_PRESET_TO_A_FILE,
+						new String[] {PRESET_XML_EXTENSION}, SWT.SAVE | SWT.SINGLE);
 				if (files == null || files.length == 0) {
 					return;
 				}

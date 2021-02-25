@@ -208,7 +208,7 @@ public abstract class BaseWizardPage extends WizardPage {
 			setErrorMessage(e.getLocalizedMessage());
 		} catch (Exception e) {
 			IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-			DialogToolkit.showException(window.getShell(), 
+			DialogToolkit.showException(window.getShell(),
 					Messages.BaseWizardPage_MESSAGE_UNEXPECTED_ERROR_HAS_OCCURRED, e);
 		}
 

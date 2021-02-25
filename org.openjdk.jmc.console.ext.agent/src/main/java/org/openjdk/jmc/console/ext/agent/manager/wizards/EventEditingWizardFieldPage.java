@@ -94,29 +94,29 @@ public class EventEditingWizardFieldPage extends BaseWizardPage {
 						| TableInspector.EDIT_BUTTON | TableInspector.DUPLICATE_BUTTON | TableInspector.REMOVE_BUTTON) {
 			@Override
 			protected void addColumns() {
-				addColumn(Messages.EventEditingWizardFieldPage_LABEL_NAME, 
-						Messages.EventEditingWizardFieldPage_ID_NAME, new FieldTableLabelProvider() {
-					@Override
-					protected String doGetText(IField field) {
-						return field.getName();
-					}
-				});
+				addColumn(Messages.EventEditingWizardFieldPage_LABEL_NAME, Messages.EventEditingWizardFieldPage_ID_NAME,
+						new FieldTableLabelProvider() {
+							@Override
+							protected String doGetText(IField field) {
+								return field.getName();
+							}
+						});
 
-				addColumn(Messages.EventEditingWizardFieldPage_LABEL_EXPRESSION, 
+				addColumn(Messages.EventEditingWizardFieldPage_LABEL_EXPRESSION,
 						Messages.EventEditingWizardFieldPage_ID_EXPRESSION, new FieldTableLabelProvider() {
-					@Override
-					protected String doGetText(IField field) {
-						return field.getExpression();
-					}
-				});
+							@Override
+							protected String doGetText(IField field) {
+								return field.getExpression();
+							}
+						});
 
-				addColumn(Messages.EventEditingWizardFieldPage_LABEL_DESCRIPTION, 
+				addColumn(Messages.EventEditingWizardFieldPage_LABEL_DESCRIPTION,
 						Messages.EventEditingWizardFieldPage_ID_DESCRIPTION, new FieldTableLabelProvider() {
-					@Override
-					protected String doGetText(IField field) {
-						return field.getDescription();
-					}
-				});
+							@Override
+							protected String doGetText(IField field) {
+								return field.getDescription();
+							}
+						});
 			}
 
 			@Override
@@ -128,7 +128,8 @@ public class EventEditingWizardFieldPage extends BaseWizardPage {
 						event.addField(field);
 					} catch (IllegalArgumentException e) {
 						if (DialogToolkit.openConfirmOnUiThread(
-								Messages.EventEditingWizardFieldPage_MESSAGE_UNABLE_TO_SAVE_THE_FIELD, e.getMessage())) {
+								Messages.EventEditingWizardFieldPage_MESSAGE_UNABLE_TO_SAVE_THE_FIELD,
+								e.getMessage())) {
 							continue;
 						}
 					}
@@ -149,7 +150,8 @@ public class EventEditingWizardFieldPage extends BaseWizardPage {
 						event.updateField(original, workingCopy);
 					} catch (IllegalArgumentException e) {
 						if (DialogToolkit.openConfirmOnUiThread(
-								Messages.EventEditingWizardFieldPage_MESSAGE_UNABLE_TO_SAVE_THE_FIELD, e.getMessage())) {
+								Messages.EventEditingWizardFieldPage_MESSAGE_UNABLE_TO_SAVE_THE_FIELD,
+								e.getMessage())) {
 							continue;
 						}
 					}

@@ -93,8 +93,7 @@ public class PresetEditingWizardConfigPage extends BaseWizardPage {
 		layout.horizontalSpacing = 8;
 		container.setLayout(layout);
 
-		fileNameText = createTextInput(container, cols, 
-				Messages.PresetEditingWizardConfigPage_LABEL_FILE_NAME,
+		fileNameText = createTextInput(container, cols, Messages.PresetEditingWizardConfigPage_LABEL_FILE_NAME,
 				Messages.PresetEditingWizardConfigPage_MESSAGE_NAME_OF_THE_SAVED_XML);
 
 		return container;
@@ -107,12 +106,11 @@ public class PresetEditingWizardConfigPage extends BaseWizardPage {
 		layout.horizontalSpacing = 8;
 		container.setLayout(layout);
 
-		classPrefixText = createTextInput(container, cols, 
-				Messages.PresetEditingWizardConfigPage_LABEL_CLASS_PREFIX,
+		classPrefixText = createTextInput(container, cols, Messages.PresetEditingWizardConfigPage_LABEL_CLASS_PREFIX,
 				Messages.PresetEditingWizardConfigPage_MESSAGE_PREFIX_ADDED_TO_GENERATED_EVENT_CLASSES);
-		allowToStringButton = createCheckboxInput(parent, cols, 
+		allowToStringButton = createCheckboxInput(parent, cols,
 				Messages.PresetEditingWizardConfigPage_LABEL_ALLOW_TO_STRING);
-		allowConverterButton = createCheckboxInput(parent, cols, 
+		allowConverterButton = createCheckboxInput(parent, cols,
 				Messages.PresetEditingWizardConfigPage_LABEL_ALLOW_CONVERTER);
 
 		return container;

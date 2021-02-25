@@ -45,7 +45,7 @@ import org.openjdk.jmc.console.ext.agent.AgentJmxHelper;
 import org.openjdk.jmc.ui.common.jvm.JVMDescriptor;
 
 public class StartAgentWizardPage extends BaseWizardPage {
-	
+
 	private static final String FILE_OPEN_JAR_EXTENSION = "*.jar"; // $NON-NLS-1$
 	private static final String FILE_OPEN_XML_EXTENSION = "*.xml"; // $NON-NLS-1$
 
@@ -109,8 +109,7 @@ public class StartAgentWizardPage extends BaseWizardPage {
 		layout.horizontalSpacing = 8;
 		container.setLayout(layout);
 
-		targetJvmText = createTextInput(container, cols,
-				Messages.StartAgentWizardPage_LABEL_TARGET_JVM, ""); // $NON-NLS-1$
+		targetJvmText = createTextInput(container, cols, Messages.StartAgentWizardPage_LABEL_TARGET_JVM, ""); // $NON-NLS-1$
 		targetJvmText.setEnabled(false);
 
 		return container;
@@ -123,16 +122,13 @@ public class StartAgentWizardPage extends BaseWizardPage {
 		layout.horizontalSpacing = 8;
 		container.setLayout(layout);
 
-		agentJarText = createTextInput(container, cols - 2,
-				Messages.StartAgentWizardPage_LABEL_AGENT_JAR,
+		agentJarText = createTextInput(container, cols - 2, Messages.StartAgentWizardPage_LABEL_AGENT_JAR,
 				Messages.StartAgentWizardPage_MESSAGE_PATH_TO_AN_AGENT_JAR);
 		agentJarText.setEditable(false);
-		agentJarBrowseButton = createButton(container,
-				Messages.StartAgentWizardPage_LABEL_BROWSE);
+		agentJarBrowseButton = createButton(container, Messages.StartAgentWizardPage_LABEL_BROWSE);
 		agentJarBrowseButton.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 2, 0));
 
-		agentXmlText = createTextInput(container, cols - 2,
-				Messages.StartAgentWizardPage_LABEL_AGENT_XML,
+		agentXmlText = createTextInput(container, cols - 2, Messages.StartAgentWizardPage_LABEL_AGENT_XML,
 				Messages.StartAgentWizardPage_MESSAGE_PATH_TO_AN_AGENT_CONFIG);
 		agentXmlText.setEditable(false);
 		agentXmlBrowseButton = createButton(container, Messages.StartAgentWizardPage_LABEL_BROWSE);
@@ -144,16 +140,14 @@ public class StartAgentWizardPage extends BaseWizardPage {
 	private void bindListeners() {
 		agentJarBrowseButton.addListener(SWT.Selection, e -> {
 			String[] path = openFileDialog(Messages.StartAgentWizardPage_DIALOG_BROWSER_FOR_AGENT_JAR,
-					new String[] {FILE_OPEN_JAR_EXTENSION},
-					SWT.OPEN | SWT.SINGLE);
+					new String[] {FILE_OPEN_JAR_EXTENSION}, SWT.OPEN | SWT.SINGLE);
 			if (path != null && path.length != 0) {
 				setText(agentJarText, path[0]);
 			}
 		});
 		agentXmlBrowseButton.addListener(SWT.Selection, e -> {
 			String[] path = openFileDialog(Messages.StartAgentWizardPage_DIALOG_BROWSER_FOR_AGENT_CONFIG,
-					new String[] {FILE_OPEN_XML_EXTENSION},
-					SWT.OPEN | SWT.SINGLE);
+					new String[] {FILE_OPEN_XML_EXTENSION}, SWT.OPEN | SWT.SINGLE);
 			if (path != null && path.length != 0) {
 				setText(agentXmlText, path[0]);
 			}
