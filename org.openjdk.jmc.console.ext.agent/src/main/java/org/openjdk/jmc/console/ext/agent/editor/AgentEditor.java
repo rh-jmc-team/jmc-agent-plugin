@@ -2,6 +2,9 @@ package org.openjdk.jmc.console.ext.agent.editor;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.action.IToolBarManager;
+import org.eclipse.jface.action.GroupMarker;
+import org.eclipse.jface.action.IContributionItem;
+import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.dialogs.ProgressIndicator;
 import org.eclipse.swt.SWT;
@@ -11,9 +14,12 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
+import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.forms.widgets.Form;
 import org.eclipse.ui.forms.widgets.FormToolkit;
+import org.eclipse.ui.internal.WorkbenchWindow;
 import org.eclipse.ui.part.EditorPart;
 import org.openjdk.jmc.console.ext.agent.messages.internal.Messages;
 import org.openjdk.jmc.flightrecorder.ui.FlightRecorderUI;
@@ -25,6 +31,7 @@ import org.openjdk.jmc.ui.misc.CompositeToolkit;
 
 import java.util.stream.Stream;
 
+//TODO: remove the @SuppressWarnings once IWorkbenchActionConstants.FIND_EXT is added to ApplicationActionBarAdvisor in JMC
 public class AgentEditor extends EditorPart implements IConnectionListener {
 	public static final String EDITOR_ID = "org.openjdk.jmc.console.ext.agent.editor.AgentEditor"; //$NON-NLS-1$
 
@@ -78,6 +85,20 @@ public class AgentEditor extends EditorPart implements IConnectionListener {
 
 		try {
 			getAgentEditorInput();
+
+			// TODO: move the addition of this ContributionItem to ApplicationActionBarAdvisor in JMC when integrating to main repository
+			((WorkbenchWindow) PlatformUI.getWorkbench().getActiveWorkbenchWindow()).getMenuBarManager().getItems();
+			for (IContributionItem m : ((WorkbenchWindow) PlatformUI.getWorkbench().getActiveWorkbenchWindow())
+					.getMenuBarManager().getItems()) {
+				if (m.getId().equals(IWorkbenchActionConstants.M_EDIT)) {
+					MenuManager mm = ((MenuManager) m);
+					if (mm.indexOf(IWorkbenchActionConstants.FIND_EXT) == -1) {
+						mm.add(new GroupMarker(IWorkbenchActionConstants.FIND_EXT));
+						mm.update(true);
+						break;
+					}
+				}
+			}
 		} catch (Exception e) {
 			throw new PartInitException(e.getMessage(), e);
 		}
