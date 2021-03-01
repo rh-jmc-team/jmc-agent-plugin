@@ -92,15 +92,15 @@ index a2d52be..4d0015e 100644
  		<module>tests</module>
  		<module>coverage</module>
 diff --git a/configuration/spotbugs/spotbugs-exclude.xml b/configuration/spotbugs/spotbugs-exclude.xml
-index 97a251c..bc50f52 100644
+index 97a251c4..9ab4df29 100644
 --- a/configuration/spotbugs/spotbugs-exclude.xml
 +++ b/configuration/spotbugs/spotbugs-exclude.xml
-@@ -32,6 +32,109 @@
+@@ -32,6 +32,112 @@
     WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  -->
  <FindBugsFilter>
-+	<!-- copied from jmc-agent-plugin -->
-+	<Match>
++    <!-- copied from jmc-agent-plugin -->
++    <Match>
 +		<Class name="org.openjdk.jmc.console.ext.agent.AgentJmxHelper"/>
 +		<Method name="retrieveCurrentTransforms"/>
 +		<Bug pattern="PZLA_PREFER_ZERO_LENGTH_ARRAYS"/>
@@ -161,11 +161,11 @@ index 97a251c..bc50f52 100644
 +		<Bug pattern="DC_DOUBLECHECK" />
 +	</Match>
 +	<!-- This is a false positive. Eclipse handles initialization of critical components elsewhere -->
-+    	<Match>
-+    		<Class name="org.openjdk.jmc.console.ext.agent.editor.AgentEditor" />
-+    		<Bug pattern="UWF_FIELD_NOT_INITIALIZED_IN_CONSTRUCTOR" />
-+   	</Match>
-+    	<Match>
++    <Match>
++		<Class name="org.openjdk.jmc.console.ext.agent.editor.AgentEditor" />
++		<Bug pattern="UWF_FIELD_NOT_INITIALIZED_IN_CONSTRUCTOR" />
++    </Match>
++    <Match>
 +		<Class name="org.openjdk.jmc.console.ext.agent.raweditor.internal.NonRuleBasedDamagerRepairer"/>
 +		<Method name="endOfLineOf"/>
 +		<Bug pattern="UWF_FIELD_NOT_INITIALIZED_IN_CONSTRUCTOR"/>
@@ -191,24 +191,20 @@ index 97a251c..bc50f52 100644
 +    <!-- There is a blanket exclude on these types of bugs in JMC.
 +     in UI classes the memory overhead is minimal and reworking it isn't really worth it -->
 +    <Match>
-+    	<Class name="org.openjdk.jmc.console.ext.agent.editor.sections.EventDetailSection" />
-+    	<Bug pattern="SIC_INNER_SHOULD_BE_STATIC_ANON" />
++		<Class name="org.openjdk.jmc.console.ext.agent.editor.sections.EventDetailSection" />
++		<Bug pattern="SIC_INNER_SHOULD_BE_STATIC_ANON" />
 +    </Match>
 +    <Match>
-+    	<Class name="org.openjdk.jmc.console.ext.agent.editor.sections.EventListSection" />
-+    	<Bug pattern="SIC_INNER_SHOULD_BE_STATIC_ANON" />
++		<Class name="org.openjdk.jmc.console.ext.agent.editor.sections.EventListSection" />
++		<Bug pattern="SIC_INNER_SHOULD_BE_STATIC_ANON" />
 +    </Match>
 +    <Match>
-+    	<Class name="org.openjdk.jmc.console.ext.agent.editor.sections.GlobalConfigSection" />
-+    	<Bug pattern="SIC_INNER_SHOULD_BE_STATIC_ANON" />
++		<Class name="org.openjdk.jmc.console.ext.agent.editor.sections.GlobalConfigSection" />
++		<Bug pattern="SIC_INNER_SHOULD_BE_STATIC_ANON" />
++    </Match>
++    <Match>
++		<Class name="org.openjdk.jmc.console.ext.agent.actions.AgentEditorOpener$ConnectJob" />
 +    </Match>
      <!-- Skip I18n -->
      <Match>
          <Bug pattern="DM_DEFAULT_ENCODING"/>
-@@ -1138,4 +1241,4 @@
- 		<Class name="org.openjdk.jmc.rjmx.subscription.internal.EvilMethodsClass"/>
- 	</Match>
- 		
--</FindBugsFilter>
-\ No newline at end of file
-+</FindBugsFilter>
