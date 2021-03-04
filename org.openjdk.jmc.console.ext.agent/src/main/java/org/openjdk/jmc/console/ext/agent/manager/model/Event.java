@@ -65,7 +65,7 @@ public class Event implements IEvent {
 	private static final Pattern COUNT_SUFFIX_PATTERN = Pattern.compile("^\\s*\\((\\d+)\\)$"); // $NON-NLS-1$
 
 	private static final String XML_TAG_EVENT = "event"; // $NON-NLS-1$
-	private static final String XML_TAG_NAME = "name"; // $NON-NLS-1$
+	private static final String XML_TAG_NAME = "label"; // $NON-NLS-1$
 	private static final String XML_TAG_DESCRIPTION = "description"; // $NON-NLS-1$
 	private static final String XML_TAG_CLASS = "class"; // $NON-NLS-1$
 	private static final String XML_TAG_PATH = "path"; // $NON-NLS-1$
@@ -80,6 +80,7 @@ public class Event implements IEvent {
 	private static final String XML_TAG_FIELD = "field"; // $NON-NLS-1$
 	private static final String XML_TAG_RETURN_VALUE = "returnvalue"; // $NON-NLS-1$
 	private static final String XML_ATTRIBUTE_ID = "id"; // $NON-NLS-1$
+	private static final String XML_TAG_METHOD_NAME = "name"; // $NON-NLS-1$
 
 	private final Preset preset;
 	private final List<IMethodParameter> parameters = new ArrayList<>();
@@ -145,7 +146,7 @@ public class Event implements IEvent {
 		}
 
 		Element methodElement = getFirstDirectChildElementByTagName(element, XML_TAG_METHOD);
-		methodName = getFirstDirectChildElementByTagName(methodElement, XML_TAG_NAME).getTextContent();
+		methodName = getFirstDirectChildElementByTagName(methodElement, XML_TAG_METHOD_NAME).getTextContent();
 		methodDescriptor = getFirstDirectChildElementByTagName(methodElement, XML_TAG_DESCRIPTOR).getTextContent();
 
 		Element parametersElement = getFirstDirectChildElementByTagName(methodElement, XML_TAG_PARAMETERS);
@@ -173,7 +174,7 @@ public class Event implements IEvent {
 	private Element buildMethodElement(Document document) {
 		Element methodElement = document.createElement(XML_TAG_METHOD);
 		{
-			Element methodNameElement = document.createElement(XML_TAG_NAME);
+			Element methodNameElement = document.createElement(XML_TAG_METHOD_NAME);
 			methodNameElement.setTextContent(methodName);
 			methodElement.appendChild(methodNameElement);
 
