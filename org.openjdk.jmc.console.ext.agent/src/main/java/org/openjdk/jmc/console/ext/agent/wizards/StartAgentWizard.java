@@ -84,7 +84,11 @@ public class StartAgentWizard extends Wizard {
 			DialogToolkit.showException(window.getShell(), Messages.StartAgentWizard_MESSAGE_FAILED_TO_START_AGENT,
 					Messages.StartAgentWizard_MESSAGE_INVALID_AGENT_CONFIG, e);
 			return false;
-		} catch (AttachNotSupportedException | IOException | AgentLoadException e) {
+		} catch (AgentLoadException e) {
+			DialogToolkit.showException(window.getShell(), Messages.StartAgentWizard_MESSAGE_FAILED_TO_START_AGENT,
+					Messages.StartAgentWizard_MESSAGE_FAILED_TO_LOAD_AGENT, e);
+			return false;
+		} catch (AttachNotSupportedException | IOException e) {
 			DialogToolkit.showException(window.getShell(), Messages.StartAgentWizard_MESSAGE_FAILED_TO_START_AGENT,
 					Messages.StartAgentWizard_MESSAGE_UNEXPECTED_ERROR_HAS_OCCURRED, e);
 			return false;
