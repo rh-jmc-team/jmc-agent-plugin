@@ -180,6 +180,7 @@ public class Messages extends NLS {
 	public static String StartAgentWizard_MESSAGE_INVALID_AGENT_CONFIG;
 	public static String StartAgentWizard_MESSAGE_ACCESS_TO_UNSAFE_REQUIRED;
 	public static String StartAgentWizard_WIZARD_FINISH_BUTTON_TEXT;
+	public static String StartAgentWizard_MESSAGE_FAILED_TO_LOAD_AGENT;
 	public static String StartAgentWizardPage_PAGE_NAME;
 	public static String StartAgentWizardPage_MESSAGE_START_AGENT_WIZARD_PAGE_TITLE;
 	public static String StartAgentWizardPage_MESSAGE_START_AGENT_WIZARD_PAGE_DESCRIPTION;
