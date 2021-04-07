@@ -50,16 +50,17 @@ import org.openjdk.jmc.ui.common.util.AdapterUtil;
 import org.openjdk.jmc.ui.idesupport.ObjectContributionMenuSelectionListener;
 
 public class CreateMethodProbeHandler extends ObjectContributionMenuSelectionListener {
-	
+
 	private static Logger logger = Logger.getLogger(CreateMethodProbeHandler.class.getName());
-	
+
 	@Override
 	public void execute(ISelection selection) {
 		if (selection instanceof IStructuredSelection && !selection.isEmpty()) {
 			IStructuredSelection structuredSelection = (IStructuredSelection) selection;
 			// This should only ever be called on an IMCFrame or IMCMethod, might not hurt to add an assertion here.
 			if (structuredSelection.getFirstElement() instanceof IMCMethod) {
-				IMCMethod method = AdapterUtil.getAdapter(((IStructuredSelection) selection).getFirstElement(), IMCMethod.class);
+				IMCMethod method = AdapterUtil.getAdapter(((IStructuredSelection) selection).getFirstElement(),
+						IMCMethod.class);
 				createMethodProbe(method);
 			} else if (structuredSelection.getFirstElement() instanceof StacktraceFrame) {
 				StacktraceFrame frame = (StacktraceFrame) structuredSelection.getFirstElement();
@@ -67,7 +68,7 @@ public class CreateMethodProbeHandler extends ObjectContributionMenuSelectionLis
 			}
 		}
 	}
-	
+
 	private void createMethodProbe(IMCMethod method) {
 		PresetRepository repository = PresetRepositoryFactory.createSingleton();
 		IPreset preset = repository.createPreset();
