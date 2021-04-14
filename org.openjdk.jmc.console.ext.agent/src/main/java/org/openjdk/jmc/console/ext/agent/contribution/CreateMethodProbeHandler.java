@@ -37,8 +37,11 @@ package org.openjdk.jmc.console.ext.agent.contribution;
 import java.io.IOException;
 import java.util.logging.Logger;
 
+import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Shell;
 import org.openjdk.jmc.common.IMCMethod;
 import org.openjdk.jmc.console.ext.agent.manager.model.IEvent;
 import org.openjdk.jmc.console.ext.agent.manager.model.IEvent.Location;
@@ -73,17 +76,27 @@ public class CreateMethodProbeHandler extends ObjectContributionMenuSelectionLis
 		PresetRepository repository = PresetRepositoryFactory.createSingleton();
 		IPreset preset = repository.createPreset();
 		IEvent event = preset.createEvent();
+		preset.setFileName(method.getMethodName() + ".xml"); //$NON-NLS-1$
 		event.setMethodName(method.getMethodName());
 		event.setMethodDescriptor(method.getFormalDescriptor());
 		event.setClazz(method.getType().getFullName());
 		event.setLocation(Location.WRAP);
 		preset.addEvent(event);
+		openUserDialog(preset);
 		preset.save();
 		try {
 			repository.addPreset(preset);
 		} catch (IOException e) {
 			logger.severe(e.toString());
 		}
+	}
+
+	private void openUserDialog(IPreset preset) {
+		Shell shell = Display.getCurrent().getActiveShell();
+		Dialog dialog = CreateMethodProbeDialog.create(shell, preset);
+		// Make sure we get the preset name before saving it
+		dialog.setBlockOnOpen(true);
+		dialog.open();
 	}
 
 }
